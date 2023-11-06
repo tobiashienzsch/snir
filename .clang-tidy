@@ -6,6 +6,7 @@ Checks: >
   *-,
   boost-*,
   bugprone-*,
+  -bugprone-exception-escape,
 
   cert-*,
   -cert-err33-c,

@@ -7,8 +7,11 @@
 #include "snir/PassManager.hpp"
 #include "snir/PrettyPrinter.hpp"
 
-auto main() -> int
+namespace {
+
+auto testPassManager() -> void
 {
+
     auto nan = snir::Function{
         .type = snir::Type::Double,
         .name = "nan",
@@ -123,6 +126,10 @@ auto main() -> int
     pm(nan);
     pm(sin);
     pm(ipow);
+}
+
+auto testParser() -> void
+{
 
     auto const* const text = R"(
 define double @nan() {
@@ -149,6 +156,13 @@ define i64 @ipow(i64 %0, i64 %1) {
 
     auto parser       = snir::Parser{};
     auto const module = parser(text);
+}
 
+}  // namespace
+
+auto main() -> int
+{
+    testPassManager();
+    testParser();
     return 0;
 }
