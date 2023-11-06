@@ -1,0 +1,9 @@
+# Editors
+.atom
+.idea
+.vs
+.vscode
+
+# CMake
+/build
+/cmake-build-*
