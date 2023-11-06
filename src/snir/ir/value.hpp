@@ -7,15 +7,15 @@
 
 namespace snir {
 
-using Operand = std::variant<Register, bool, int, float, double>;
+using Value = std::variant<Register, bool, int, float, double>;
 
 }  // namespace snir
 
 template<>
-struct std::formatter<snir::Operand, char> : formatter<string_view, char>
+struct std::formatter<snir::Value, char> : formatter<string_view, char>
 {
     template<typename FormatContext>
-    auto format(snir::Operand op, FormatContext& fc) const
+    auto format(snir::Value op, FormatContext& fc) const
     {
         auto str = visit([](auto v) { return std::format("{}", v); }, op);
         return formatter<string_view, char>::format(str, fc);

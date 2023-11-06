@@ -60,7 +60,7 @@ auto testPassManager() -> void
                     },
                     snir::ReturnInst{
                         .type = snir::Type::Double,
-                        .operand = snir::Register{5},
+                        .value = snir::Register{5},
                     },
                 },
             },
@@ -80,11 +80,11 @@ auto testPassManager() -> void
                     snir::TruncInst{
                         .type = snir::Type::Float,
                         .destination = snir::Register{2},
-                        .operand = snir::Register{1},
+                        .value = snir::Register{1},
                     },
                     snir::ReturnInst{
                         .type = snir::Type::Float,
-                        .operand = snir::Register{2},
+                        .value = snir::Register{2},
                     },
                 },
             },
@@ -103,7 +103,7 @@ auto testPassManager() -> void
                     },
                     snir::ReturnInst{
                         .type = snir::Type::Int64,
-                        .operand = snir::Register{2},
+                        .value = snir::Register{2},
                     },
                 },
             },

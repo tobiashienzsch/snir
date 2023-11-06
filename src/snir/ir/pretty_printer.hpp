@@ -80,14 +80,14 @@ struct PrettyPrinter
             "  {} = {} {} as {}",
             trunc.destination,
             snir::TruncInst::name,
-            trunc.operand,
+            trunc.value,
             trunc.type
         );
     }
 
     auto operator()(snir::ReturnInst const& ret) -> void
     {
-        println(_out, "  {} {}", snir::ReturnInst::name, ret.operand);
+        println(_out, "  {} {}", snir::ReturnInst::name, ret.value);
     }
 
 private:

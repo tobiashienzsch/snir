@@ -1,9 +1,9 @@
 #pragma once
 
 #include "snir/ir/instructions.hpp"
-#include "snir/ir/operand.hpp"
 #include "snir/ir/register.hpp"
 #include "snir/ir/type.hpp"
+#include "snir/ir/value.hpp"
 
 #include <array>
 
@@ -29,15 +29,15 @@ struct Instruction
         return std::visit(std::forward<Visitor>(visitor), _holder);
     }
 
-    [[nodiscard]] auto getOperands() const -> std::array<std::optional<Operand>, 2>
+    [[nodiscard]] auto getOperands() const -> std::array<std::optional<Value>, 2>
     {
         return visit([]<typename T>(T const& i) {
             if constexpr (T::args == 2) {
-                return std::array<std::optional<Operand>, 2>{i.lhs, i.rhs};
+                return std::array<std::optional<Value>, 2>{i.lhs, i.rhs};
             } else if constexpr (std::same_as<T, TruncInst> or std::same_as<T, ReturnInst>) {
-                return std::array<std::optional<Operand>, 2>{i.operand, std::nullopt};
+                return std::array<std::optional<Value>, 2>{i.value, std::nullopt};
             } else {
-                return std::array<std::optional<Operand>, 2>{};
+                return std::array<std::optional<Value>, 2>{};
             }
         });
     }

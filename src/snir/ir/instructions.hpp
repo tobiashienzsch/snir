@@ -1,9 +1,9 @@
 #pragma once
 
 #include "snir/ir/literal.hpp"
-#include "snir/ir/operand.hpp"
 #include "snir/ir/register.hpp"
 #include "snir/ir/type.hpp"
+#include "snir/ir/value.hpp"
 
 #include <string_view>
 
@@ -32,7 +32,7 @@ struct TruncInst
 
     Type type;
     Register destination;
-    Operand operand;
+    Value value;
 };
 
 struct AddInst
@@ -42,8 +42,8 @@ struct AddInst
 
     Type type;
     Register destination;
-    Operand lhs;
-    Operand rhs;
+    Value lhs;
+    Value rhs;
 };
 
 struct SubInst
@@ -53,8 +53,8 @@ struct SubInst
 
     Type type;
     Register destination;
-    Operand lhs;
-    Operand rhs;
+    Value lhs;
+    Value rhs;
 };
 
 struct MulInst
@@ -64,8 +64,8 @@ struct MulInst
 
     Type type;
     Register destination;
-    Operand lhs;
-    Operand rhs;
+    Value lhs;
+    Value rhs;
 };
 
 struct DivInst
@@ -75,8 +75,8 @@ struct DivInst
 
     Type type;
     Register destination;
-    Operand lhs;
-    Operand rhs;
+    Value lhs;
+    Value rhs;
 };
 
 struct ModInst
@@ -86,8 +86,8 @@ struct ModInst
 
     Type type;
     Register destination;
-    Operand lhs;
-    Operand rhs;
+    Value lhs;
+    Value rhs;
 };
 
 struct FloatAddInst
@@ -97,8 +97,8 @@ struct FloatAddInst
 
     Type type;
     Register destination;
-    Operand lhs;
-    Operand rhs;
+    Value lhs;
+    Value rhs;
 };
 
 struct FloatSubInst
@@ -108,8 +108,8 @@ struct FloatSubInst
 
     Type type;
     Register destination;
-    Operand lhs;
-    Operand rhs;
+    Value lhs;
+    Value rhs;
 };
 
 struct FloatMulInst
@@ -119,8 +119,8 @@ struct FloatMulInst
 
     Type type;
     Register destination;
-    Operand lhs;
-    Operand rhs;
+    Value lhs;
+    Value rhs;
 };
 
 struct FloatDivInst
@@ -130,8 +130,8 @@ struct FloatDivInst
 
     Type type;
     Register destination;
-    Operand lhs;
-    Operand rhs;
+    Value lhs;
+    Value rhs;
 };
 
 struct FloatModInst
@@ -141,8 +141,8 @@ struct FloatModInst
 
     Type type;
     Register destination;
-    Operand lhs;
-    Operand rhs;
+    Value lhs;
+    Value rhs;
 };
 
 struct ShiftLeftInst
@@ -152,8 +152,8 @@ struct ShiftLeftInst
 
     Type type;
     Register destination;
-    Operand lhs;
-    Operand rhs;
+    Value lhs;
+    Value rhs;
 };
 
 struct ShiftRightInst
@@ -163,8 +163,8 @@ struct ShiftRightInst
 
     Type type;
     Register destination;
-    Operand lhs;
-    Operand rhs;
+    Value lhs;
+    Value rhs;
 };
 
 struct AndInst
@@ -174,8 +174,8 @@ struct AndInst
 
     Type type;
     Register destination;
-    Operand lhs;
-    Operand rhs;
+    Value lhs;
+    Value rhs;
 };
 
 struct OrInst
@@ -185,8 +185,8 @@ struct OrInst
 
     Type type;
     Register destination;
-    Operand lhs;
-    Operand rhs;
+    Value lhs;
+    Value rhs;
 };
 
 struct XorInst
@@ -196,8 +196,8 @@ struct XorInst
 
     Type type;
     Register destination;
-    Operand lhs;
-    Operand rhs;
+    Value lhs;
+    Value rhs;
 };
 
 struct ReturnInst
@@ -206,7 +206,7 @@ struct ReturnInst
     static constexpr auto args = 1;
 
     Type type;
-    Operand operand;
+    Value value;
 };
 
 }  // namespace snir
