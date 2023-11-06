@@ -1,44 +1,32 @@
+# Remove in future
+# cert-err33-c = Return of fprintf
+# cert-dcl58-cpp = Adding stuff to std
+# *-vararg = printf and friends
 Checks: >
   *-,
-
   boost-*,
-
   bugprone-*,
-  -bugprone-macro-parentheses,
-
 
   cert-*,
-  -cert-err58-cpp,
-  -cert-oop54-cpp,
+  -cert-err33-c,
+  -cert-dcl58-cpp,
 
   clang-analyzer-*,
   clang-diagnostics-*,
-
   concurrency-*,
-
   cppcoreguidelines-*,
-  -cppcoreguidelines-avoid-magic-numbers,
-  -cppcoreguidelines-avoid-const-or-ref-data-members,
-  -cppcoreguidelines-pro-bounds-constant-array-index,
-  -cppcoreguidelines-pro-bounds-pointer-arithmetic,
-
   hicpp-*,
-
   misc-*,
-
   modernize-*,
-
   performance-*,
 
   readability-*,
   readability-identifier-naming,
-  -readability-const-return-type,
   -readability-identifier-length,
-  -readability-magic-numbers,
 
-  -*-named-parameter,
+  -*-magic-numbers,
   -*-non-private-member-variables-in-classes,
-  -*-special-member-functions,
+  -*-vararg,
 
 WarningsAsErrors: "*"
 FormatStyle: none

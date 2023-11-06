@@ -105,8 +105,8 @@ auto main() -> int
             },
     };
 
-    auto o0 = std::fopen("snir_O0.ll", "w");
-    auto o1 = std::fopen("snir_O1.ll", "w");
+    auto* o0 = std::fopen("snir_O0.ll", "w");
+    auto* o1 = std::fopen("snir_O1.ll", "w");
 
     auto opt = snir::PassManager{true};
     opt.add(snir::DeadStoreElimination{});
@@ -126,7 +126,7 @@ auto main() -> int
     std::fclose(o0);
     std::fclose(o1);
 
-    auto const text = R"(
+    auto const* const text = R"(
 define double @nan() {
 0:
   %3 = double 2

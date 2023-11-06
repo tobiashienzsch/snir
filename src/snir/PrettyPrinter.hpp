@@ -69,12 +69,18 @@ struct PrettyPrinter
 
     auto operator()(snir::TruncInst const& trunc) -> void
     {
-        writeln("  {} = {} {} as {}", trunc.destination, trunc.name, trunc.operand, trunc.type);
+        writeln(
+            "  {} = {} {} as {}",
+            trunc.destination,
+            snir::TruncInst::name,
+            trunc.operand,
+            trunc.type
+        );
     }
 
     auto operator()(snir::ReturnInst const& ret) -> void
     {
-        writeln("  {} {}", ret.name, ret.operand);
+        writeln("  {} {}", snir::ReturnInst::name, ret.operand);
     }
 
 private:

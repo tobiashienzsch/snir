@@ -10,22 +10,24 @@ namespace snir {
 struct Instruction
 {
     template<typename Inst>
-    Instruction(Inst&& inst) : holder(std::forward<Inst>(inst))
+        requires(not std::same_as<Inst, Instruction>)
+    // NOLINTNEXTLINE(hicpp-explicit-conversions, bugprone-forwarding-reference-overload)
+    explicit(false) Instruction(Inst&& inst) : _holder(std::forward<Inst>(inst))
     {}
 
     template<typename Visitor>
     auto visit(Visitor&& visitor)
     {
-        return std::visit(std::forward<Visitor>(visitor), holder);
+        return std::visit(std::forward<Visitor>(visitor), _holder);
     }
 
     template<typename Visitor>
     auto visit(Visitor&& visitor) const
     {
-        return std::visit(std::forward<Visitor>(visitor), holder);
+        return std::visit(std::forward<Visitor>(visitor), _holder);
     }
 
-    auto getOperands() const -> std::array<std::optional<Operand>, 2>
+    [[nodiscard]] auto getOperands() const -> std::array<std::optional<Operand>, 2>
     {
         return visit([]<typename T>(T const& i) {
             if constexpr (T::args == 2) {
@@ -38,20 +40,20 @@ struct Instruction
         });
     }
 
-    auto getOperandRegisters() const -> std::array<std::optional<Register>, 2>
+    [[nodiscard]] auto getOperandRegisters() const -> std::array<std::optional<Register>, 2>
     {
         auto const operands = getOperands();
         auto registers      = std::array<std::optional<Register>, 2>{};
         for (auto i{0U}; i < operands.size(); ++i) {
-            auto const op = operands[i].value_or(false);
-            if (auto* reg = std::get_if<Register>(&op); reg != nullptr) {
-                registers[i] = *reg;
+            auto const op = operands.at(i).value_or(false);
+            if (auto const* reg = std::get_if<Register>(&op); reg != nullptr) {
+                registers.at(i) = *reg;
             }
         }
         return registers;
     }
 
-    auto getDestinationRegister() const -> std::optional<Register>
+    [[nodiscard]] auto getDestinationRegister() const -> std::optional<Register>
     {
         return visit([]<typename T>(T const& i) -> std::optional<Register> {
             if constexpr (requires { T::destination; }) {
@@ -82,7 +84,7 @@ private:
         XorInst,
         ReturnInst>;
 
-    Holder holder;
+    Holder _holder;
 };
 
 }  // namespace snir

@@ -38,7 +38,7 @@ struct DeadStoreElimination
 
     auto operator()(Function& f) -> void
     {
-        used.clear();
+        _used.clear();
         for (auto block = std::rbegin(f.blocks); block != std::rend(f.blocks); ++block) {
             std::transform(
                 std::rbegin(*block),
@@ -53,20 +53,20 @@ private:
     auto replaceWithNopIfUnused(Instruction const& inst) -> Instruction
     {
         auto const destination = inst.getDestinationRegister();
-        if (destination and not used.contains(*destination)) {
+        if (destination and not _used.contains(*destination)) {
             return NopInst{};
         }
 
         for (auto const reg : inst.getOperandRegisters()) {
             if (reg) {
-                used.insert(*reg);
+                _used.insert(*reg);
             }
         }
 
         return inst;
     }
 
-    std::set<Register> used;
+    std::set<Register> _used;
 };
 
 }  // namespace snir

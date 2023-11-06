@@ -44,7 +44,7 @@ struct std::formatter<snir::Type, char> : std::formatter<std::string_view, char>
             std::string_view{"event"},
         };
 
-        auto str = names[static_cast<std::size_t>(type)];
+        auto str = names.at(static_cast<std::size_t>(type));
         return std::formatter<std::string_view, char>::format(str, fc);
     }
 };

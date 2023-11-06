@@ -33,9 +33,17 @@ struct PassManager
 private:
     struct PassInterface
     {
-        virtual ~PassInterface()                    = default;
-        virtual auto getName() const -> std::string = 0;
-        virtual auto run(Function& func) -> void    = 0;
+        PassInterface()          = default;
+        virtual ~PassInterface() = default;
+
+        PassInterface(PassInterface const&)                    = delete;
+        auto operator=(PassInterface const&) -> PassInterface& = delete;
+
+        PassInterface(PassInterface&&)                    = delete;
+        auto operator=(PassInterface&&) -> PassInterface& = delete;
+
+        [[nodiscard]] virtual auto getName() const -> std::string = 0;
+        virtual auto run(Function& func) -> void                  = 0;
     };
 
     template<typename Type>
@@ -43,7 +51,7 @@ private:
     {
         explicit Pass(Type p) : _pass(std::move(p)) {}
 
-        auto getName() const -> std::string override
+        [[nodiscard]] auto getName() const -> std::string override
         {
             if constexpr (requires { Type::name; }) {
                 return std::string{Type::name};
