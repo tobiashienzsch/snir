@@ -1,7 +1,7 @@
 #pragma once
 
-#include "Instructions.hpp"
-#include "Types.hpp"
+#include "snir/instructions.hpp"
+#include "snir/types.hpp"
 
 #include <array>
 

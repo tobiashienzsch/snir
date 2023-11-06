@@ -1,6 +1,6 @@
-#include "Parser.hpp"
+#include "parser.hpp"
 
-#include "Print.hpp"
+#include "snir/print.hpp"
 
 #include <regex>
 

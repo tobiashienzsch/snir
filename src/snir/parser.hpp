@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Function.hpp"
+#include "snir/function.hpp"
 
 #include <string>
 

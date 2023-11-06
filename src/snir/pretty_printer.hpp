@@ -1,6 +1,6 @@
 #pragma once
 
-#include "PassManager.hpp"
+#include "snir/print.hpp"
 
 #include <algorithm>
 #include <functional>

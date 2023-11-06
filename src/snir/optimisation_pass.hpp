@@ -1,7 +1,7 @@
 #pragma once
 
-#include "Function.hpp"
-#include "Instruction.hpp"
+#include "snir/function.hpp"
+#include "snir/instruction.hpp"
 
 #include <algorithm>
 #include <set>
