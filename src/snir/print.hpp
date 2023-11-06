@@ -9,8 +9,11 @@ namespace snir {
 template<typename... Args>
 inline auto print(std::FILE* out, std::format_string<Args...> fmt, Args&&... args) -> void
 {
-    auto str = std::format(fmt, std::forward<Args>(args)...);
-    std::fwrite(str.c_str(), sizeof(char), str.size(), out);
+    auto const str     = std::format(fmt, std::forward<Args>(args)...);
+    auto const written = std::fwrite(str.c_str(), sizeof(char), str.size(), out);
+    if (written != str.size()) {
+        throw std::runtime_error{"failed to write to file"};
+    }
 }
 
 template<typename... Args>

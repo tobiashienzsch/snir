@@ -1,10 +1,15 @@
 #include "file.hpp"
 
+#include <stdexcept>
+
 namespace snir {
 
 auto FileClose::operator()(std::FILE* file) -> void
 {
-    std::fclose(file);  // NOLINT(cppcoreguidelines-owning-memory)
+    // NOLINTNEXTLINE(cppcoreguidelines-owning-memory)
+    if (auto const result = std::fclose(file); result != 0) {
+        throw std::runtime_error{"failed to close file"};
+    }
 }
 
 auto openFile(std::filesystem::path const& path, char const* mode) -> File

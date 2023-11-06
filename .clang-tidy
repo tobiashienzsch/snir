@@ -1,7 +1,4 @@
-# Remove in future
-# cert-err33-c = Return of fprintf
-# cert-dcl58-cpp = Adding stuff to std
-# *-vararg = printf and friends
+# cert-dcl58-cpp = modification of 'std' namespace (fails for std::formatter)
 Checks: >
   *-,
   boost-*,
@@ -9,7 +6,6 @@ Checks: >
   -bugprone-exception-escape,
 
   cert-*,
-  -cert-err33-c,
   -cert-dcl58-cpp,
 
   clang-analyzer-*,
