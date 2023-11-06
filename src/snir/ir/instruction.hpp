@@ -1,6 +1,8 @@
 #pragma once
 
 #include "snir/ir/instructions.hpp"
+#include "snir/ir/operand.hpp"
+#include "snir/ir/register.hpp"
 #include "snir/ir/types.hpp"
 
 #include <array>
