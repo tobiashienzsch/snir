@@ -2,9 +2,11 @@
 #include "snir/ir/instruction.hpp"
 #include "snir/ir/instructions.hpp"
 #include "snir/ir/parser.hpp"
+#include "snir/ir/pass/dead_store_elimination.hpp"
+#include "snir/ir/pass/remove_empty_block.hpp"
+#include "snir/ir/pass/remove_nop.hpp"
+#include "snir/ir/pass_manager.hpp"
 #include "snir/ir/pretty_printer.hpp"
-#include "snir/pass/optimisation_pass.hpp"
-#include "snir/pass/pass_manager.hpp"
 
 #undef NDEBUG
 #include <cassert>

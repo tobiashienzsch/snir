@@ -8,29 +8,6 @@
 
 namespace snir {
 
-struct RemoveNop
-{
-    static constexpr auto name = std::string_view{"RemoveNop"};
-    RemoveNop()                = default;
-
-    auto operator()(Function& func) -> void
-    {
-        for (auto& block : func.blocks) {
-            std::erase_if(block, [](Instruction const& inst) {
-                return inst.visit([](auto i) { return std::same_as<decltype(i), NopInst>; });
-            });
-        }
-    }
-};
-
-struct RemoveEmptyBlock
-{
-    static constexpr auto name = std::string_view{"RemoveEmptyBlock"};
-    RemoveEmptyBlock()         = default;
-
-    auto operator()(Function& f) -> void { std::erase_if(f.blocks, &Block::empty); }
-};
-
 struct DeadStoreElimination
 {
     static constexpr auto name = std::string_view{"DeadStoreElimination"};
