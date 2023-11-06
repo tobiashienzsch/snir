@@ -11,7 +11,7 @@ namespace snir {
 enum struct Type : std::uint8_t
 {
 #define SNIR_BUILTIN_TYPE(Constant, Name) Constant,
-#include "snir/ir/types.def"
+#include "snir/ir/type.def"
 #undef SNIR_BUILTIN_TYPE
 };
 
@@ -25,7 +25,7 @@ struct std::formatter<snir::Type, char> : std::formatter<std::string_view, char>
     {
         static constexpr auto names = std::array{
 #define SNIR_BUILTIN_TYPE(Constant, Name) std::string_view{#Name},
-#include "snir/ir/types.def"
+#include "snir/ir/type.def"
 #undef SNIR_BUILTIN_TYPE
         };
 

@@ -3,7 +3,7 @@
 #include "snir/ir/literal.hpp"
 #include "snir/ir/operand.hpp"
 #include "snir/ir/register.hpp"
-#include "snir/ir/types.hpp"
+#include "snir/ir/type.hpp"
 
 #include <string_view>
 
