@@ -1,4 +1,3 @@
-#include "snir/core/file.hpp"
 #include "snir/ir/function.hpp"
 #include "snir/ir/instruction.hpp"
 #include "snir/ir/instructions.hpp"

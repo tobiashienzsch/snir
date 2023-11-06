@@ -4,13 +4,16 @@
 #include "snir/ir/function.hpp"
 #include "snir/ir/instruction.hpp"
 
+#include <functional>
+#include <ostream>
+
 namespace snir {
 
 struct PrettyPrinter
 {
     static constexpr auto name = std::string_view{"PrettyPrinter"};
 
-    explicit PrettyPrinter(std::FILE* out);
+    explicit PrettyPrinter(std::ostream& out);
 
     auto operator()(snir::Function const& f) -> void;
     auto operator()(snir::Block const& block) -> void;
@@ -37,7 +40,7 @@ struct PrettyPrinter
     }
 
 private:
-    std::FILE* _out;
+    std::reference_wrapper<std::ostream> _out;
 };
 
 }  // namespace snir

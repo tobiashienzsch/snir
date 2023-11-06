@@ -1,23 +1,18 @@
 #pragma once
 
-#include <cstdio>
 #include <format>
 #include <iostream>
 
 namespace snir {
 
 template<typename... Args>
-inline auto print(std::FILE* out, std::format_string<Args...> fmt, Args&&... args) -> void
+inline auto print(std::ostream& out, std::format_string<Args...> fmt, Args&&... args) -> void
 {
-    auto const str     = std::format(fmt, std::forward<Args>(args)...);
-    auto const written = std::fwrite(str.c_str(), sizeof(char), str.size(), out);
-    if (written != str.size()) {
-        throw std::runtime_error{"failed to write to file"};
-    }
+    out << std::format(fmt, std::forward<Args>(args)...);
 }
 
 template<typename... Args>
-inline auto println(std::FILE* out, std::format_string<Args...> fmt, Args&&... args) -> void
+inline auto println(std::ostream& out, std::format_string<Args...> fmt, Args&&... args) -> void
 {
     print(out, fmt, std::forward<Args>(args)...);
     print(out, "\n");
@@ -26,7 +21,7 @@ inline auto println(std::FILE* out, std::format_string<Args...> fmt, Args&&... a
 template<typename... Args>
 inline auto print(std::format_string<Args...> fmt, Args&&... args) -> void
 {
-    print(::stdout, fmt, std::forward<Args>(args)...);
+    print(std::cout, fmt, std::forward<Args>(args)...);
 }
 
 template<typename... Args>

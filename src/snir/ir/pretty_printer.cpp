@@ -5,7 +5,7 @@
 
 namespace snir {
 
-PrettyPrinter::PrettyPrinter(std::FILE* out) : _out{out} {}
+PrettyPrinter::PrettyPrinter(std::ostream& out) : _out{out} {}
 
 auto PrettyPrinter::operator()(snir::Function const& f) -> void
 {
