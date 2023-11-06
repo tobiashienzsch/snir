@@ -26,12 +26,12 @@ auto testPassManager() -> void
                     snir::ConstInst{
                         .type = snir::Type::Int64,
                         .destination = snir::Register{0},
-                        .literal = snir::Literal{1},
+                        .value = snir::Value{1},
                     },
                     snir::ConstInst{
                         .type = snir::Type::Int64,
                         .destination = snir::Register{1},
-                        .literal = snir::Literal{2},
+                        .value = snir::Value{2},
                     },
                     snir::AddInst{
                         .type = snir::Type::Int64,
@@ -45,12 +45,12 @@ auto testPassManager() -> void
                     snir::ConstInst{
                         .type = snir::Type::Double,
                         .destination = snir::Register{3},
-                        .literal = snir::Literal{2.0},
+                        .value = snir::Value{2.0},
                     },
                     snir::ConstInst{
                         .type = snir::Type::Double,
                         .destination = snir::Register{4},
-                        .literal = snir::Literal{1.14159265359},
+                        .value = snir::Value{1.14159265359},
                     },
                     snir::FloatAddInst{
                         .type = snir::Type::Double,
@@ -75,7 +75,7 @@ auto testPassManager() -> void
                     snir::ConstInst{
                         .type = snir::Type::Double,
                         .destination = snir::Register{1},
-                        .literal = snir::Literal{42},
+                        .value = snir::Value{42},
                     },
                     snir::TruncInst{
                         .type = snir::Type::Float,
@@ -99,7 +99,7 @@ auto testPassManager() -> void
                     snir::ConstInst{
                         .type = snir::Type::Int64,
                         .destination = snir::Register{2},
-                        .literal = snir::Literal{42},
+                        .value = snir::Value{42},
                     },
                     snir::ReturnInst{
                         .type = snir::Type::Int64,
