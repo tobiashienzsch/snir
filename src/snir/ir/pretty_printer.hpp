@@ -1,9 +1,8 @@
 #pragma once
 
 #include "snir/core/print.hpp"
-
-#include <algorithm>
-#include <functional>
+#include "snir/ir/function.hpp"
+#include "snir/ir/instruction.hpp"
 
 namespace snir {
 
@@ -11,47 +10,16 @@ struct PrettyPrinter
 {
     static constexpr auto name = std::string_view{"PrettyPrinter"};
 
-    explicit PrettyPrinter(std::FILE* out) : _out{out} {}
+    explicit PrettyPrinter(std::FILE* out);
 
-    auto operator()(snir::Function const& f) -> void
-    {
-        auto const args = [](auto const& a) -> std::string {
-            if (a.empty()) {
-                return "()";
-            }
+    auto operator()(snir::Function const& f) -> void;
+    auto operator()(snir::Block const& block) -> void;
+    auto operator()(snir::Instruction const& inst) -> void;
 
-            auto idx  = 0;
-            auto list = std::format("({} %{}", a[0], idx++);
-            std::for_each(std::next(a.begin()), a.end(), [&](auto arg) {
-                list += std::format(", {} %{}", arg, idx++);
-            });
-            return list + ")";
-        }(f.arguments);
-
-        auto id         = 0;
-        auto printBlock = [&id, this](auto const& block) {
-            println(_out, "{}:", id++);
-            std::invoke(*this, block);
-        };
-
-        println(_out, "define {} @{}{} {{", f.type, f.name, args);
-        std::ranges::for_each(f.blocks, printBlock);
-        println(_out, "}}\n");
-    }
-
-    auto operator()(snir::Block const& block) -> void
-    {
-        std::ranges::for_each(block, std::bind_front(*this));
-    }
-
-    auto operator()(snir::Instruction const& inst) -> void { inst.visit(*this); }
-
-    template<typename T>
-        requires(T::args == 0)
-    auto operator()(T const& inst) -> void
-    {
-        println(_out, "  ; {}", inst.name);
-    }
+    auto operator()(snir::NopInst const& nop) -> void;
+    auto operator()(snir::ConstInst const& constant) -> void;
+    auto operator()(snir::TruncInst const& trunc) -> void;
+    auto operator()(snir::ReturnInst const& ret) -> void;
 
     template<typename T>
         requires(T::args == 2)
@@ -66,28 +34,6 @@ struct PrettyPrinter
             inst.lhs,
             inst.rhs
         );
-    }
-
-    auto operator()(snir::ConstInst const& constant) -> void
-    {
-        println(_out, "  {} = {} {}", constant.destination, constant.type, constant.literal);
-    }
-
-    auto operator()(snir::TruncInst const& trunc) -> void
-    {
-        println(
-            _out,
-            "  {} = {} {} as {}",
-            trunc.destination,
-            snir::TruncInst::name,
-            trunc.value,
-            trunc.type
-        );
-    }
-
-    auto operator()(snir::ReturnInst const& ret) -> void
-    {
-        println(_out, "  {} {}", snir::ReturnInst::name, ret.value);
     }
 
 private:
