@@ -4,46 +4,33 @@
 #include <format>
 #include <iostream>
 
-namespace std {
+namespace snir {
 
 template<typename... Args>
 inline auto print(std::FILE* out, std::format_string<Args...> fmt, Args&&... args) -> void
 {
     auto str = std::format(fmt, std::forward<Args>(args)...);
-    std::fprintf(out, "%s", str.c_str());
+    std::fwrite(str.c_str(), sizeof(char), str.size(), out);
 }
 
 template<typename... Args>
 inline auto println(std::FILE* out, std::format_string<Args...> fmt, Args&&... args) -> void
 {
-    auto str = std::format(fmt, std::forward<Args>(args)...);
-    std::fprintf(out, "%s\n", str.c_str());
-}
-
-template<typename... Args>
-inline auto print(std::ostream& out, std::format_string<Args...> fmt, Args&&... args) -> void
-{
-    out << std::format(fmt, std::forward<Args>(args)...);
-}
-
-template<typename... Args>
-inline auto println(std::ostream& out, std::format_string<Args...> fmt, Args&&... args) -> void
-{
-    out << std::format(fmt, std::forward<Args>(args)...) << '\n';
+    print(out, fmt, std::forward<Args>(args)...);
+    print(out, "\n");
 }
 
 template<typename... Args>
 inline auto print(std::format_string<Args...> fmt, Args&&... args) -> void
 {
-    auto str = std::format(fmt, std::forward<Args>(args)...);
-    std::fprintf(::stdout, "%s", str.c_str());
+    print(::stdout, fmt, std::forward<Args>(args)...);
 }
 
 template<typename... Args>
 inline auto println(std::format_string<Args...> fmt, Args&&... args) -> void
 {
-    auto str = std::format(fmt, std::forward<Args>(args)...);
-    std::fprintf(::stdout, "%s\n", str.c_str());
+    print(fmt, std::forward<Args>(args)...);
+    print("\n");
 }
 
-}  // namespace std
+}  // namespace snir

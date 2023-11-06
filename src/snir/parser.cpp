@@ -17,7 +17,7 @@ auto Parser::operator()(std::string const& source) -> std::optional<Module>
         auto const name      = matches[2].str();
         auto const arguments = matches[3].str();
         auto const body      = matches[4].str();
-        std::println("define {} {}({}) {{{}}}\n", type, name, arguments, body);
+        snir::println("define {} {}({}) {{{}}}\n", type, name, arguments, body);
         search = matches.suffix().first;  // Update the search start position
     }
 

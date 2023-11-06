@@ -13,8 +13,6 @@ struct PrettyPrinter
 
     explicit PrettyPrinter(std::FILE* out) : _out{out} {}
 
-    explicit PrettyPrinter(std::ostream& out) : _out{std::ref(out)} {}
-
     auto operator()(snir::Function const& f) -> void
     {
         auto const args = [](auto const& a) -> std::string {
@@ -32,13 +30,13 @@ struct PrettyPrinter
 
         auto id         = 0;
         auto printBlock = [&id, this](auto const& block) {
-            writeln("{}:", id++);
+            println(_out, "{}:", id++);
             std::invoke(*this, block);
         };
 
-        writeln("define {} @{}{} {{", f.type, f.name, args);
+        println(_out, "define {} @{}{} {{", f.type, f.name, args);
         std::ranges::for_each(f.blocks, printBlock);
-        writeln("}}\n");
+        println(_out, "}}\n");
     }
 
     auto operator()(snir::Block const& block) -> void
@@ -52,24 +50,33 @@ struct PrettyPrinter
         requires(T::args == 0)
     auto operator()(T const& inst) -> void
     {
-        writeln("  ; {}", inst.name);
+        println(_out, "  ; {}", inst.name);
     }
 
     template<typename T>
         requires(T::args == 2)
     auto operator()(T const& inst) -> void
     {
-        writeln("  {} = {} {} {} {}", inst.destination, inst.name, inst.type, inst.lhs, inst.rhs);
+        println(
+            _out,
+            "  {} = {} {} {} {}",
+            inst.destination,
+            inst.name,
+            inst.type,
+            inst.lhs,
+            inst.rhs
+        );
     }
 
     auto operator()(snir::ConstInst const& constant) -> void
     {
-        writeln("  {} = {} {}", constant.destination, constant.type, constant.literal);
+        println(_out, "  {} = {} {}", constant.destination, constant.type, constant.literal);
     }
 
     auto operator()(snir::TruncInst const& trunc) -> void
     {
-        writeln(
+        println(
+            _out,
             "  {} = {} {} as {}",
             trunc.destination,
             snir::TruncInst::name,
@@ -80,25 +87,11 @@ struct PrettyPrinter
 
     auto operator()(snir::ReturnInst const& ret) -> void
     {
-        writeln("  {} {}", snir::ReturnInst::name, ret.operand);
+        println(_out, "  {} {}", snir::ReturnInst::name, ret.operand);
     }
 
 private:
-    using Stream = std::variant<std::FILE*, std::reference_wrapper<std::ostream>>;
-
-    template<typename... Args>
-    void write(std::format_string<Args...> fmt, Args&&... args)
-    {
-        std::visit([&](auto out) { std::print(out, fmt, std::forward<Args>(args)...); }, _out);
-    }
-
-    template<typename... Args>
-    void writeln(std::format_string<Args...> fmt, Args&&... args)
-    {
-        std::visit([&](auto out) { std::println(out, fmt, std::forward<Args>(args)...); }, _out);
-    }
-
-    Stream _out;
+    std::FILE* _out;
 };
 
 }  // namespace snir

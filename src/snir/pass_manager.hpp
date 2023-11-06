@@ -24,7 +24,7 @@ struct PassManager
     {
         for (auto& pass : _passes) {
             if (_print) {
-                std::println("function pass on {}: {}", func.name, pass->getName());
+                println("function pass on {}: {}", func.name, pass->getName());
             }
             pass->run(func);
         }
