@@ -1,3 +1,4 @@
+#include "snir/File.hpp"
 #include "snir/Function.hpp"
 #include "snir/Instruction.hpp"
 #include "snir/Instructions.hpp"
@@ -105,8 +106,8 @@ auto main() -> int
             },
     };
 
-    auto* o0 = std::fopen("snir_O0.ll", "w");
-    auto* o1 = std::fopen("snir_O1.ll", "w");
+    auto o0 = snir::openFile("snir_O0.ll", "w");
+    auto o1 = snir::openFile("snir_O1.ll", "w");
 
     auto opt = snir::PassManager{true};
     opt.add(snir::DeadStoreElimination{});
@@ -114,17 +115,14 @@ auto main() -> int
     opt.add(snir::RemoveEmptyBlock{});
 
     auto pm = snir::PassManager{true};
-    pm.add(snir::PrettyPrinter{o0});
+    pm.add(snir::PrettyPrinter{o0.get()});
     pm.add(std::ref(opt));
     pm.add(std::ref(opt));
-    pm.add(snir::PrettyPrinter{o1});
+    pm.add(snir::PrettyPrinter{o1.get()});
 
     pm(nan);
     pm(sin);
     pm(ipow);
-
-    std::fclose(o0);
-    std::fclose(o1);
 
     auto const* const text = R"(
 define double @nan() {
