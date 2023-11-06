@@ -1,7 +1,7 @@
 #pragma once
 
-#include "snir/function.hpp"
-#include "snir/print.hpp"
+#include "snir/core/print.hpp"
+#include "snir/ir/function.hpp"
 
 #include <functional>
 #include <memory>

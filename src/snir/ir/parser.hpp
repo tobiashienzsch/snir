@@ -1,15 +1,10 @@
 #pragma once
 
-#include "snir/function.hpp"
+#include "snir/ir/module.hpp"
 
 #include <string>
 
 namespace snir {
-
-struct Module
-{
-    std::vector<Function> functions;
-};
 
 struct Parser
 {

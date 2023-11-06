@@ -1,6 +1,6 @@
 #pragma once
 
-#include "snir/types.hpp"
+#include "snir/ir/types.hpp"
 
 #include <string_view>
 

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "snir/print.hpp"
+#include "snir/core/print.hpp"
 
 #include <algorithm>
 #include <functional>

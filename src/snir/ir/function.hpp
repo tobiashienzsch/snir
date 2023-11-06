@@ -1,6 +1,6 @@
 #pragma once
 
-#include "snir/instruction.hpp"
+#include "snir/ir/instruction.hpp"
 
 #include <string>
 #include <vector>

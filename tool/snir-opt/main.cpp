@@ -1,11 +1,11 @@
-#include "snir/file.hpp"
-#include "snir/function.hpp"
-#include "snir/instruction.hpp"
-#include "snir/instructions.hpp"
-#include "snir/optimisation_pass.hpp"
-#include "snir/parser.hpp"
-#include "snir/pass_manager.hpp"
-#include "snir/pretty_printer.hpp"
+#include "snir/core/file.hpp"
+#include "snir/ir/function.hpp"
+#include "snir/ir/instruction.hpp"
+#include "snir/ir/instructions.hpp"
+#include "snir/ir/parser.hpp"
+#include "snir/ir/pretty_printer.hpp"
+#include "snir/pass/optimisation_pass.hpp"
+#include "snir/pass/pass_manager.hpp"
 
 namespace {
 
