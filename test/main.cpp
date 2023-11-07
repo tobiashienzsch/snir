@@ -161,23 +161,37 @@ define i64 @ipow(i64 %0, i64 %1) {
 auto testInterpreter() -> void
 {
     using namespace snir;
+    auto const r0  = Register{0};
+    auto const r1  = Register{1};
+    auto const r2  = Register{2};
+    auto const v42 = Value{42};
+
     {
         // empty function
         auto vm = Interpreter{};
 
-        auto const empty  = Function{.type = Type::Void};
-        auto const result = vm.execute(empty, {});
+        auto const func   = Function{.type = Type::Void};
+        auto const result = vm.execute(func, {});
         assert(result.has_value());
         assert(std::holds_alternative<std::nullopt_t>(result.value()));
+    }
+
+    {
+        // function arg mismatch
+        auto vm = Interpreter{};
+
+        auto const func   = Function{.type = Type::Void, .arguments = std::vector{Type::Double}};
+        auto const result = vm.execute(func, {});
+        assert(not result.has_value());
     }
 
     {
         // return literal
         auto vm = Interpreter{};
 
-        auto block   = snir::Block{Instruction{ReturnInst{.type = Type::Int64, .value = Value{42}}}};
-        auto literal = Function{.type = Type::Int64, .blocks = {block}};
-        auto result  = vm.execute(literal, {});
+        auto block  = snir::Block{Instruction{ReturnInst{.type = Type::Int64, .value = Value{42}}}};
+        auto func   = Function{.type = Type::Int64, .blocks = {block}};
+        auto result = vm.execute(func, {});
         assert(result.has_value());
         assert(std::holds_alternative<int>(result.value()));
         assert(std::get<int>(result.value()) == 42);
@@ -185,8 +199,7 @@ auto testInterpreter() -> void
 
     {
         // return constant<int>
-        auto vm       = Interpreter{};
-        auto const r0 = Register{0};
+        auto vm = Interpreter{};
 
         auto block = snir::Block{};
         block.push_back(ConstInst{.type = Type::Int64, .destination = r0, .value = Value{143}});
@@ -200,8 +213,7 @@ auto testInterpreter() -> void
 
     {
         // return constant<float>
-        auto vm       = Interpreter{};
-        auto const r0 = Register{0};
+        auto vm = Interpreter{};
 
         auto block = snir::Block{};
         block.push_back(ConstInst{.type = Type::Float, .destination = r0, .value = Value{42.0F}});
@@ -215,8 +227,7 @@ auto testInterpreter() -> void
 
     {
         // return constant<double>
-        auto vm       = Interpreter{};
-        auto const r0 = Register{0};
+        auto vm = Interpreter{};
 
         auto block = snir::Block{};
         block.push_back(ConstInst{.type = Type::Double, .destination = r0, .value = Value{42.0}});
@@ -226,6 +237,36 @@ auto testInterpreter() -> void
         assert(result.has_value());
         assert(std::holds_alternative<double>(result.value()));
         assert(std::get<double>(result.value()) == 42.0);
+    }
+
+    {
+        // return add<int>
+        auto vm = Interpreter{};
+
+        auto block = snir::Block{};
+        block.push_back(ConstInst{.type = Type::Int64, .destination = r0, .value = v42});
+        block.push_back(AddInst{.type = Type::Int64, .destination = r1, .lhs = r0, .rhs = v42});
+        block.push_back(ReturnInst{.type = Type::Int64, .value = r1});
+        auto func   = Function{.type = Type::Int64, .blocks = {block}};
+        auto result = vm.execute(func, {});
+        assert(result.has_value());
+        assert(std::holds_alternative<int>(result.value()));
+        assert(std::get<int>(result.value()) == 84);
+    }
+
+    {
+        // return add<int>
+        auto vm = Interpreter{};
+
+        auto block = snir::Block{};
+        block.push_back(ConstInst{.type = Type::Int64, .destination = r0, .value = v42});
+        block.push_back(SubInst{.type = Type::Int64, .destination = r1, .lhs = r0, .rhs = v42});
+        block.push_back(ReturnInst{.type = Type::Int64, .value = r1});
+        auto func   = Function{.type = Type::Int64, .blocks = {block}};
+        auto result = vm.execute(func, {});
+        assert(result.has_value());
+        assert(std::holds_alternative<int>(result.value()));
+        assert(std::get<int>(result.value()) == 0);
     }
 }
 

@@ -40,6 +40,81 @@ auto VirtualMachine::operator()(ConstInst const& inst) -> void
     _registers.emplace(inst.destination, inst.value);
 }
 
+auto VirtualMachine::operator()(AddInst const& inst) -> void
+{
+    return binaryIntegerInst<std::plus<>>(inst);
+}
+
+auto VirtualMachine::operator()(SubInst const& inst) -> void
+{
+    return binaryIntegerInst<std::minus<>>(inst);
+}
+
+auto VirtualMachine::operator()(MulInst const& inst) -> void
+{
+    return binaryIntegerInst<std::multiplies<>>(inst);
+}
+
+auto VirtualMachine::operator()(DivInst const& inst) -> void
+{
+    return binaryIntegerInst<std::divides<>>(inst);
+}
+
+auto VirtualMachine::operator()(ModInst const& inst) -> void
+{
+    return binaryIntegerInst<std::modulus<>>(inst);
+}
+
+// auto VirtualMachine::operator()(FloatAddInst const& inst) -> void
+// {
+//     return binaryIntegerInst<std::plus<>>(inst);
+// }
+
+// auto VirtualMachine::operator()(FloatSubInst const& inst) -> void
+// {
+//     return binaryIntegerInst<std::plus<>>(inst);
+// }
+
+// auto VirtualMachine::operator()(FloatMulInst const& inst) -> void
+// {
+//     return binaryIntegerInst<std::plus<>>(inst);
+// }
+
+// auto VirtualMachine::operator()(FloatDivInst const& inst) -> void
+// {
+//     return binaryIntegerInst<std::plus<>>(inst);
+// }
+
+// auto VirtualMachine::operator()(FloatModInst const& inst) -> void
+// {
+//     return binaryIntegerInst<std::plus<>>(inst);
+// }
+
+auto VirtualMachine::operator()(AndInst const& inst) -> void
+{
+    return binaryIntegerInst<std::bit_and<>>(inst);
+}
+
+auto VirtualMachine::operator()(OrInst const& inst) -> void
+{
+    return binaryIntegerInst<std::bit_or<>>(inst);
+}
+
+auto VirtualMachine::operator()(XorInst const& inst) -> void
+{
+    return binaryIntegerInst<std::bit_xor<>>(inst);
+}
+
+// auto VirtualMachine::operator()(ShiftLeftInst const& inst) -> void
+// {
+//     return binaryIntegerInst<std::plus<>>(inst);
+// }
+
+// auto VirtualMachine::operator()(ShiftRightInst const& inst) -> void
+// {
+//     return binaryIntegerInst<std::plus<>>(inst);
+// }
+
 auto Interpreter::execute(Function const& func, std::span<Value> arguments) -> std::optional<Value>
 {
     if (func.arguments.size() != arguments.size()) {
