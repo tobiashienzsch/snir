@@ -68,7 +68,7 @@ private:
 
         auto lhs = std::visit(ValueAs<int>{_registers}, inst.lhs);
         auto rhs = std::visit(ValueAs<int>{_registers}, inst.rhs);
-        _registers.emplace(inst.destination, Op{}(lhs, rhs));
+        _registers.emplace(inst.result, Op{}(lhs, rhs));
     }
 
     std::map<Register, Value> _registers;

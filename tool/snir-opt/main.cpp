@@ -37,17 +37,17 @@ auto main() -> int
                 snir::Block{
                     snir::ConstInst{
                         .type = snir::Type::Int64,
-                        .destination = snir::Register{0},
+                        .result = snir::Register{0},
                         .value = 1,
                     },
                     snir::ConstInst{
                         .type = snir::Type::Int64,
-                        .destination = snir::Register{1},
+                        .result = snir::Register{1},
                         .value = 2,
                     },
                     snir::AddInst{
                         .type = snir::Type::Int64,
-                        .destination = snir::Register{2},
+                        .result = snir::Register{2},
                         .lhs = snir::Register{0},
                         .rhs = snir::Register{1},
                     },
@@ -56,17 +56,17 @@ auto main() -> int
                 snir::Block{
                     snir::ConstInst{
                         .type = snir::Type::Double,
-                        .destination = snir::Register{3},
+                        .result = snir::Register{3},
                         .value = 2.0,
                     },
                     snir::ConstInst{
                         .type = snir::Type::Double,
-                        .destination = snir::Register{4},
+                        .result = snir::Register{4},
                         .value = 1.14159265359,
                     },
                     snir::FloatAddInst{
                         .type = snir::Type::Double,
-                        .destination = snir::Register{5},
+                        .result = snir::Register{5},
                         .lhs = snir::Register{3},
                         .rhs = snir::Register{4},
                     },

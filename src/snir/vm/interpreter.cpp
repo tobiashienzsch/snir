@@ -37,7 +37,7 @@ auto VirtualMachine::operator()(ReturnInst const& inst) -> void
 
 auto VirtualMachine::operator()(ConstInst const& inst) -> void
 {
-    _registers.emplace(inst.destination, inst.value);
+    _registers.emplace(inst.result, inst.value);
 }
 
 auto VirtualMachine::operator()(AddInst const& inst) -> void

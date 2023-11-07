@@ -29,8 +29,8 @@ struct DeadStoreElimination
 private:
     auto replaceWithNopIfUnused(Instruction const& inst) -> Instruction
     {
-        auto const destination = inst.getDestinationRegister();
-        if (destination and not _used.contains(*destination)) {
+        auto const result = inst.getResultRegister();
+        if (result and not _used.contains(*result)) {
             return NopInst{};
         }
 

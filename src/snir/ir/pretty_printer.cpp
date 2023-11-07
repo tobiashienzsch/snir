@@ -47,19 +47,12 @@ auto PrettyPrinter::operator()(snir::NopInst const& nop) -> void
 
 auto PrettyPrinter::operator()(snir::ConstInst const& constant) -> void
 {
-    println(_out, "  {} = {} {}", constant.destination, constant.type, constant.value);
+    println(_out, "  {} = {} {}", constant.result, constant.type, constant.value);
 }
 
 auto PrettyPrinter::operator()(snir::TruncInst const& trunc) -> void
 {
-    println(
-        _out,
-        "  {} = {} {} as {}",
-        trunc.destination,
-        snir::TruncInst::name,
-        trunc.value,
-        trunc.type
-    );
+    println(_out, "  {} = {} {} as {}", trunc.result, snir::TruncInst::name, trunc.value, trunc.type);
 }
 
 auto PrettyPrinter::operator()(snir::ReturnInst const& ret) -> void

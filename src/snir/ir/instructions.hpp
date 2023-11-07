@@ -29,7 +29,7 @@ struct ReturnInst
         static constexpr auto name = std::string_view{#Name};                                        \
         static constexpr auto args = 1;                                                              \
         Type type;                                                                                   \
-        Register destination;                                                                        \
+        Register result;                                                                             \
         Value value;                                                                                 \
     };
 
@@ -39,7 +39,7 @@ struct ReturnInst
         static constexpr auto name = std::string_view{#Name};                                        \
         static constexpr auto args = 2;                                                              \
         Type type;                                                                                   \
-        Register destination;                                                                        \
+        Register result;                                                                             \
         Value lhs;                                                                                   \
         Value rhs;                                                                                   \
     };

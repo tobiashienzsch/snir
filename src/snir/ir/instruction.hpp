@@ -55,11 +55,11 @@ struct Instruction
         return registers;
     }
 
-    [[nodiscard]] auto getDestinationRegister() const -> std::optional<Register>
+    [[nodiscard]] auto getResultRegister() const -> std::optional<Register>
     {
         return visit([]<typename T>(T const& i) -> std::optional<Register> {
-            if constexpr (requires { T::destination; }) {
-                return i.destination;
+            if constexpr (requires { T::result; }) {
+                return i.result;
             } else {
                 return std::nullopt;
             }

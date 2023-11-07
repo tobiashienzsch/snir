@@ -24,19 +24,11 @@ struct PrettyPrinter
     auto operator()(snir::TruncInst const& trunc) -> void;
     auto operator()(snir::ReturnInst const& ret) -> void;
 
-    template<typename T>
-        requires(T::args == 2)
-    auto operator()(T const& inst) -> void
+    template<typename Inst>
+        requires(Inst::args == 2)
+    auto operator()(Inst const& inst) -> void
     {
-        println(
-            _out,
-            "  {} = {} {} {} {}",
-            inst.destination,
-            inst.name,
-            inst.type,
-            inst.lhs,
-            inst.rhs
-        );
+        println(_out, "  {} = {} {} {} {}", inst.result, inst.name, inst.type, inst.lhs, inst.rhs);
     }
 
 private:

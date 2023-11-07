@@ -11,6 +11,7 @@
 
 #undef NDEBUG
 #include <cassert>
+#include <sstream>
 
 namespace {
 
@@ -30,17 +31,17 @@ auto testPassManager() -> void
                 snir::Block{
                     snir::ConstInst{
                         .type = snir::Type::Int64,
-                        .destination = snir::Register{0},
+                        .result = snir::Register{0},
                         .value = 1,
                     },
                     snir::ConstInst{
                         .type = snir::Type::Int64,
-                        .destination = snir::Register{1},
+                        .result = snir::Register{1},
                         .value = 2,
                     },
                     snir::AddInst{
                         .type = snir::Type::Int64,
-                        .destination = snir::Register{2},
+                        .result = snir::Register{2},
                         .lhs = snir::Register{0},
                         .rhs = snir::Register{1},
                     },
@@ -49,17 +50,17 @@ auto testPassManager() -> void
                 snir::Block{
                     snir::ConstInst{
                         .type = snir::Type::Double,
-                        .destination = snir::Register{3},
+                        .result = snir::Register{3},
                         .value = 2.0,
                     },
                     snir::ConstInst{
                         .type = snir::Type::Double,
-                        .destination = snir::Register{4},
+                        .result = snir::Register{4},
                         .value = 1.14159265359,
                     },
                     snir::FloatAddInst{
                         .type = snir::Type::Double,
-                        .destination = snir::Register{5},
+                        .result = snir::Register{5},
                         .lhs = snir::Register{3},
                         .rhs = snir::Register{4},
                     },
@@ -79,12 +80,12 @@ auto testPassManager() -> void
                 snir::Block{
                     snir::ConstInst{
                         .type = snir::Type::Double,
-                        .destination = snir::Register{1},
+                        .result = snir::Register{1},
                         .value = 42,
                     },
                     snir::TruncInst{
                         .type = snir::Type::Float,
-                        .destination = snir::Register{2},
+                        .result = snir::Register{2},
                         .value = snir::Register{1},
                     },
                     snir::ReturnInst{
@@ -103,7 +104,7 @@ auto testPassManager() -> void
                 snir::Block{
                     snir::ConstInst{
                         .type = snir::Type::Int64,
-                        .destination = snir::Register{2},
+                        .result = snir::Register{2},
                         .value = 42,
                     },
                     snir::ReturnInst{
@@ -113,6 +114,19 @@ auto testPassManager() -> void
                 },
             },
     };
+
+    {
+        auto out     = std::stringstream{};
+        auto printer = snir::PrettyPrinter{out};
+        printer(nan);
+        printer(sin);
+        printer(ipow);
+
+        auto str = out.str();
+        assert(str.find("define double @nan()") != std::string::npos);
+        assert(str.find("define float @sin(float %0)") != std::string::npos);
+        assert(str.find("define i64 @ipow(i64 %0, i64 %1)") != std::string::npos);
+    }
 
     auto opt = snir::PassManager{true};
     opt.add(snir::DeadStoreElimination{});
@@ -202,7 +216,7 @@ auto testInterpreter() -> void
         auto vm = Interpreter{};
 
         auto block = snir::Block{};
-        block.push_back(ConstInst{.type = Type::Int64, .destination = r0, .value = Value{143}});
+        block.push_back(ConstInst{.type = Type::Int64, .result = r0, .value = Value{143}});
         block.push_back(ReturnInst{.type = Type::Int64, .value = r0});
         auto func   = Function{.type = Type::Int64, .blocks = {block}};
         auto result = vm.execute(func, {});
@@ -216,7 +230,7 @@ auto testInterpreter() -> void
         auto vm = Interpreter{};
 
         auto block = snir::Block{};
-        block.push_back(ConstInst{.type = Type::Float, .destination = r0, .value = Value{42.0F}});
+        block.push_back(ConstInst{.type = Type::Float, .result = r0, .value = Value{42.0F}});
         block.push_back(ReturnInst{.type = Type::Float, .value = r0});
         auto func   = Function{.type = Type::Float, .blocks = {block}};
         auto result = vm.execute(func, {});
@@ -230,7 +244,7 @@ auto testInterpreter() -> void
         auto vm = Interpreter{};
 
         auto block = snir::Block{};
-        block.push_back(ConstInst{.type = Type::Double, .destination = r0, .value = Value{42.0}});
+        block.push_back(ConstInst{.type = Type::Double, .result = r0, .value = Value{42.0}});
         block.push_back(ReturnInst{.type = Type::Double, .value = r0});
         auto func   = Function{.type = Type::Double, .blocks = {block}};
         auto result = vm.execute(func, {});
@@ -244,8 +258,8 @@ auto testInterpreter() -> void
         auto vm = Interpreter{};
 
         auto block = snir::Block{};
-        block.push_back(ConstInst{.type = Type::Int64, .destination = r0, .value = v42});
-        block.push_back(AddInst{.type = Type::Int64, .destination = r1, .lhs = r0, .rhs = v42});
+        block.push_back(ConstInst{.type = Type::Int64, .result = r0, .value = v42});
+        block.push_back(AddInst{.type = Type::Int64, .result = r1, .lhs = r0, .rhs = v42});
         block.push_back(ReturnInst{.type = Type::Int64, .value = r1});
         auto func   = Function{.type = Type::Int64, .blocks = {block}};
         auto result = vm.execute(func, {});
@@ -259,8 +273,8 @@ auto testInterpreter() -> void
         auto vm = Interpreter{};
 
         auto block = snir::Block{};
-        block.push_back(ConstInst{.type = Type::Int64, .destination = r0, .value = v42});
-        block.push_back(SubInst{.type = Type::Int64, .destination = r1, .lhs = r0, .rhs = v42});
+        block.push_back(ConstInst{.type = Type::Int64, .result = r0, .value = v42});
+        block.push_back(SubInst{.type = Type::Int64, .result = r1, .lhs = r0, .rhs = v42});
         block.push_back(ReturnInst{.type = Type::Int64, .value = r1});
         auto func   = Function{.type = Type::Int64, .blocks = {block}};
         auto result = vm.execute(func, {});
