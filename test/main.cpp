@@ -7,6 +7,7 @@
 #include "snir/ir/pass/remove_nop.hpp"
 #include "snir/ir/pass_manager.hpp"
 #include "snir/ir/pretty_printer.hpp"
+#include "snir/vm/interpreter.hpp"
 
 #undef NDEBUG
 #include <cassert>
@@ -157,11 +158,83 @@ define i64 @ipow(i64 %0, i64 %1) {
     // assert(module.value().functions.size() == 3);
 }
 
+auto testInterpreter() -> void
+{
+    using namespace snir;
+    {
+        // empty function
+        auto vm = Interpreter{};
+
+        auto const empty  = Function{.type = Type::Void};
+        auto const result = vm.execute(empty, {});
+        assert(result.has_value());
+        assert(std::holds_alternative<std::nullopt_t>(result.value()));
+    }
+
+    {
+        // return literal
+        auto vm = Interpreter{};
+
+        auto block   = snir::Block{Instruction{ReturnInst{.type = Type::Int64, .value = Value{42}}}};
+        auto literal = Function{.type = Type::Int64, .blocks = {block}};
+        auto result  = vm.execute(literal, {});
+        assert(result.has_value());
+        assert(std::holds_alternative<int>(result.value()));
+        assert(std::get<int>(result.value()) == 42);
+    }
+
+    {
+        // return constant<int>
+        auto vm       = Interpreter{};
+        auto const r0 = Register{0};
+
+        auto block = snir::Block{};
+        block.push_back(ConstInst{.type = Type::Int64, .destination = r0, .value = Value{143}});
+        block.push_back(ReturnInst{.type = Type::Int64, .value = r0});
+        auto func   = Function{.type = Type::Int64, .blocks = {block}};
+        auto result = vm.execute(func, {});
+        assert(result.has_value());
+        assert(std::holds_alternative<int>(result.value()));
+        assert(std::get<int>(result.value()) == 143);
+    }
+
+    {
+        // return constant<float>
+        auto vm       = Interpreter{};
+        auto const r0 = Register{0};
+
+        auto block = snir::Block{};
+        block.push_back(ConstInst{.type = Type::Float, .destination = r0, .value = Value{42.0F}});
+        block.push_back(ReturnInst{.type = Type::Float, .value = r0});
+        auto func   = Function{.type = Type::Float, .blocks = {block}};
+        auto result = vm.execute(func, {});
+        assert(result.has_value());
+        assert(std::holds_alternative<float>(result.value()));
+        assert(std::get<float>(result.value()) == 42.0F);
+    }
+
+    {
+        // return constant<double>
+        auto vm       = Interpreter{};
+        auto const r0 = Register{0};
+
+        auto block = snir::Block{};
+        block.push_back(ConstInst{.type = Type::Double, .destination = r0, .value = Value{42.0}});
+        block.push_back(ReturnInst{.type = Type::Double, .value = r0});
+        auto func   = Function{.type = Type::Double, .blocks = {block}};
+        auto result = vm.execute(func, {});
+        assert(result.has_value());
+        assert(std::holds_alternative<double>(result.value()));
+        assert(std::get<double>(result.value()) == 42.0);
+    }
+}
+
 }  // namespace
 
 auto main() -> int
 {
     testPassManager();
     testParser();
+    testInterpreter();
     return 0;
 }

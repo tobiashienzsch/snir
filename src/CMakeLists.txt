@@ -8,4 +8,5 @@ target_sources(snir
     PRIVATE
         snir/ir/parser.cpp
         snir/ir/pretty_printer.cpp
+        snir/vm/interpreter.cpp
 )
