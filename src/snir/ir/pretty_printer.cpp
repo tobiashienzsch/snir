@@ -7,6 +7,13 @@ namespace snir {
 
 PrettyPrinter::PrettyPrinter(std::ostream& out) : _out{out} {}
 
+auto PrettyPrinter::operator()(snir::Module const& m) -> void
+{
+    for (auto const& func : m.functions) {
+        std::invoke(*this, func);
+    }
+}
+
 auto PrettyPrinter::operator()(snir::Function const& f) -> void
 {
     auto const args = [](auto const& a) -> std::string {

@@ -79,6 +79,11 @@ struct Instruction
         });
     }
 
+    friend auto operator==(Instruction const& lhs, Instruction const& rhs) noexcept -> bool
+    {
+        return lhs._holder == rhs._holder;
+    }
+
 private:
     using Holder = std::variant<
         NopInst,

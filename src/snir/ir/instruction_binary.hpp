@@ -17,6 +17,13 @@ namespace snir {
         Register result;                                                                             \
         Value lhs;                                                                                   \
         Value rhs;                                                                                   \
+                                                                                                     \
+        friend auto operator==(Identifier##Inst const& lhs, Identifier##Inst const& rhs) noexcept    \
+            -> bool                                                                                  \
+        {                                                                                            \
+            return lhs.type == rhs.type and lhs.result == rhs.result and lhs.lhs == rhs.lhs          \
+               and lhs.rhs == rhs.rhs;                                                               \
+        }                                                                                            \
     };
 
 #include "snir/ir/instruction_binary.def"

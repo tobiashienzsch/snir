@@ -116,20 +116,7 @@ auto testPassManager() -> void
             },
     };
 
-    {
-        auto out     = std::stringstream{};
-        auto printer = snir::PrettyPrinter{out};
-        printer(nan);
-        printer(sin);
-        printer(ipow);
-
-        auto str = out.str();
-        assert(str.find("define double @nan()") != std::string::npos);
-        assert(str.find("define float @sin(float %0)") != std::string::npos);
-        assert(str.find("define i64 @ipow(i64 %0, i64 %1)") != std::string::npos);
-    }
-
-    static constexpr auto const logging = true;
+    static constexpr auto const logging = false;
 
     auto opt = snir::PassManager{logging};
     opt.add(snir::DeadStoreElimination{});
@@ -218,6 +205,10 @@ auto testParser() -> void
         assert(inst.has_value());
         assert(inst->hasType<AddInst>());
         assert(inst->getResultRegister() == Register{5});
+
+        auto const lhs = parser.parseInstruction(src);
+        auto const rhs = parser.parseInstruction(src);
+        assert(lhs == rhs);
     }
 
     {
@@ -379,6 +370,12 @@ auto testInterpreter() -> void
             assert(result.has_value());
             assert(std::holds_alternative<int>(result.value()));
             assert(std::get<int>(result.value()) == expected);
+
+            auto stream  = std::stringstream{};
+            auto printer = snir::PrettyPrinter{stream};
+            printer(module.value());
+            auto reconstructed = parser.parseModule(stream.str());
+            assert(module == reconstructed);
         }
     }
 
@@ -404,6 +401,12 @@ auto testInterpreter() -> void
             assert(result.has_value());
             assert(std::holds_alternative<float>(result.value()));
             assert(std::get<float>(result.value()) == expected);
+
+            auto stream  = std::stringstream{};
+            auto printer = snir::PrettyPrinter{stream};
+            printer(module.value());
+            auto reconstructed = parser.parseModule(stream.str());
+            assert(module == reconstructed);
         }
     }
 
@@ -429,6 +432,12 @@ auto testInterpreter() -> void
             assert(result.has_value());
             assert(std::holds_alternative<double>(result.value()));
             assert(std::get<double>(result.value()) == expected);
+
+            auto stream  = std::stringstream{};
+            auto printer = snir::PrettyPrinter{stream};
+            printer(module.value());
+            auto reconstructed = parser.parseModule(stream.str());
+            assert(module == reconstructed);
         }
     }
     {

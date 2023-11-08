@@ -3,6 +3,7 @@
 #include "snir/core/print.hpp"
 #include "snir/ir/function.hpp"
 #include "snir/ir/instruction.hpp"
+#include "snir/ir/module.hpp"
 
 #include <functional>
 #include <ostream>
@@ -15,6 +16,7 @@ struct PrettyPrinter
 
     explicit PrettyPrinter(std::ostream& out);
 
+    auto operator()(snir::Module const& m) -> void;
     auto operator()(snir::Function const& f) -> void;
     auto operator()(snir::Block const& block) -> void;
     auto operator()(snir::Instruction const& inst) -> void;
