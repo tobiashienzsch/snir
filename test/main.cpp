@@ -265,10 +265,29 @@ auto testParser() -> void
 
             auto const& block = nan.blocks[0];
             assert(block.size() == 4);
-            assert(block.at(0).hasType<snir::ConstInst>());
-            assert(block.at(1).hasType<snir::ConstInst>());
-            assert(block.at(2).hasType<snir::FloatAddInst>());
-            assert(block.at(3).hasType<snir::ReturnInst>());
+
+            auto const i0 = block.at(0);
+            assert(i0.hasType<snir::ConstInst>());
+            assert(i0.get<snir::ConstInst>().type == snir::Type::Double);
+            assert(i0.get<snir::ConstInst>().result == snir::Register{3});
+            assert(std::get<double>(i0.get<snir::ConstInst>().value) == 2.0);
+
+            auto const i1 = block.at(1);
+            assert(i1.hasType<snir::ConstInst>());
+            assert(i1.get<snir::ConstInst>().type == snir::Type::Double);
+            assert(i1.get<snir::ConstInst>().result == snir::Register{4});
+            assert(std::get<double>(i1.get<snir::ConstInst>().value) == 4.0);
+
+            auto const i2 = block.at(2);
+            assert(i2.hasType<snir::FloatAddInst>());
+            assert(i2.get<snir::FloatAddInst>().type == snir::Type::Double);
+            assert(i2.get<snir::FloatAddInst>().result == snir::Register{5});
+            assert(std::get<snir::Register>(i2.get<snir::FloatAddInst>().lhs) == snir::Register{3});
+            assert(std::get<snir::Register>(i2.get<snir::FloatAddInst>().rhs) == snir::Register{4});
+
+            auto const i3 = block.at(3);
+            assert(i3.hasType<snir::ReturnInst>());
+            assert(std::get<snir::Register>(i3.get<snir::ReturnInst>().value) == snir::Register{5});
         }
 
         {
@@ -415,6 +434,39 @@ auto testInterpreter() -> void
         assert(result.has_value());
         assert(std::holds_alternative<int>(result.value()));
         assert(std::get<int>(result.value()) == 0);
+    }
+
+    {
+        // return files/constant_i64.ll
+        auto tests = std::vector<std::pair<std::string, int>>{
+            std::pair{"./test/files/i64_add.ll",   42 + 143},
+            std::pair{"./test/files/i64_and.ll",   42 & 143},
+            std::pair{"./test/files/i64_const.ll", 42      },
+            std::pair{"./test/files/i64_div.ll",   42 / 2  },
+            std::pair{"./test/files/i64_mul.ll",   42 * 143},
+            std::pair{"./test/files/i64_or.ll",    42 | 143},
+            std::pair{"./test/files/i64_mod.ll",   42 % 3  },
+            std::pair{"./test/files/i64_shl.ll",   42 << 2 },
+            std::pair{"./test/files/i64_shr.ll",   42 >> 0 },
+            std::pair{"./test/files/i64_sub.ll",   42 - 143},
+            std::pair{"./test/files/i64_xor.ll",   42 ^ 143},
+        };
+
+        for (auto const& [path, expected] : tests) {
+            snir::println("execute: {}", path);
+
+            auto vm     = Interpreter{};
+            auto src    = snir::readFile(path).value();
+            auto parser = snir::Parser{};
+            auto module = parser.parseModule(src);
+            assert(module.has_value());
+            assert(module->functions.size() == 1);
+
+            auto result = vm.execute(module->functions.at(0), {});
+            assert(result.has_value());
+            assert(std::holds_alternative<int>(result.value()));
+            assert(std::get<int>(result.value()) == expected);
+        }
     }
 }
 

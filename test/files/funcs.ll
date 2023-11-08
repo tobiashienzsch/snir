@@ -1,7 +1,7 @@
 define double @nan() {
 0:
   %3 = double 2
-  %4 = double 1.14159265359
+  %4 = double 4.0
   %5 = fadd double %3 %4
   ret %5
 }
