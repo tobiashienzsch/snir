@@ -9,4 +9,5 @@ target_sources(snir
         snir/ir/parser.cpp
         snir/ir/pretty_printer.cpp
         snir/vm/interpreter.cpp
+        snir/vm/virtual_machine.cpp
 )

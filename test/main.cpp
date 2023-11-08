@@ -336,29 +336,26 @@ auto testInterpreter() -> void
 
     {
         // empty function
-        auto vm = Interpreter{};
 
         auto const func   = Function{.type = Type::Void};
-        auto const result = vm.execute(func, {});
+        auto const result = Interpreter::execute(func, {});
         assert(not result.has_value());
     }
 
     {
         // function arg mismatch
-        auto vm = Interpreter{};
 
         auto const func   = Function{.type = Type::Void, .arguments = std::vector{Type::Double}};
-        auto const result = vm.execute(func, {});
+        auto const result = Interpreter::execute(func, {});
         assert(not result.has_value());
     }
 
     {
         // return literal
-        auto vm = Interpreter{};
 
         auto block  = snir::Block{Instruction{ReturnInst{.type = Type::Int64, .value = Value{42}}}};
         auto func   = Function{.type = Type::Int64, .blocks = {block}};
-        auto result = vm.execute(func, {});
+        auto result = Interpreter::execute(func, {});
         assert(result.has_value());
         assert(std::holds_alternative<int>(result.value()));
         assert(std::get<int>(result.value()) == 42);
@@ -366,13 +363,12 @@ auto testInterpreter() -> void
 
     {
         // return constant<int>
-        auto vm = Interpreter{};
 
         auto block = snir::Block{};
         block.push_back(ConstInst{.type = Type::Int64, .result = r0, .value = Value{143}});
         block.push_back(ReturnInst{.type = Type::Int64, .value = r0});
         auto func   = Function{.type = Type::Int64, .blocks = {block}};
-        auto result = vm.execute(func, {});
+        auto result = Interpreter::execute(func, {});
         assert(result.has_value());
         assert(std::holds_alternative<int>(result.value()));
         assert(std::get<int>(result.value()) == 143);
@@ -380,13 +376,12 @@ auto testInterpreter() -> void
 
     {
         // return constant<float>
-        auto vm = Interpreter{};
 
         auto block = snir::Block{};
         block.push_back(ConstInst{.type = Type::Float, .result = r0, .value = Value{42.0F}});
         block.push_back(ReturnInst{.type = Type::Float, .value = r0});
         auto func   = Function{.type = Type::Float, .blocks = {block}};
-        auto result = vm.execute(func, {});
+        auto result = Interpreter::execute(func, {});
         assert(result.has_value());
         assert(std::holds_alternative<float>(result.value()));
         assert(std::get<float>(result.value()) == 42.0F);
@@ -394,13 +389,12 @@ auto testInterpreter() -> void
 
     {
         // return constant<double>
-        auto vm = Interpreter{};
 
         auto block = snir::Block{};
         block.push_back(ConstInst{.type = Type::Double, .result = r0, .value = Value{42.0}});
         block.push_back(ReturnInst{.type = Type::Double, .value = r0});
         auto func   = Function{.type = Type::Double, .blocks = {block}};
-        auto result = vm.execute(func, {});
+        auto result = Interpreter::execute(func, {});
         assert(result.has_value());
         assert(std::holds_alternative<double>(result.value()));
         assert(std::get<double>(result.value()) == 42.0);
@@ -408,14 +402,13 @@ auto testInterpreter() -> void
 
     {
         // return add<int>
-        auto vm = Interpreter{};
 
         auto block = snir::Block{};
         block.push_back(ConstInst{.type = Type::Int64, .result = r0, .value = v42});
         block.push_back(AddInst{.type = Type::Int64, .result = r1, .lhs = r0, .rhs = v42});
         block.push_back(ReturnInst{.type = Type::Int64, .value = r1});
         auto func   = Function{.type = Type::Int64, .blocks = {block}};
-        auto result = vm.execute(func, {});
+        auto result = Interpreter::execute(func, {});
         assert(result.has_value());
         assert(std::holds_alternative<int>(result.value()));
         assert(std::get<int>(result.value()) == 84);
@@ -423,14 +416,13 @@ auto testInterpreter() -> void
 
     {
         // return add<int>
-        auto vm = Interpreter{};
 
         auto block = snir::Block{};
         block.push_back(ConstInst{.type = Type::Int64, .result = r0, .value = v42});
         block.push_back(SubInst{.type = Type::Int64, .result = r1, .lhs = r0, .rhs = v42});
         block.push_back(ReturnInst{.type = Type::Int64, .value = r1});
         auto func   = Function{.type = Type::Int64, .blocks = {block}};
-        auto result = vm.execute(func, {});
+        auto result = Interpreter::execute(func, {});
         assert(result.has_value());
         assert(std::holds_alternative<int>(result.value()));
         assert(std::get<int>(result.value()) == 0);
@@ -455,14 +447,13 @@ auto testInterpreter() -> void
         for (auto const& [path, expected] : tests) {
             snir::println("execute: {}", path);
 
-            auto vm     = Interpreter{};
             auto src    = snir::readFile(path).value();
             auto parser = snir::Parser{};
             auto module = parser.parseModule(src);
             assert(module.has_value());
             assert(module->functions.size() == 1);
 
-            auto result = vm.execute(module->functions.at(0), {});
+            auto result = Interpreter::execute(module->functions.at(0), {});
             assert(result.has_value());
             assert(std::holds_alternative<int>(result.value()));
             assert(std::get<int>(result.value()) == expected);
