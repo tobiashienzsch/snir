@@ -167,8 +167,16 @@ define i64 @ipow(i64 %0, i64 %1) {
 }
 )";
 
-    auto parser       = snir::Parser{};
-    auto const module = parser(text);
+    auto parser = snir::Parser{};
+    assert(parser.parseType("void") == snir::Type::Void);
+    assert(parser.parseType("i1") == snir::Type::Bool);
+    assert(parser.parseType("i64") == snir::Type::Int64);
+    assert(parser.parseType("float") == snir::Type::Float);
+    assert(parser.parseType("double") == snir::Type::Double);
+    assert(parser.parseType("block") == snir::Type::Block);
+    assert(parser.parseType("event") == snir::Type::Event);
+
+    auto const module = parser.parseModule(text);
     // assert(module.value().functions.size() == 3);
 }
 
