@@ -47,7 +47,10 @@ auto PrettyPrinter::operator()(Block const& block) -> void
 
 auto PrettyPrinter::operator()(Instruction const& inst) -> void { inst.visit(*this); }
 
-auto PrettyPrinter::operator()(NopInst const& nop) -> void { println(_out, "  ; {}", nop.name); }
+auto PrettyPrinter::operator()(NopInst const& /*nop*/) -> void
+{
+    println(_out, "  ; {}", snir::NopInst::name);
+}
 
 auto PrettyPrinter::operator()(ConstInst const& constant) -> void
 {

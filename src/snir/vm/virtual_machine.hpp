@@ -41,7 +41,7 @@ struct VirtualMachine
     auto operator()(FloatDivInst const& inst) -> void;
 
     template<typename Inst>
-    auto operator()(Inst const& inst) -> void
+    auto operator()(Inst const& /*inst*/) -> void
     {
         raisef<std::runtime_error>("unhandled instruction '{}'", Inst::name);
     }
@@ -77,7 +77,7 @@ private:
 
         auto operator()(auto v) -> T { return static_cast<T>(v); }
 
-        auto operator()(Void) -> T
+        auto operator()(Void /*unused*/) -> T
         {
             raisef<std::runtime_error>("can't cast void to '{}'", typeid(T).name());
         }
@@ -106,7 +106,8 @@ private:
             auto const rhs = std::visit(ValueAs<float>{_register}, inst.rhs);
             _register.emplace(inst.result, op(lhs, rhs));
             return;
-        } else if (inst.type == Type::Double) {
+        }
+        if (inst.type == Type::Double) {
             auto const lhs = std::visit(ValueAs<double>{_register}, inst.lhs);
             auto const rhs = std::visit(ValueAs<double>{_register}, inst.rhs);
             _register.emplace(inst.result, op(lhs, rhs));

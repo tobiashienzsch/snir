@@ -4,6 +4,7 @@ Checks: >
   boost-*,
   bugprone-*,
   -bugprone-exception-escape,
+  -bugprone-unchecked-optional-access,
 
   cert-*,
   -cert-dcl58-cpp,
@@ -11,7 +12,10 @@ Checks: >
   clang-analyzer-*,
   clang-diagnostics-*,
   concurrency-*,
+
   cppcoreguidelines-*,
+  -cppcoreguidelines-macro-usage,
+
   hicpp-*,
   misc-*,
   modernize-*,

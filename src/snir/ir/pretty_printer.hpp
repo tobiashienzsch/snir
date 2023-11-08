@@ -24,7 +24,7 @@ struct PrettyPrinter
     auto operator()(NopInst const& nop) -> void;
     auto operator()(ConstInst const& constant) -> void;
     auto operator()(TruncInst const& trunc) -> void;
-    auto operator()(IntCmpInst const& ret) -> void;
+    auto operator()(IntCmpInst const& inst) -> void;
     auto operator()(ReturnInst const& ret) -> void;
 
     template<typename Inst>

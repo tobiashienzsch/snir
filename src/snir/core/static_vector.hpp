@@ -27,7 +27,7 @@ struct StaticVector
 
     StaticVector() = default;
 
-    explicit StaticVector(std::initializer_list<T> il)
+    StaticVector(std::initializer_list<T> il)
     {
         if (il.size() <= capacity()) {
             std::ranges::copy(il, _buffer.begin());
@@ -69,7 +69,7 @@ struct StaticVector
     }
 
     template<typename U>
-    auto push_back(U&& val) -> reference
+    auto push_back(U&& val) -> reference  // NOLINT(readability-identifier-naming)
     {
         if (full()) {
             raisef<std::out_of_range>("push_back on full StaticVector<T, {}>", capacity());

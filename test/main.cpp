@@ -107,15 +107,13 @@ auto testVector() -> void
 
 auto testPassManager() -> void
 {
-    auto parser = snir::Parser{};
-
-    for (auto const test : {
+    for (auto const& test : {
              std::string{"test/files/opt_dead_store.ll"},
              std::string{"test/files/opt_empty_block.ll"},
          }) {
 
         auto const src      = snir::readFile(test).value();
-        auto const original = parser.parseModule(src).value();
+        auto const original = snir::Parser::parseModule(src).value();
 
         auto pm = snir::PassManager{true};
         pm.add(snir::DeadStoreElimination{});
@@ -134,16 +132,14 @@ auto testPassManager() -> void
 template<typename Inst>
 [[nodiscard]] auto checkInstruction(char const* src) -> bool
 {
-    auto parser     = snir::Parser{};
-    auto const inst = parser.parseInstruction(src);
+    auto const inst = snir::Parser::parseInstruction(src);
     return inst.has_value() and inst->hasType<Inst>();
 }
 
 template<snir::Type Type>
 [[nodiscard]] auto checkInstructionType(char const* src) -> bool
 {
-    auto parser     = snir::Parser{};
-    auto const inst = parser.parseInstruction(src);
+    auto const inst = snir::Parser::parseInstruction(src);
     return inst and inst->visit([](auto i) {
         if constexpr (requires { i.type; }) {
             return i.type == Type;
@@ -157,14 +153,13 @@ auto testParser() -> void
 {
     using namespace snir;
 
-    auto parser = Parser{};
-    assert(parser.parseType("void") == Type::Void);
-    assert(parser.parseType("i1") == Type::Bool);
-    assert(parser.parseType("i64") == Type::Int64);
-    assert(parser.parseType("float") == Type::Float);
-    assert(parser.parseType("double") == Type::Double);
-    assert(parser.parseType("block") == Type::Block);
-    assert(parser.parseType("event") == Type::Event);
+    assert(snir::Parser::parseType("void") == Type::Void);
+    assert(snir::Parser::parseType("i1") == Type::Bool);
+    assert(snir::Parser::parseType("i64") == Type::Int64);
+    assert(snir::Parser::parseType("float") == Type::Float);
+    assert(snir::Parser::parseType("double") == Type::Double);
+    assert(snir::Parser::parseType("block") == Type::Block);
+    assert(snir::Parser::parseType("event") == Type::Event);
 
     assert(checkInstruction<ReturnInst>("ret i64 %1"));
     assert(checkInstruction<ConstInst>("%5 = i64 42"));
@@ -203,19 +198,19 @@ auto testParser() -> void
 
     {
         auto const* src = "%5 = add i64 %3 %4";
-        auto const inst = parser.parseInstruction(src);
+        auto const inst = snir::Parser::parseInstruction(src);
         assert(inst.has_value());
         assert(inst->hasType<AddInst>());
         assert(inst->getResultRegister() == Register{5});
 
-        auto const lhs = parser.parseInstruction(src);
-        auto const rhs = parser.parseInstruction(src);
+        auto const lhs = snir::Parser::parseInstruction(src);
+        auto const rhs = snir::Parser::parseInstruction(src);
         assert(lhs == rhs);
     }
 
     {
         auto const* src = "%5 = i64 42";
-        auto const inst = parser.parseInstruction(src);
+        auto const inst = snir::Parser::parseInstruction(src);
         assert(inst.has_value());
 
         auto const operand = inst->getOperands()[0];
@@ -225,7 +220,7 @@ auto testParser() -> void
 
     {
         auto const* src = "ret i64 %5";
-        auto const inst = parser.parseInstruction(src);
+        auto const inst = snir::Parser::parseInstruction(src);
         assert(inst.has_value());
         assert(inst->get<ReturnInst>().type == Type::Int64);
         assert(std::get<Register>(inst->get<ReturnInst>().value) == Register{5});
@@ -233,7 +228,7 @@ auto testParser() -> void
 
     {
         auto const text   = readFile("./test/files/func.ll").value();
-        auto const module = parser.parseModule(text);
+        auto const module = snir::Parser::parseModule(text);
         assert(module.value().functions.size() == 1);
 
         auto const& func = module.value().functions[0];
@@ -250,7 +245,7 @@ auto testParser() -> void
 
     {
         auto const text   = readFile("./test/files/funcs.ll").value();
-        auto const module = parser.parseModule(text);
+        auto const module = snir::Parser::parseModule(text);
         assert(module.value().functions.size() == 3);
 
         auto const& funcs = module->functions;
@@ -258,7 +253,7 @@ auto testParser() -> void
             auto const& nan = funcs[0];
             assert(nan.name == "nan");
             assert(nan.type == Type::Double);
-            assert(nan.arguments.size() == 0);
+            assert(nan.arguments.empty());
             assert(nan.blocks.size() == 1);
 
             auto const& block = nan.blocks[0];
@@ -372,8 +367,7 @@ auto testInterpreter() -> void
             println("execute: {}", path);
 
             auto src    = readFile(path).value();
-            auto parser = Parser{};
-            auto module = parser.parseModule(src);
+            auto module = snir::Parser::parseModule(src);
             assert(module.has_value());
             assert(module->functions.size() == 1);
 
@@ -387,18 +381,17 @@ auto testInterpreter() -> void
     {
         // return files/float_*.ll
         auto tests = std::vector<std::pair<std::string, float>>{};
-        tests.emplace_back("./test/files/float_add.ll", 42.0f + 143.0f);
-        tests.emplace_back("./test/files/float_div.ll", 42.0f / 2.0f);
-        tests.emplace_back("./test/files/float_mul.ll", 42.0f * 143.0f);
-        tests.emplace_back("./test/files/float_sub.ll", 42.0f - 143.0f);
-        tests.emplace_back("./test/files/float_trunc.ll", 42.0f - 143.0f);
+        tests.emplace_back("./test/files/float_add.ll", 42.0F + 143.0F);
+        tests.emplace_back("./test/files/float_div.ll", 42.0F / 2.0F);
+        tests.emplace_back("./test/files/float_mul.ll", 42.0F * 143.0F);
+        tests.emplace_back("./test/files/float_sub.ll", 42.0F - 143.0F);
+        tests.emplace_back("./test/files/float_trunc.ll", 42.0F - 143.0F);
 
         for (auto const& [path, expected] : tests) {
             println("execute: {}", path);
 
             auto src    = readFile(path).value();
-            auto parser = Parser{};
-            auto module = parser.parseModule(src);
+            auto module = snir::Parser::parseModule(src);
             assert(module.has_value());
             assert(module->functions.size() == 1);
 
@@ -422,8 +415,7 @@ auto testInterpreter() -> void
             println("execute: {}", path);
 
             auto src    = readFile(path).value();
-            auto parser = Parser{};
-            auto module = parser.parseModule(src);
+            auto module = snir::Parser::parseModule(src);
             assert(module.has_value());
             assert(module->functions.size() == 1);
 
@@ -435,14 +427,14 @@ auto testInterpreter() -> void
     }
     {
         // return files/mismatch_float_*.ll
-        auto const mismatch              = "type mismatch for instruction: 'f' vs 'd'";
-        auto const unsupported_int_float = "unsupported type for int instruction: 'float'";
-        auto const unsupported_float_i64 = "unsupported type for float instruction: 'i64'";
+        auto const* const mismatch            = "type mismatch for instruction: 'f' vs 'd'";
+        auto const* const unsupportedIntFloat = "unsupported type for int instruction: 'float'";
+        auto const* const unsupportedFloatI64 = "unsupported type for float instruction: 'i64'";
 
         auto tests = std::vector<std::pair<std::string, std::string>>{};
         tests.emplace_back("./test/files/mismatch_float_add_0.ll", mismatch);
-        tests.emplace_back("./test/files/mismatch_float_add_1.ll", unsupported_int_float);
-        tests.emplace_back("./test/files/mismatch_float_add_2.ll", unsupported_float_i64);
+        tests.emplace_back("./test/files/mismatch_float_add_1.ll", unsupportedIntFloat);
+        tests.emplace_back("./test/files/mismatch_float_add_2.ll", unsupportedFloatI64);
         tests.emplace_back("./test/files/mismatch_float_div.ll", mismatch);
         tests.emplace_back("./test/files/mismatch_float_mul.ll", mismatch);
         tests.emplace_back("./test/files/mismatch_float_sub.ll", mismatch);
@@ -451,38 +443,34 @@ auto testInterpreter() -> void
             println("execute: {}", path);
 
             auto src    = readFile(path).value();
-            auto parser = Parser{};
-            auto module = parser.parseModule(src);
+            auto module = snir::Parser::parseModule(src);
             assert(module.has_value());
             assert(module->functions.size() == 1);
 
-            auto run = false;
             try {
-                auto result = Interpreter::execute(module->functions.at(0), {});
-                auto run    = true;
+                [[maybe_unused]] auto result = Interpreter::execute(module->functions.at(0), {});
+                assert(false);
             } catch (std::exception const& e) {
                 assert(strings::contains(e.what(), expected));
             }
-            assert(not run);
         }
     }
 }
 
 auto testPrettyPrinter() -> void
 {
-    for (auto const entry : std::filesystem::directory_iterator{"./test/files"}) {
+    for (auto const& entry : std::filesystem::directory_iterator{"./test/files"}) {
         snir::println("pretty-print/parse: {}", entry.path().string());
 
         auto src    = snir::readFile(entry.path()).value();
-        auto parser = snir::Parser{};
-        auto module = parser.parseModule(src);
+        auto module = snir::Parser::parseModule(src);
         assert(module.has_value());
 
         auto stream  = std::stringstream{};
         auto printer = snir::PrettyPrinter{stream};
         printer(module.value());
 
-        auto reconstructed = parser.parseModule(stream.str());
+        auto reconstructed = snir::Parser::parseModule(stream.str());
         if (module.value() != reconstructed.value()) {
             snir::println("'{}'", stream.str());
             assert(false);

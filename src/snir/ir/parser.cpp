@@ -34,8 +34,8 @@ auto Parser::parseModule(std::string const& src) -> std::optional<Module>
         module.functions.push_back(Function{
             .type      = type.value(),
             .name      = matches[2].str(),
-            .arguments = std::move(arguments.value()),
-            .blocks    = std::move(blocks.value()),
+            .arguments = arguments.value(),
+            .blocks    = blocks.value(),
         });
 
         // Update the search start position
@@ -269,9 +269,11 @@ auto Parser::parseValue(std::string const& src, Type type) -> std::optional<Valu
 
     if (type == Type::Int64) {
         return std::stoi(src);
-    } else if (type == Type::Float) {
+    }
+    if (type == Type::Float) {
         return std::stof(src);
-    } else {
+    }
+    if (type == Type::Double) {
         return std::stod(src);
     }
 

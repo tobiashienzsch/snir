@@ -55,11 +55,10 @@ auto main(int argc, char const* const* argv) -> int
 
     // Parse source
     auto src    = snir::readFile(args->input).value();
-    auto parser = snir::Parser{};
     auto module = snir::Module{};
     {
         auto const start = std::chrono::steady_clock::now();
-        module           = parser.parseModule(src).value();
+        module           = snir::Parser::parseModule(src).value();
         if (args->verbose) {
             auto const stop  = std::chrono::steady_clock::now();
             auto const delta = std::chrono::duration_cast<std::chrono::microseconds>(stop - start);

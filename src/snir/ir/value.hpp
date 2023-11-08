@@ -10,7 +10,7 @@ namespace snir {
 
 struct Void
 {
-    friend auto operator==(Void const& lhs, Void const& rhs) noexcept -> bool = default;
+    friend auto operator==(Void const& /*lhs*/, Void const& /*rhs*/) noexcept -> bool = default;
 };
 
 using Value = std::variant<Void, bool, int, float, double, Register>;

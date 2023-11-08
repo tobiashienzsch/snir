@@ -16,7 +16,7 @@ struct NopInst
     static constexpr auto name = std::string_view{"nop"};
     static constexpr auto args = 0;
 
-    friend auto operator==(NopInst const& lhs, NopInst const& rhs) noexcept -> bool = default;
+    friend auto operator==(NopInst const& /*lhs*/, NopInst const& /*rhs*/) noexcept -> bool = default;
 };
 
 struct ReturnInst
