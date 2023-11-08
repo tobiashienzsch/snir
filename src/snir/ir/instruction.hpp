@@ -1,5 +1,6 @@
 #pragma once
 
+#include "snir/core/static_vector.hpp"
 #include "snir/ir/compare.hpp"
 #include "snir/ir/register.hpp"
 #include "snir/ir/type.hpp"
@@ -106,27 +107,26 @@ struct Instruction
         return std::visit(std::forward<Visitor>(visitor), _holder);
     }
 
-    [[nodiscard]] auto getOperands() const -> std::array<std::optional<Value>, 2>
+    [[nodiscard]] auto getOperands() const -> StaticVector<Value, 2>
     {
         return visit([]<typename T>(T const& i) {
             if constexpr (T::args == 2) {
-                return std::array<std::optional<Value>, 2>{i.lhs, i.rhs};
+                return StaticVector<Value, 2>{i.lhs, i.rhs};
             } else if constexpr (requires { T::value; }) {
-                return std::array<std::optional<Value>, 2>{i.value, std::nullopt};
+                return StaticVector<Value, 2>{i.value};
             } else {
-                return std::array<std::optional<Value>, 2>{};
+                return StaticVector<Value, 2>{};
             }
         });
     }
 
-    [[nodiscard]] auto getOperandRegisters() const -> std::array<std::optional<Register>, 2>
+    [[nodiscard]] auto getOperandRegisters() const -> StaticVector<Register, 2>
     {
         auto const operands = getOperands();
-        auto registers      = std::array<std::optional<Register>, 2>{};
-        for (auto i{0U}; i < operands.size(); ++i) {
-            auto const op = operands.at(i).value_or(false);
+        auto registers      = StaticVector<Register, 2>{};
+        for (auto const& op : operands) {
             if (auto const* reg = std::get_if<Register>(&op); reg != nullptr) {
-                registers.at(i) = *reg;
+                registers.push_back(*reg);
             }
         }
         return registers;

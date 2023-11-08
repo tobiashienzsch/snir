@@ -35,9 +35,7 @@ private:
         }
 
         for (auto const reg : inst.getOperandRegisters()) {
-            if (reg) {
-                _used.insert(*reg);
-            }
+            _used.insert(reg);
         }
 
         return inst;
