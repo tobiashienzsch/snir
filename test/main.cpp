@@ -19,7 +19,7 @@ namespace {
 
 auto testVector() -> void
 {
-    auto test = []<typename T>(T val) {
+    auto test = []<typename T>(T val) {  // NOLINT(readability-function-cognitive-complexity)
         using Vec = snir::StaticVector<T, 2>;
         static_assert(std::same_as<typename Vec::value_type, T>);
         static_assert(std::same_as<typename Vec::value_type, T>);
@@ -113,7 +113,7 @@ auto testPassManager() -> void
          }) {
 
         auto const src      = snir::readFile(test).value();
-        auto const original = snir::Parser::parseModule(src).value();
+        auto const original = snir::Parser::readModule(src).value();
 
         auto pm = snir::PassManager{true};
         pm.add(snir::DeadStoreElimination{});
@@ -132,14 +132,14 @@ auto testPassManager() -> void
 template<typename Inst>
 [[nodiscard]] auto checkInstruction(char const* src) -> bool
 {
-    auto const inst = snir::Parser::parseInstruction(src);
+    auto const inst = snir::Parser::readInstruction(src);
     return inst.has_value() and inst->hasType<Inst>();
 }
 
 template<snir::Type Type>
 [[nodiscard]] auto checkInstructionType(char const* src) -> bool
 {
-    auto const inst = snir::Parser::parseInstruction(src);
+    auto const inst = snir::Parser::readInstruction(src);
     return inst and inst->visit([](auto i) {
         if constexpr (requires { i.type; }) {
             return i.type == Type;
@@ -149,17 +149,17 @@ template<snir::Type Type>
     });
 }
 
-auto testParser() -> void
+auto testParser() -> void  // NOLINT(readability-function-cognitive-complexity)
 {
     using namespace snir;
 
-    assert(snir::Parser::parseType("void") == Type::Void);
-    assert(snir::Parser::parseType("i1") == Type::Bool);
-    assert(snir::Parser::parseType("i64") == Type::Int64);
-    assert(snir::Parser::parseType("float") == Type::Float);
-    assert(snir::Parser::parseType("double") == Type::Double);
-    assert(snir::Parser::parseType("block") == Type::Block);
-    assert(snir::Parser::parseType("event") == Type::Event);
+    assert(snir::Parser::readType("void") == Type::Void);
+    assert(snir::Parser::readType("i1") == Type::Bool);
+    assert(snir::Parser::readType("i64") == Type::Int64);
+    assert(snir::Parser::readType("float") == Type::Float);
+    assert(snir::Parser::readType("double") == Type::Double);
+    assert(snir::Parser::readType("block") == Type::Block);
+    assert(snir::Parser::readType("event") == Type::Event);
 
     assert(checkInstruction<ReturnInst>("ret i64 %1"));
     assert(checkInstruction<ConstInst>("%5 = i64 42"));
@@ -198,19 +198,19 @@ auto testParser() -> void
 
     {
         auto const* src = "%5 = add i64 %3 %4";
-        auto const inst = snir::Parser::parseInstruction(src);
+        auto const inst = snir::Parser::readInstruction(src);
         assert(inst.has_value());
         assert(inst->hasType<AddInst>());
         assert(inst->getResultRegister() == Register{5});
 
-        auto const lhs = snir::Parser::parseInstruction(src);
-        auto const rhs = snir::Parser::parseInstruction(src);
+        auto const lhs = snir::Parser::readInstruction(src);
+        auto const rhs = snir::Parser::readInstruction(src);
         assert(lhs == rhs);
     }
 
     {
         auto const* src = "%5 = i64 42";
-        auto const inst = snir::Parser::parseInstruction(src);
+        auto const inst = snir::Parser::readInstruction(src);
         assert(inst.has_value());
 
         auto const operand = inst->getOperands()[0];
@@ -220,7 +220,7 @@ auto testParser() -> void
 
     {
         auto const* src = "ret i64 %5";
-        auto const inst = snir::Parser::parseInstruction(src);
+        auto const inst = snir::Parser::readInstruction(src);
         assert(inst.has_value());
         assert(inst->get<ReturnInst>().type == Type::Int64);
         assert(std::get<Register>(inst->get<ReturnInst>().value) == Register{5});
@@ -228,7 +228,7 @@ auto testParser() -> void
 
     {
         auto const text   = readFile("./test/files/func.ll").value();
-        auto const module = snir::Parser::parseModule(text);
+        auto const module = snir::Parser::readModule(text);
         assert(module.value().functions.size() == 1);
 
         auto const& func = module.value().functions[0];
@@ -245,7 +245,7 @@ auto testParser() -> void
 
     {
         auto const text   = readFile("./test/files/funcs.ll").value();
-        auto const module = snir::Parser::parseModule(text);
+        auto const module = snir::Parser::readModule(text);
         assert(module.value().functions.size() == 3);
 
         auto const& funcs = module->functions;
@@ -319,7 +319,7 @@ auto testParser() -> void
     }
 }
 
-auto testInterpreter() -> void
+auto testInterpreter() -> void  // NOLINT(readability-function-cognitive-complexity)
 {
     using namespace snir;
 
@@ -367,7 +367,7 @@ auto testInterpreter() -> void
             println("execute: {}", path);
 
             auto src    = readFile(path).value();
-            auto module = snir::Parser::parseModule(src);
+            auto module = snir::Parser::readModule(src);
             assert(module.has_value());
             assert(module->functions.size() == 1);
 
@@ -391,7 +391,7 @@ auto testInterpreter() -> void
             println("execute: {}", path);
 
             auto src    = readFile(path).value();
-            auto module = snir::Parser::parseModule(src);
+            auto module = snir::Parser::readModule(src);
             assert(module.has_value());
             assert(module->functions.size() == 1);
 
@@ -415,7 +415,7 @@ auto testInterpreter() -> void
             println("execute: {}", path);
 
             auto src    = readFile(path).value();
-            auto module = snir::Parser::parseModule(src);
+            auto module = snir::Parser::readModule(src);
             assert(module.has_value());
             assert(module->functions.size() == 1);
 
@@ -443,7 +443,7 @@ auto testInterpreter() -> void
             println("execute: {}", path);
 
             auto src    = readFile(path).value();
-            auto module = snir::Parser::parseModule(src);
+            auto module = snir::Parser::readModule(src);
             assert(module.has_value());
             assert(module->functions.size() == 1);
 
@@ -463,14 +463,14 @@ auto testPrettyPrinter() -> void
         snir::println("pretty-print/parse: {}", entry.path().string());
 
         auto src    = snir::readFile(entry.path()).value();
-        auto module = snir::Parser::parseModule(src);
+        auto module = snir::Parser::readModule(src);
         assert(module.has_value());
 
         auto stream  = std::stringstream{};
         auto printer = snir::PrettyPrinter{stream};
         printer(module.value());
 
-        auto reconstructed = snir::Parser::parseModule(stream.str());
+        auto reconstructed = snir::Parser::readModule(stream.str());
         if (module.value() != reconstructed.value()) {
             snir::println("'{}'", stream.str());
             assert(false);

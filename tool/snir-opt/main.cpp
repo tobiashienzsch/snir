@@ -20,25 +20,25 @@ struct Arguments
     bool verbose{false};
 };
 
-[[nodiscard]] auto parseArguments(int argc, char const* const* argv) -> std::optional<Arguments>
+[[nodiscard]] auto parseArguments(std::span<char const* const> arguments) -> std::optional<Arguments>
 {
     auto args = Arguments{};
-    for (auto i{1}; i < argc; ++i) {
-        if (snir::strings::trim(argv[i]) == std::string_view{"-v"}) {
+    for (auto i{1}; i < arguments.size(); ++i) {
+        if (snir::strings::trim(arguments[i]) == std::string_view{"-v"}) {
             args.verbose = true;
             continue;
         }
-        if (snir::strings::contains(argv[i], "-O")) {
-            args.opt = std::stoi(std::string(argv[i]).substr(2));
+        if (snir::strings::contains(arguments[i], "-O")) {
+            args.opt = std::stoi(std::string(arguments[i]).substr(2));
             continue;
         }
-        if (snir::strings::contains(argv[i], "-o")) {
-            args.output = argv[++i];
+        if (snir::strings::contains(arguments[i], "-o")) {
+            args.output = arguments[++i];
             continue;
         }
     }
 
-    args.input = argv[argc - 1];
+    args.input = arguments.back();
     return args;
 };
 
@@ -47,7 +47,7 @@ struct Arguments
 auto main(int argc, char const* const* argv) -> int
 {
     // Parse arguments
-    auto args = parseArguments(argc, argv);
+    auto args = parseArguments(std::span<char const* const>(argv, std::size_t(argc)));
     if (not args) {
         snir::println("Usage:\nsnex-opt -v -O[0,1,2]");
         return EXIT_FAILURE;
@@ -58,7 +58,7 @@ auto main(int argc, char const* const* argv) -> int
     auto module = snir::Module{};
     {
         auto const start = std::chrono::steady_clock::now();
-        module           = snir::Parser::parseModule(src).value();
+        module           = snir::Parser::readModule(src).value();
         if (args->verbose) {
             auto const stop  = std::chrono::steady_clock::now();
             auto const delta = std::chrono::duration_cast<std::chrono::microseconds>(stop - start);

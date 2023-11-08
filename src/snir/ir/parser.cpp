@@ -7,7 +7,7 @@
 
 namespace snir {
 
-auto Parser::parseModule(std::string const& src) -> std::optional<Module>
+auto Parser::readModule(std::string const& src) -> std::optional<Module>
 {
     auto module = Module{};
 
@@ -16,17 +16,17 @@ auto Parser::parseModule(std::string const& src) -> std::optional<Module>
     auto pattern = std::regex(R"(define\s+(\w+)\s+@(\w+)\(([^)]*)\)\s*\{([^}]*)\})");
 
     while (std::regex_search(search, src.cend(), matches, pattern)) {
-        auto const type = parseType(matches[1].str());
+        auto const type = readType(matches[1].str());
         if (not type) {
             return std::nullopt;
         }
 
-        auto const arguments = parseFunctionArgs(matches[3].str());
+        auto const arguments = readFunctionArgs(matches[3].str());
         if (not arguments) {
             return std::nullopt;
         }
 
-        auto const blocks = parseBlocks(matches[4].str());
+        auto const blocks = readBlocks(matches[4].str());
         if (not blocks) {
             return std::nullopt;
         }
@@ -45,25 +45,25 @@ auto Parser::parseModule(std::string const& src) -> std::optional<Module>
     return module;
 }
 
-auto Parser::parseInstruction(std::string const& src) -> std::optional<Instruction>
+auto Parser::readInstruction(std::string const& src) -> std::optional<Instruction>
 {
-    if (auto inst = parseBinaryInst(src); inst) {
+    if (auto inst = readBinaryInst(src); inst) {
         return inst;
     }
 
-    if (auto inst = parseConstInst(src); inst) {
+    if (auto inst = readConstInst(src); inst) {
         return inst.value();
     }
 
-    if (auto inst = parseTruncInst(src); inst) {
+    if (auto inst = readTruncInst(src); inst) {
         return inst.value();
     }
 
-    if (auto inst = parseIntCmpInst(src); inst) {
+    if (auto inst = readIntCmpInst(src); inst) {
         return inst.value();
     }
 
-    if (auto inst = parseReturnInst(src); inst) {
+    if (auto inst = readReturnInst(src); inst) {
         return inst.value();
     }
 
@@ -74,7 +74,7 @@ auto Parser::parseInstruction(std::string const& src) -> std::optional<Instructi
     return std::nullopt;
 }
 
-auto Parser::parseType(std::string_view src) -> std::optional<Type>
+auto Parser::readType(std::string_view src) -> std::optional<Type>
 {
 #define SNIR_BUILTIN_TYPE(Id, Name)                                                                  \
     if (src == std::string_view{#Name}) {                                                            \
@@ -86,7 +86,7 @@ auto Parser::parseType(std::string_view src) -> std::optional<Type>
     return std::nullopt;
 }
 
-auto Parser::parseFunctionArgs(std::string const& src) -> std::optional<std::vector<Type>>
+auto Parser::readFunctionArgs(std::string const& src) -> std::optional<std::vector<Type>>
 {
     auto args = std::vector<Type>{};
 
@@ -95,7 +95,7 @@ auto Parser::parseFunctionArgs(std::string const& src) -> std::optional<std::vec
     auto pattern = std::regex(R"(\s*([a-zA-Z_]\w*)\s+%[0-9]+(?:\s*,\s*|$))");
 
     while (std::regex_search(search, src.cend(), matches, pattern)) {
-        auto const type = parseType(matches[1].str());
+        auto const type = readType(matches[1].str());
         if (not type) {
             return std::nullopt;
         }
@@ -107,7 +107,7 @@ auto Parser::parseFunctionArgs(std::string const& src) -> std::optional<std::vec
     return args;
 }
 
-auto Parser::parseBlocks(std::string const& src) -> std::optional<std::vector<Block>>
+auto Parser::readBlocks(std::string const& src) -> std::optional<std::vector<Block>>
 {
     auto blocks = std::vector<Block>{};
 
@@ -120,7 +120,7 @@ auto Parser::parseBlocks(std::string const& src) -> std::optional<std::vector<Bl
             continue;
         }
 
-        auto block = parseBlock(str);
+        auto block = readBlock(str);
         if (not block) {
             return std::nullopt;
         }
@@ -130,14 +130,14 @@ auto Parser::parseBlocks(std::string const& src) -> std::optional<std::vector<Bl
     return blocks;
 }
 
-auto Parser::parseBlock(std::string const& src) -> std::optional<Block>
+auto Parser::readBlock(std::string const& src) -> std::optional<Block>
 {
     auto block = Block{};
 
     auto line   = std::string{};
     auto stream = std::istringstream(src);
     while (std::getline(stream, line)) {
-        auto inst = parseInstruction(strings::trim(line));
+        auto inst = readInstruction(strings::trim(line));
         if (inst) {
             block.push_back(inst.value());
         }
@@ -146,16 +146,17 @@ auto Parser::parseBlock(std::string const& src) -> std::optional<Block>
     return block;
 }
 
-auto Parser::parseBinaryInst(std::string const& src) -> std::optional<Instruction>
+// NOLINTNEXTLINE(readability-function-cognitive-complexity)
+auto Parser::readBinaryInst(std::string const& src) -> std::optional<Instruction>
 {
     auto matches = std::smatch();
     auto pattern = std::regex(R"(%(\d+) = (\w+) (\w+) (\d+|%\d+) (\d+|%\d+))");
     if (std::regex_match(src, matches, pattern)) {
         auto op     = matches[2].str();
-        auto type   = parseType(matches[3].str()).value();
+        auto type   = readType(matches[3].str()).value();
         auto result = Register{std::stoi(matches[1])};
-        auto lhs    = parseValue(matches[4], type).value();
-        auto rhs    = parseValue(matches[5], type).value();
+        auto lhs    = readValue(matches[4], type).value();
+        auto rhs    = readValue(matches[5], type).value();
 
 #define SNIR_INST_BINARY_OP(Id, Name)                                                                \
     if (op == std::string_view{#Name}) {                                                             \
@@ -174,14 +175,14 @@ auto Parser::parseBinaryInst(std::string const& src) -> std::optional<Instructio
     return std::nullopt;
 }
 
-auto Parser::parseConstInst(std::string const& src) -> std::optional<ConstInst>
+auto Parser::readConstInst(std::string const& src) -> std::optional<ConstInst>
 {
     auto matches = std::smatch();
     auto pattern = std::regex(R"(%(\d+) = (\w+) ([-+]?(\d+\.\d+|\d+)))");
     if (std::regex_match(src, matches, pattern)) {
         auto const result = Register{std::stoi(matches[1])};
-        auto const type   = parseType(matches[2].str()).value();
-        auto const value  = parseValue(matches[3], type).value();
+        auto const type   = readType(matches[2].str()).value();
+        auto const value  = readValue(matches[3], type).value();
 
         return ConstInst{
             .type   = type,
@@ -193,15 +194,15 @@ auto Parser::parseConstInst(std::string const& src) -> std::optional<ConstInst>
     return std::nullopt;
 }
 
-auto Parser::parseIntCmpInst(std::string const& src) -> std::optional<IntCmpInst>
+auto Parser::readIntCmpInst(std::string const& src) -> std::optional<IntCmpInst>
 {
     // <result> = icmp eq i32 4, 5
     auto matches = std::smatch();
     auto pattern = std::regex(R"(%(\d+) = icmp (\w+) (\w+) %(\d+) %(\d+))");
     if (std::regex_match(src, matches, pattern)) {
         auto const result = Register{std::stoi(matches[1])};
-        auto const kind   = parseCompare(matches[2]).value();
-        auto const type   = parseType(matches[3].str()).value();
+        auto const kind   = readCompare(matches[2]).value();
+        auto const type   = readType(matches[3].str()).value();
         auto const lhs    = Register{std::stoi(matches[4])};
         auto const rhs    = Register{std::stoi(matches[5])};
 
@@ -217,14 +218,14 @@ auto Parser::parseIntCmpInst(std::string const& src) -> std::optional<IntCmpInst
     return std::nullopt;
 }
 
-auto Parser::parseTruncInst(std::string const& src) -> std::optional<TruncInst>
+auto Parser::readTruncInst(std::string const& src) -> std::optional<TruncInst>
 {
     // %2 = trunc %1 as float
     auto matches = std::smatch();
     auto pattern = std::regex(R"(%(\d+) = trunc %(\d+) as (\w+))");
     if (std::regex_match(src, matches, pattern)) {
         auto const result = Register{std::stoi(matches[1])};
-        auto const type   = parseType(matches[3].str()).value();
+        auto const type   = readType(matches[3].str()).value();
         auto const value  = Register{std::stoi(matches[2])};
         return TruncInst{
             .type   = type,
@@ -236,12 +237,12 @@ auto Parser::parseTruncInst(std::string const& src) -> std::optional<TruncInst>
     return std::nullopt;
 }
 
-auto Parser::parseReturnInst(std::string const& src) -> std::optional<ReturnInst>
+auto Parser::readReturnInst(std::string const& src) -> std::optional<ReturnInst>
 {
     auto matches = std::smatch();
     auto pattern = std::regex(R"(ret (\w+) %(\d+))");
     if (std::regex_match(src, matches, pattern)) {
-        auto const type    = parseType(matches[1].str()).value();
+        auto const type    = readType(matches[1].str()).value();
         auto const operand = std::stoi(matches[2]);
         return ReturnInst{.type = type, .value = Register{operand}};
     }
@@ -249,7 +250,7 @@ auto Parser::parseReturnInst(std::string const& src) -> std::optional<ReturnInst
     return std::nullopt;
 }
 
-auto Parser::parseCompare(std::string const& src) -> std::optional<Compare>
+auto Parser::readCompare(std::string const& src) -> std::optional<Compare>
 {
 #define SNIR_INST_COMPARE_OP(Op, Name)                                                               \
     if (src == std::string_view{#Name}) {                                                            \
@@ -261,7 +262,7 @@ auto Parser::parseCompare(std::string const& src) -> std::optional<Compare>
     return std::nullopt;
 }
 
-auto Parser::parseValue(std::string const& src, Type type) -> std::optional<Value>
+auto Parser::readValue(std::string const& src, Type type) -> std::optional<Value>
 {
     if (src.starts_with("%")) {
         return Register{std::stoi(src.substr(1))};

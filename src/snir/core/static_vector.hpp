@@ -75,7 +75,7 @@ struct StaticVector
             raisef<std::out_of_range>("push_back on full StaticVector<T, {}>", capacity());
         }
 
-        _buffer[_size] = std::forward<U>(val);
+        _buffer.at(_size) = std::forward<U>(val);
         ++_size;
         return *std::prev(end());
     }
