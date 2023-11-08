@@ -1,5 +1,6 @@
 #pragma once
 
+#include "snir/ir/compare.hpp"
 #include "snir/ir/register.hpp"
 #include "snir/ir/type.hpp"
 #include "snir/ir/value.hpp"
@@ -26,6 +27,20 @@ struct ReturnInst
     Value value;
 
     friend auto operator==(ReturnInst const& lhs, ReturnInst const& rhs) -> bool = default;
+};
+
+struct IntCmpInst
+{
+    static constexpr auto name = std::string_view{"icmp"};
+    static constexpr auto args = 2;
+
+    Type type;
+    Compare kind;
+    Register result;
+    Value lhs;
+    Value rhs;
+
+    friend auto operator==(IntCmpInst const& lhs, IntCmpInst const& rhs) -> bool = default;
 };
 
 #define SNIR_INST_UNARY_OP(Id, Name)                                                                 \
@@ -134,6 +149,7 @@ private:
     using Holder = std::variant<
         NopInst,
         ReturnInst,
+        IntCmpInst,
         ConstInst,
         TruncInst,
         AddInst,

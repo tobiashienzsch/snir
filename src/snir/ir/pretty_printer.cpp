@@ -7,14 +7,14 @@ namespace snir {
 
 PrettyPrinter::PrettyPrinter(std::ostream& out) : _out{out} {}
 
-auto PrettyPrinter::operator()(snir::Module const& m) -> void
+auto PrettyPrinter::operator()(Module const& m) -> void
 {
     for (auto const& func : m.functions) {
         std::invoke(*this, func);
     }
 }
 
-auto PrettyPrinter::operator()(snir::Function const& f) -> void
+auto PrettyPrinter::operator()(Function const& f) -> void
 {
     auto const args = [](auto const& a) -> std::string {
         if (a.empty()) {
@@ -40,31 +40,42 @@ auto PrettyPrinter::operator()(snir::Function const& f) -> void
     println(_out, "}}\n");
 }
 
-auto PrettyPrinter::operator()(snir::Block const& block) -> void
+auto PrettyPrinter::operator()(Block const& block) -> void
 {
     std::ranges::for_each(block, std::bind_front(*this));
 }
 
-auto PrettyPrinter::operator()(snir::Instruction const& inst) -> void { inst.visit(*this); }
+auto PrettyPrinter::operator()(Instruction const& inst) -> void { inst.visit(*this); }
 
-auto PrettyPrinter::operator()(snir::NopInst const& nop) -> void
-{
-    println(_out, "  ; {}", nop.name);
-}
+auto PrettyPrinter::operator()(NopInst const& nop) -> void { println(_out, "  ; {}", nop.name); }
 
-auto PrettyPrinter::operator()(snir::ConstInst const& constant) -> void
+auto PrettyPrinter::operator()(ConstInst const& constant) -> void
 {
     println(_out, "  {} = {} {}", constant.result, constant.type, constant.value);
 }
 
-auto PrettyPrinter::operator()(snir::TruncInst const& trunc) -> void
+auto PrettyPrinter::operator()(TruncInst const& trunc) -> void
 {
-    println(_out, "  {} = {} {} as {}", trunc.result, snir::TruncInst::name, trunc.value, trunc.type);
+    println(_out, "  {} = {} {} as {}", trunc.result, TruncInst::name, trunc.value, trunc.type);
 }
 
-auto PrettyPrinter::operator()(snir::ReturnInst const& ret) -> void
+auto PrettyPrinter::operator()(IntCmpInst const& inst) -> void
 {
-    println(_out, "  {} {} {}", snir::ReturnInst::name, ret.type, ret.value);
+    println(
+        _out,
+        "  {} = {} {} {} {}",
+        inst.result,
+        IntCmpInst::name,
+        inst.kind,
+        inst.type,
+        inst.lhs,
+        inst.rhs
+    );
+}
+
+auto PrettyPrinter::operator()(ReturnInst const& ret) -> void
+{
+    println(_out, "  {} {} {}", ReturnInst::name, ret.type, ret.value);
 }
 
 }  // namespace snir

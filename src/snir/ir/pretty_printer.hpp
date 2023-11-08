@@ -16,15 +16,16 @@ struct PrettyPrinter
 
     explicit PrettyPrinter(std::ostream& out);
 
-    auto operator()(snir::Module const& m) -> void;
-    auto operator()(snir::Function const& f) -> void;
-    auto operator()(snir::Block const& block) -> void;
-    auto operator()(snir::Instruction const& inst) -> void;
+    auto operator()(Module const& m) -> void;
+    auto operator()(Function const& f) -> void;
+    auto operator()(Block const& block) -> void;
+    auto operator()(Instruction const& inst) -> void;
 
-    auto operator()(snir::NopInst const& nop) -> void;
-    auto operator()(snir::ConstInst const& constant) -> void;
-    auto operator()(snir::TruncInst const& trunc) -> void;
-    auto operator()(snir::ReturnInst const& ret) -> void;
+    auto operator()(NopInst const& nop) -> void;
+    auto operator()(ConstInst const& constant) -> void;
+    auto operator()(TruncInst const& trunc) -> void;
+    auto operator()(IntCmpInst const& ret) -> void;
+    auto operator()(ReturnInst const& ret) -> void;
 
     template<typename Inst>
         requires(Inst::args == 2)
