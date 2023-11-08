@@ -429,7 +429,7 @@ auto testInterpreter() -> void
     }
 
     {
-        // return files/constant_i64.ll
+        // return files/i64_*.ll
         auto tests = std::vector<std::pair<std::string, int>>{
             std::pair{"./test/files/i64_add.ll",   42 + 143},
             std::pair{"./test/files/i64_and.ll",   42 & 143},
@@ -457,6 +457,31 @@ auto testInterpreter() -> void
             assert(result.has_value());
             assert(std::holds_alternative<int>(result.value()));
             assert(std::get<int>(result.value()) == expected);
+        }
+    }
+
+    {
+        // return files/i64_*.ll
+        auto tests = std::vector<std::pair<std::string, float>>{
+            std::pair{"./test/files/float_add.ll", 42.0f + 143.0f},
+            std::pair{"./test/files/float_div.ll", 42.0f / 2.0f  },
+            std::pair{"./test/files/float_mul.ll", 42.0f * 143.0f},
+            std::pair{"./test/files/float_sub.ll", 42.0f - 143.0f},
+        };
+
+        for (auto const& [path, expected] : tests) {
+            snir::println("execute: {}", path);
+
+            auto src    = snir::readFile(path).value();
+            auto parser = snir::Parser{};
+            auto module = parser.parseModule(src);
+            assert(module.has_value());
+            assert(module->functions.size() == 1);
+
+            auto result = Interpreter::execute(module->functions.at(0), {});
+            assert(result.has_value());
+            assert(std::holds_alternative<float>(result.value()));
+            assert(std::get<float>(result.value()) == expected);
         }
     }
 }

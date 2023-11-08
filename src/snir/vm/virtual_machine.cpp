@@ -65,25 +65,25 @@ auto VirtualMachine::operator()(ModInst const& inst) -> void
     return binaryIntegerInst<std::modulus<>>(inst);
 }
 
-// auto VirtualMachine::operator()(FloatAddInst const& inst) -> void
-// {
-//     return binaryIntegerInst<std::plus<>>(inst);
-// }
+auto VirtualMachine::operator()(FloatAddInst const& inst) -> void
+{
+    return binaryFloatInst(inst, std::plus{});
+}
 
-// auto VirtualMachine::operator()(FloatSubInst const& inst) -> void
-// {
-//     return binaryIntegerInst<std::plus<>>(inst);
-// }
+auto VirtualMachine::operator()(FloatSubInst const& inst) -> void
+{
+    return binaryFloatInst(inst, std::minus{});
+}
 
-// auto VirtualMachine::operator()(FloatMulInst const& inst) -> void
-// {
-//     return binaryIntegerInst<std::plus<>>(inst);
-// }
+auto VirtualMachine::operator()(FloatMulInst const& inst) -> void
+{
+    return binaryFloatInst(inst, std::multiplies{});
+}
 
-// auto VirtualMachine::operator()(FloatDivInst const& inst) -> void
-// {
-//     return binaryIntegerInst<std::plus<>>(inst);
-// }
+auto VirtualMachine::operator()(FloatDivInst const& inst) -> void
+{
+    return binaryFloatInst(inst, std::divides{});
+}
 
 auto VirtualMachine::operator()(AndInst const& inst) -> void
 {

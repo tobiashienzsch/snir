@@ -31,11 +31,10 @@ struct VirtualMachine
     auto operator()(XorInst const& inst) -> void;
     auto operator()(ShiftLeftInst const& inst) -> void;
     auto operator()(ShiftRightInst const& inst) -> void;
-
-    // auto operator()(FloatAddInst const& inst) -> void;
-    // auto operator()(FloatSubInst const& inst) -> void;
-    // auto operator()(FloatMulInst const& inst) -> void;
-    // auto operator()(FloatDivInst const& inst) -> void;
+    auto operator()(FloatAddInst const& inst) -> void;
+    auto operator()(FloatSubInst const& inst) -> void;
+    auto operator()(FloatMulInst const& inst) -> void;
+    auto operator()(FloatDivInst const& inst) -> void;
 
     template<typename T>
     auto operator()(T const& inst) -> void
@@ -68,6 +67,21 @@ private:
         auto lhs = std::visit(ValueAs<int>{_register}, inst.lhs);
         auto rhs = std::visit(ValueAs<int>{_register}, inst.rhs);
         _register.emplace(inst.result, Op{}(lhs, rhs));
+    }
+
+    template<typename Inst, typename Op>
+    auto binaryFloatInst(Inst const& inst, Op op) -> void
+    {
+        if (inst.type == Type::Float) {
+            auto lhs = std::visit(ValueAs<float>{_register}, inst.lhs);
+            auto rhs = std::visit(ValueAs<float>{_register}, inst.rhs);
+            _register.emplace(inst.result, op(lhs, rhs));
+            return;
+        }
+
+        auto lhs = std::visit(ValueAs<double>{_register}, inst.lhs);
+        auto rhs = std::visit(ValueAs<double>{_register}, inst.rhs);
+        _register.emplace(inst.result, op(lhs, rhs));
     }
 
     std::map<Register, Value> _register;
