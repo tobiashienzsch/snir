@@ -1,5 +1,5 @@
 // This macro should be defined before including this header:
-// - SNIR_INST_UNARY(Identifier, Name)
+// - SNIR_INST_UNARY(Id, Name)
 
 SNIR_INST_UNARY(Const, const)
 SNIR_INST_UNARY(Trunc, trunc)

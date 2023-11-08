@@ -1,5 +1,5 @@
 // This macro should be defined before including this header:
-// - SNIR_INST_BINARY(Identifier, Name)
+// - SNIR_INST_BINARY(Id, Name)
 
 SNIR_INST_BINARY(Add, add)
 SNIR_INST_BINARY(Sub, sub)

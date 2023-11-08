@@ -72,9 +72,9 @@ auto Parser::parseInstruction(std::string const& src) -> std::optional<Instructi
 
 auto Parser::parseType(std::string_view src) -> std::optional<Type>
 {
-#define SNIR_BUILTIN_TYPE(Identifier, Name)                                                          \
+#define SNIR_BUILTIN_TYPE(Id, Name)                                                                  \
     if (src == std::string_view{#Name}) {                                                            \
-        return Type::Identifier;                                                                     \
+        return Type::Id;                                                                             \
     }
 #include "snir/ir/type.def"
 #undef SNIR_BUILTIN_TYPE
@@ -153,9 +153,9 @@ auto Parser::parseBinaryInst(std::string const& src) -> std::optional<Instructio
         auto lhs    = parseValue(matches[4], type).value();
         auto rhs    = parseValue(matches[5], type).value();
 
-#define SNIR_INST_BINARY(Identifier, Name)                                                           \
+#define SNIR_INST_BINARY(Id, Name)                                                                   \
     if (op == std::string_view{#Name}) {                                                             \
-        return Identifier##Inst{                                                                     \
+        return Id##Inst{                                                                             \
             .type   = type,                                                                          \
             .result = result,                                                                        \
             .lhs    = lhs,                                                                           \

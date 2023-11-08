@@ -10,10 +10,7 @@ struct Module
 {
     std::vector<Function> functions;
 
-    friend auto operator==(Module const& lhs, Module const& rhs) noexcept -> bool
-    {
-        return lhs.functions == rhs.functions;
-    }
+    friend auto operator==(Module const& lhs, Module const& rhs) noexcept -> bool = default;
 };
 
 }  // namespace snir

@@ -1,5 +1,5 @@
 // This macro should be defined before including this header:
-// - SNIR_BUILTIN_TYPE(Identifier, Name)
+// - SNIR_BUILTIN_TYPE(Id, Name)
 
 SNIR_BUILTIN_TYPE(Void, void)
 SNIR_BUILTIN_TYPE(Bool, i1)

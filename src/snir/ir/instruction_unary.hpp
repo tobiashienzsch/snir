@@ -13,7 +13,7 @@ struct NopInst
     static constexpr auto name = std::string_view{"nop"};
     static constexpr auto args = 0;
 
-    friend auto operator==(NopInst const& lhs, NopInst const& rhs) noexcept -> bool { return true; }
+    friend auto operator==(NopInst const& lhs, NopInst const& rhs) noexcept -> bool = default;
 };
 
 struct ReturnInst
@@ -24,14 +24,11 @@ struct ReturnInst
     Type type;
     Value value;
 
-    friend auto operator==(ReturnInst const& lhs, ReturnInst const& rhs) noexcept -> bool
-    {
-        return lhs.type == rhs.type and lhs.value == rhs.value;
-    }
+    friend auto operator==(ReturnInst const& lhs, ReturnInst const& rhs) -> bool = default;
 };
 
-#define SNIR_INST_UNARY(Identifier, Name)                                                            \
-    struct Identifier##Inst                                                                          \
+#define SNIR_INST_UNARY(Id, Name)                                                                    \
+    struct Id##Inst                                                                                  \
     {                                                                                                \
         static constexpr auto name = std::string_view{#Name};                                        \
         static constexpr auto args = 1;                                                              \
@@ -39,11 +36,7 @@ struct ReturnInst
         Register result;                                                                             \
         Value value;                                                                                 \
                                                                                                      \
-        friend auto operator==(Identifier##Inst const& lhs, Identifier##Inst const& rhs) noexcept    \
-            -> bool                                                                                  \
-        {                                                                                            \
-            return lhs.type == rhs.type and lhs.result == rhs.result and lhs.value == rhs.value;     \
-        }                                                                                            \
+        friend auto operator==(Id##Inst const& lhs, Id##Inst const& rhs) -> bool = default;          \
     };
 #include "snir/ir/instruction_unary.def"
 #undef SNIR_INST_UNARY

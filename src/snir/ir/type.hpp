@@ -10,7 +10,7 @@ namespace snir {
 
 enum struct Type : std::uint8_t
 {
-#define SNIR_BUILTIN_TYPE(Identifier, Name) Identifier,
+#define SNIR_BUILTIN_TYPE(Id, Name) Id,
 #include "snir/ir/type.def"
 #undef SNIR_BUILTIN_TYPE
 };
@@ -24,7 +24,7 @@ struct std::formatter<snir::Type, char> : std::formatter<std::string_view, char>
     auto format(snir::Type type, FormatContext& fc) const
     {
         static constexpr auto names = std::array{
-#define SNIR_BUILTIN_TYPE(Identifier, Name) std::string_view{#Name},
+#define SNIR_BUILTIN_TYPE(Id, Name) std::string_view{#Name},
 #include "snir/ir/type.def"
 #undef SNIR_BUILTIN_TYPE
         };
