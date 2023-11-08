@@ -8,7 +8,10 @@
 
 namespace snir {
 
-using Value = std::variant<bool, int, float, double, Register>;
+struct Void
+{};
+
+using Value = std::variant<Void, bool, int, float, double, Register>;
 
 }  // namespace snir
 
@@ -18,7 +21,14 @@ struct std::formatter<snir::Value, char> : formatter<string_view, char>
     template<typename FormatContext>
     auto format(snir::Value op, FormatContext& fc) const
     {
-        auto str = visit([](auto v) { return std::format("{}", v); }, op);
+        auto visitor = [](auto v) {
+            if constexpr (std::same_as<decltype(v), snir::Void>) {
+                return std::string{"void"};
+            } else {
+                return std::format("{}", v);
+            }
+        };
+        auto str = std::visit(visitor, op);
         return formatter<string_view, char>::format(str, fc);
     }
 };
