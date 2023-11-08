@@ -1,5 +1,7 @@
 #pragma once
 
+#include "snir/core/exception.hpp"
+
 #include <algorithm>
 #include <charconv>
 #include <iterator>
@@ -14,11 +16,11 @@ namespace snir::strings {
     return str.find(sub) != std::string_view::npos;
 }
 
-[[nodiscard]] inline auto trim(std::string const& str, std::string const& whitespace = " \t")
-    -> std::string
+[[nodiscard]] inline auto trim(std::string_view str, std::string_view whitespace = " \t")
+    -> std::string_view
 {
     auto const first = str.find_first_not_of(whitespace);
-    if (first == std::string::npos) {
+    if (first == std::string_view::npos) {
         return {};
     }
 
@@ -28,7 +30,7 @@ namespace snir::strings {
 }
 
 template<typename NumberType>
-[[nodiscard]] auto parse(std::string_view str) -> std::optional<NumberType>
+[[nodiscard]] auto tryParse(std::string_view str) -> std::optional<NumberType>
 {
     auto value        = NumberType{};
     auto const first  = str.data();
@@ -39,6 +41,16 @@ template<typename NumberType>
     }
 
     return std::nullopt;
+}
+
+template<typename NumberType>
+[[nodiscard]] auto parse(std::string_view str) -> NumberType
+{
+    auto value = tryParse<NumberType>(str);
+    if (not value) {
+        raisef<std::invalid_argument>("failed to parse '{}' to number", str);
+    }
+    return *value;
 }
 
 }  // namespace snir::strings

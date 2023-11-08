@@ -102,7 +102,7 @@ auto Parser::readBasicBlocks(std::string_view src) -> std::optional<std::vector<
     auto blocks = std::vector<BasicBlock>{};
 
     for (auto match : ctre::split<R"(\d+:)">(src)) {
-        auto const str = strings::trim(match.to_string(), " \t\n");
+        auto const str = strings::trim(match, " \t\n");
         if (str.empty()) {
             continue;
         }
@@ -139,7 +139,7 @@ auto Parser::readBinaryInst(std::string_view src) -> std::optional<Instruction>
     if (auto match = ctre::match<R"(%(\d+) = (\w+) (\w+) (\d+|%\d+) (\d+|%\d+))">(src); match) {
         auto op     = match.get<2>().to_view();
         auto type   = readType(match.get<3>().to_view()).value();
-        auto result = Register{strings::parse<int>(match.get<1>()).value()};
+        auto result = Register{strings::parse<int>(match.get<1>())};
         auto lhs    = readValue(match.get<4>().to_view(), type).value();
         auto rhs    = readValue(match.get<5>().to_view(), type).value();
 
@@ -163,7 +163,7 @@ auto Parser::readBinaryInst(std::string_view src) -> std::optional<Instruction>
 auto Parser::readConstInst(std::string_view src) -> std::optional<ConstInst>
 {
     if (auto match = ctre::match<R"(%(\d+) = (\w+) (\d+\.\d+|\d+))">(src); match) {
-        auto const result = Register{strings::parse<int>(match.get<1>()).value()};
+        auto const result = Register{strings::parse<int>(match.get<1>())};
         auto const type   = readType(match.get<2>().to_view()).value();
         auto const value  = readValue(match.get<3>().to_view(), type).value();
 
@@ -181,11 +181,11 @@ auto Parser::readIntCmpInst(std::string_view src) -> std::optional<IntCmpInst>
 {
     // <result> = icmp eq i32 4, 5
     if (auto match = ctre::match<R"(%(\d+) = icmp (\w+) (\w+) %(\d+) %(\d+))">(src); match) {
-        auto const result = Register{strings::parse<int>(match.get<1>()).value()};
+        auto const result = Register{strings::parse<int>(match.get<1>())};
         auto const kind   = readCompare(match.get<2>().to_view()).value();
         auto const type   = readType(match.get<3>().to_view()).value();
-        auto const lhs    = Register{strings::parse<int>(match.get<4>()).value()};
-        auto const rhs    = Register{strings::parse<int>(match.get<5>()).value()};
+        auto const lhs    = Register{strings::parse<int>(match.get<4>())};
+        auto const rhs    = Register{strings::parse<int>(match.get<5>())};
 
         return IntCmpInst{
             .type   = type,
@@ -203,8 +203,8 @@ auto Parser::readTruncInst(std::string_view src) -> std::optional<TruncInst>
 {
     // %2 = trunc %1 as float
     if (auto match = ctre::match<R"(%(\d+) = trunc %(\d+) as (\w+))">(src); match) {
-        auto const result = Register{strings::parse<int>(match.get<1>()).value()};
-        auto const value  = Register{strings::parse<int>(match.get<2>()).value()};
+        auto const result = Register{strings::parse<int>(match.get<1>())};
+        auto const value  = Register{strings::parse<int>(match.get<2>())};
         auto const type   = readType(match.get<3>().to_view()).value();
         return TruncInst{
             .type   = type,
@@ -220,7 +220,7 @@ auto Parser::readReturnInst(std::string_view src) -> std::optional<ReturnInst>
 {
     if (auto match = ctre::match<R"(ret (\w+) %(\d+))">(src); match) {
         auto const type    = readType(match.get<1>()).value();
-        auto const operand = Register{strings::parse<int>(match.get<2>()).value()};
+        auto const operand = Register{strings::parse<int>(match.get<2>())};
         return ReturnInst{.type = type, .value = operand};
     }
 
@@ -243,16 +243,16 @@ auto Parser::readValue(std::string_view src, Type type) -> std::optional<Value>
 {
     if (auto const m = ctre::match<R"((%[0-9]+)|([\d]+(|\.[\d]+)))">(src); m) {
         if (m.get<1>()) {
-            return Register{strings::parse<int>(m.get<1>().to_view().substr(1)).value()};
+            return Register{strings::parse<int>(m.get<1>().to_view().substr(1))};
         } else if (m.get<2>()) {
             if (type == Type::Int64) {
-                return strings::parse<int>(m.get<2>()).value();
+                return strings::parse<int>(m.get<2>());
             }
             if (type == Type::Float) {
-                return strings::parse<float>(m.get<2>()).value();
+                return strings::parse<float>(m.get<2>());
             }
             if (type == Type::Double) {
-                return strings::parse<double>(m.get<2>()).value();
+                return strings::parse<double>(m.get<2>());
             }
         }
     }
