@@ -4,6 +4,7 @@ project(snir VERSION ${CMAKE_PROJECT_VERSION})
 add_library(snir)
 add_library(snir::snir ALIAS snir)
 target_include_directories(snir PUBLIC ${PROJECT_SOURCE_DIR})
+target_link_libraries(snir PRIVATE snir::compiler_warnings)
 target_sources(snir
     PRIVATE
         snir/ir/parser.cpp

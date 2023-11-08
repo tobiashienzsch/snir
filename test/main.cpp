@@ -60,21 +60,21 @@ auto testVector() -> void  // NOLINT(readability-function-cognitive-complexity)
         assert(list[1] == val);
 
         try {
-            auto tooBig = Vec{val, val, val};
+            [[maybe_unused]] auto tooBig = Vec{val, val, val};
             assert(false);
         } catch (const std::exception& e) {
             assert(snir::strings::contains(e.what(), "initializer_list out-of-bounds size: 3"));
         }
 
         try {
-            auto newVal = vec[42];
+            [[maybe_unused]] auto newVal = vec[42];
             assert(false);
         } catch (const std::exception& e) {
             assert(snir::strings::contains(e.what(), "subscript out-of-bounds idx: 42, size: 2"));
         }
 
         try {
-            auto newVal = vec.push_back(val);
+            [[maybe_unused]] auto newVal = vec.push_back(val);
             assert(false);
         } catch (const std::exception& e) {
             assert(snir::strings::contains(e.what(), "push_back on full StaticVector<T, 2>"));

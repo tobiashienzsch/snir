@@ -6,7 +6,7 @@
 
 namespace snir {
 
-PassManager::PassManager(bool log, std::ostream& out) : _log{log}, _out{out} {}
+PassManager::PassManager(bool log, std::ostream& out) : _out{out}, _log{log} {}
 
 auto PassManager::operator()(Module& m) -> void
 {

@@ -15,6 +15,8 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 enable_testing()
 
+include(cmake/snir_compiler_warnings.cmake)
+
 add_subdirectory(src)
 add_subdirectory(test)
 add_subdirectory(tool/snir-opt)
