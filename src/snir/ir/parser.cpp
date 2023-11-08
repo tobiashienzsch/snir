@@ -47,9 +47,18 @@ auto Parser::parseModule(std::string const& source) -> std::optional<Module>
 
 auto Parser::parseInstruction(std::string const& source) -> std::optional<Instruction>
 {
-    if (auto inst = parseBinaryInst(source, "fadd"); inst) {
+    if (auto inst = parseBinaryInst(source); inst) {
         return inst;
     }
+
+    if (auto ret = parseReturnInst(source); ret) {
+        return ret.value();
+    }
+
+    if (strings::contains(source, "; nop")) {
+        return NopInst{};
+    }
+
     return std::nullopt;
 }
 
@@ -119,18 +128,14 @@ auto Parser::parseBlock(std::string const& source) -> std::optional<Block>
         auto inst = parseInstruction(strings::trim(line));
         if (inst) {
             block.push_back(inst.value());
-            // return std::nullopt;
         }
     }
 
     return block;
 }
 
-auto Parser::parseBinaryInst(std::string const& source, std::string_view inst)
-    -> std::optional<Instruction>
+auto Parser::parseBinaryInst(std::string const& source) -> std::optional<Instruction>
 {
-    // std::string input = "%5 = fadd double %3 %4";
-
     auto matches = std::smatch();
     auto pattern = std::regex(R"(%(\d+) = (\w+) (\w+) %(\d+) %(\d+))");
     if (std::regex_match(source, matches, pattern)) {
@@ -154,6 +159,18 @@ auto Parser::parseBinaryInst(std::string const& source, std::string_view inst)
 #include "snir/ir/instructions.def"
 #undef SNIR_INST_UNARY
 #undef SNIR_INST_BINARY
+    }
+
+    return std::nullopt;
+}
+
+auto Parser::parseReturnInst(std::string const& source) -> std::optional<ReturnInst>
+{
+    auto matches = std::smatch();
+    auto pattern = std::regex(R"(ret %(\d+))");
+    if (std::regex_match(source, matches, pattern)) {
+        auto operand = std::stoi(matches[1]);
+        return ReturnInst{.type = {}, .value = Register{operand}};
     }
 
     return std::nullopt;

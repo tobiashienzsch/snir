@@ -1,3 +1,4 @@
+#include "snir/core/file.hpp"
 #include "snir/ir/function.hpp"
 #include "snir/ir/instruction.hpp"
 #include "snir/ir/instructions.hpp"
@@ -128,7 +129,7 @@ auto testPassManager() -> void
         assert(str.find("define i64 @ipow(i64 %0, i64 %1)") != std::string::npos);
     }
 
-    static constexpr auto const logging = false;
+    static constexpr auto const logging = true;
 
     auto opt = snir::PassManager{logging};
     opt.add(snir::DeadStoreElimination{});
@@ -156,7 +157,7 @@ template<snir::Type Type>
 {
     auto parser     = snir::Parser{};
     auto const inst = parser.parseInstruction(src);
-    return inst.has_value() and inst->visit([](auto i) {
+    return inst and inst->visit([](auto i) {
         if constexpr (requires { i.type; }) {
             return i.type == Type;
         } else {
@@ -167,33 +168,6 @@ template<snir::Type Type>
 
 auto testParser() -> void
 {
-
-    auto const* const text = R"(
-define double @nan() {
-0:
-  %3 = double 2
-  %4 = double 1.14159265359
-  %5 = fadd double %3 %4
-  ret %5
-}
-
-define float @sin(float %0) {
-0:
-  %1 = double 42
-  %2 = trunc %1 as float
-  ret %2
-}
-
-define i64 @ipow(i64 %0, i64 %1) {
-0:
-  %0 = i64 42
-  ret %0
-1:
-  %1 = i64 43
-  ret %1
-}
-)";
-
     auto parser = snir::Parser{};
     assert(parser.parseType("void") == snir::Type::Void);
     assert(parser.parseType("i1") == snir::Type::Bool);
@@ -203,11 +177,15 @@ define i64 @ipow(i64 %0, i64 %1) {
     assert(parser.parseType("block") == snir::Type::Block);
     assert(parser.parseType("event") == snir::Type::Event);
 
+    assert(checkInstruction<snir::ReturnInst>("ret %1"));
     assert(checkInstruction<snir::AddInst>("%5 = add i64 %3 %4"));
     assert(checkInstruction<snir::SubInst>("%5 = sub i64 %3 %4"));
     assert(checkInstruction<snir::MulInst>("%5 = mul i64 %3 %4"));
     assert(checkInstruction<snir::DivInst>("%5 = div i64 %3 %4"));
     assert(checkInstruction<snir::ModInst>("%5 = mod i64 %3 %4"));
+    assert(checkInstruction<snir::AndInst>("%5 = and i64 %3 %4"));
+    assert(checkInstruction<snir::OrInst>("%5 = or i64 %3 %4"));
+    assert(checkInstruction<snir::XorInst>("%5 = xor i64 %3 %4"));
     assert(checkInstruction<snir::FloatAddInst>("%5 = fadd double %3 %4"));
     assert(checkInstruction<snir::FloatSubInst>("%5 = fsub double %3 %4"));
     assert(checkInstruction<snir::FloatMulInst>("%5 = fmul double %3 %4"));
@@ -218,6 +196,9 @@ define i64 @ipow(i64 %0, i64 %1) {
     assert(checkInstructionType<snir::Type::Int64>("%5 = mul i64 %3 %4"));
     assert(checkInstructionType<snir::Type::Int64>("%5 = div i64 %3 %4"));
     assert(checkInstructionType<snir::Type::Int64>("%5 = mod i64 %3 %4"));
+    assert(checkInstructionType<snir::Type::Int64>("%5 = and i64 %3 %4"));
+    assert(checkInstructionType<snir::Type::Int64>("%5 = or i64 %3 %4"));
+    assert(checkInstructionType<snir::Type::Int64>("%5 = xor i64 %3 %4"));
     assert(checkInstructionType<snir::Type::Double>("%5 = fadd double %3 %4"));
     assert(checkInstructionType<snir::Type::Double>("%5 = fsub double %3 %4"));
     assert(checkInstructionType<snir::Type::Double>("%5 = fmul double %3 %4"));
@@ -231,26 +212,53 @@ define i64 @ipow(i64 %0, i64 %1) {
         assert(inst->getResultRegister() == snir::Register{5});
     }
 
-    auto const module = parser.parseModule(text);
-    assert(module.value().functions.size() == 3);
+    {
+        auto const* src = "ret %5";
+        auto const inst = parser.parseInstruction(src);
+        assert(inst.has_value());
+        assert(inst->getOperandRegisters().at(0).value() == snir::Register{5});
+    }
 
-    assert(module->functions[0].name == "nan");
-    assert(module->functions[0].type == snir::Type::Double);
-    assert(module->functions[0].arguments.size() == 0);
-    assert(module->functions[0].blocks.size() == 1);
+    {
+        auto const text   = snir::readFile("./test/files/func.ll").value();
+        auto const module = parser.parseModule(text);
+        assert(module.value().functions.size() == 1);
 
-    assert(module->functions[1].name == "sin");
-    assert(module->functions[1].type == snir::Type::Float);
-    assert(module->functions[1].arguments.size() == 1);
-    assert(module->functions[1].arguments[0] == snir::Type::Float);
-    assert(module->functions[1].blocks.size() == 1);
+        auto const& func = module.value().functions[0];
+        assert(func.name == "foo");
+        assert(func.type == snir::Type::Double);
+        assert(func.arguments.size() == 2);
+        assert(func.blocks.size() == 1);
 
-    assert(module->functions[2].name == "ipow");
-    assert(module->functions[2].type == snir::Type::Int64);
-    assert(module->functions[2].arguments.size() == 2);
-    assert(module->functions[2].arguments[0] == snir::Type::Int64);
-    assert(module->functions[2].arguments[1] == snir::Type::Int64);
-    assert(module->functions[2].blocks.size() == 2);
+        auto const& block = func.blocks[0];
+        assert(block.size() == 2);
+        assert(block.at(0).hasType<snir::NopInst>());
+        assert(block.at(1).hasType<snir::FloatAddInst>());
+    }
+
+    {
+        auto const text   = snir::readFile("./test/files/funcs.ll").value();
+        auto const module = parser.parseModule(text);
+        assert(module.value().functions.size() == 3);
+
+        assert(module->functions[0].name == "nan");
+        assert(module->functions[0].type == snir::Type::Double);
+        assert(module->functions[0].arguments.size() == 0);
+        assert(module->functions[0].blocks.size() == 1);
+
+        assert(module->functions[1].name == "sin");
+        assert(module->functions[1].type == snir::Type::Float);
+        assert(module->functions[1].arguments.size() == 1);
+        assert(module->functions[1].arguments[0] == snir::Type::Float);
+        assert(module->functions[1].blocks.size() == 1);
+
+        assert(module->functions[2].name == "ipow");
+        assert(module->functions[2].type == snir::Type::Int64);
+        assert(module->functions[2].arguments.size() == 2);
+        assert(module->functions[2].arguments[0] == snir::Type::Int64);
+        assert(module->functions[2].arguments[1] == snir::Type::Int64);
+        assert(module->functions[2].blocks.size() == 2);
+    }
 }
 
 auto testInterpreter() -> void
