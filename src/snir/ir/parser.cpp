@@ -154,7 +154,7 @@ auto Parser::readBinaryInst(std::string_view src) -> std::optional<Instruction>
     if (auto match = ctre::match<R"(%(\d+) = (\w+) (\w+) (\d+|%\d+) (\d+|%\d+))">(src); match) {
         auto op     = match.get<2>().to_view();
         auto type   = readType(match.get<3>().to_view()).value();
-        auto result = Register{std::stoi(match.get<1>().to_string())};
+        auto result = Register{strings::parse<int>(match.get<1>()).value()};
         auto lhs    = readValue(match.get<4>().to_view(), type).value();
         auto rhs    = readValue(match.get<5>().to_view(), type).value();
 
@@ -178,7 +178,7 @@ auto Parser::readBinaryInst(std::string_view src) -> std::optional<Instruction>
 auto Parser::readConstInst(std::string_view src) -> std::optional<ConstInst>
 {
     if (auto match = ctre::match<R"(%(\d+) = (\w+) (\d+\.\d+|\d+))">(src); match) {
-        auto const result = Register{std::stoi(match.get<1>().to_string())};
+        auto const result = Register{strings::parse<int>(match.get<1>()).value()};
         auto const type   = readType(match.get<2>().to_view()).value();
         auto const value  = readValue(match.get<3>().to_view(), type).value();
 
@@ -196,11 +196,11 @@ auto Parser::readIntCmpInst(std::string_view src) -> std::optional<IntCmpInst>
 {
     // <result> = icmp eq i32 4, 5
     if (auto match = ctre::match<R"(%(\d+) = icmp (\w+) (\w+) %(\d+) %(\d+))">(src); match) {
-        auto const result = Register{std::stoi(match.get<1>().to_string())};
+        auto const result = Register{strings::parse<int>(match.get<1>()).value()};
         auto const kind   = readCompare(match.get<2>().to_view()).value();
         auto const type   = readType(match.get<3>().to_view()).value();
-        auto const lhs    = Register{std::stoi(match.get<4>().to_string())};
-        auto const rhs    = Register{std::stoi(match.get<5>().to_string())};
+        auto const lhs    = Register{strings::parse<int>(match.get<4>()).value()};
+        auto const rhs    = Register{strings::parse<int>(match.get<5>()).value()};
 
         return IntCmpInst{
             .type   = type,
@@ -218,8 +218,8 @@ auto Parser::readTruncInst(std::string_view src) -> std::optional<TruncInst>
 {
     // %2 = trunc %1 as float
     if (auto match = ctre::match<R"(%(\d+) = trunc %(\d+) as (\w+))">(src); match) {
-        auto const result = Register{std::stoi(match.get<1>().to_string())};
-        auto const value  = Register{std::stoi(match.get<2>().to_string())};
+        auto const result = Register{strings::parse<int>(match.get<1>()).value()};
+        auto const value  = Register{strings::parse<int>(match.get<2>()).value()};
         auto const type   = readType(match.get<3>().to_view()).value();
         return TruncInst{
             .type   = type,
@@ -235,8 +235,8 @@ auto Parser::readReturnInst(std::string_view src) -> std::optional<ReturnInst>
 {
     if (auto match = ctre::match<R"(ret (\w+) %(\d+))">(src); match) {
         auto const type    = readType(match.get<1>()).value();
-        auto const operand = std::stoi(match.get<2>().to_string());
-        return ReturnInst{.type = type, .value = Register{operand}};
+        auto const operand = Register{strings::parse<int>(match.get<2>()).value()};
+        return ReturnInst{.type = type, .value = operand};
     }
 
     return std::nullopt;
@@ -258,17 +258,16 @@ auto Parser::readValue(std::string_view src, Type type) -> std::optional<Value>
 {
     if (auto const m = ctre::match<R"((%[0-9]+)|([\d]+(|\.[\d]+)))">(src); m) {
         if (m.get<1>()) {
-            return Register{std::stoi(m.get<1>().to_string().substr(1))};
+            return Register{strings::parse<int>(m.get<1>().to_view().substr(1)).value()};
         } else if (m.get<2>()) {
-            auto const str = m.get<2>().to_string();
             if (type == Type::Int64) {
-                return std::stoi(str);
+                return strings::parse<int>(m.get<2>()).value();
             }
             if (type == Type::Float) {
-                return std::stof(str);
+                return strings::parse<float>(m.get<2>()).value();
             }
             if (type == Type::Double) {
-                return std::stod(str);
+                return strings::parse<double>(m.get<2>()).value();
             }
         }
     }

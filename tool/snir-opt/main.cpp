@@ -29,7 +29,7 @@ struct Arguments
             continue;
         }
         if (snir::strings::contains(arguments[i], "-O")) {
-            args.opt = std::stoi(std::string(arguments[i]).substr(2));
+            args.opt = snir::strings::parse<int>(std::string_view(arguments[i]).substr(2)).value();
             continue;
         }
         if (snir::strings::contains(arguments[i], "-o")) {
