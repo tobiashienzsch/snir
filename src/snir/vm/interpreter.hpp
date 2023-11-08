@@ -48,15 +48,15 @@ private:
     template<typename T>
     struct ValueAs
     {
-        explicit ValueAs(std::map<Register, Value>& regs) : registers{&regs} {}
+        explicit ValueAs(std::map<Register, Value>& regs) : memory{&regs} {}
 
-        auto operator()(Register reg) -> T { return std::visit(*this, registers->at(reg)); }
+        auto operator()(Register reg) -> T { return std::visit(*this, memory->at(reg)); }
 
         auto operator()(T v) -> T { return static_cast<T>(v); }
 
         auto operator()(auto) -> T { throw std::runtime_error{"invalid type"}; }
 
-        std::map<Register, Value>* registers;
+        std::map<Register, Value>* memory;
     };
 
     template<typename Op, typename Inst>
@@ -66,12 +66,12 @@ private:
             throw std::runtime_error{"unsupported type"};
         }
 
-        auto lhs = std::visit(ValueAs<int>{_registers}, inst.lhs);
-        auto rhs = std::visit(ValueAs<int>{_registers}, inst.rhs);
-        _registers.emplace(inst.result, Op{}(lhs, rhs));
+        auto lhs = std::visit(ValueAs<int>{_memory}, inst.lhs);
+        auto rhs = std::visit(ValueAs<int>{_memory}, inst.rhs);
+        _memory.emplace(inst.result, Op{}(lhs, rhs));
     }
 
-    std::map<Register, Value> _registers;
+    std::map<Register, Value> _memory;
     std::optional<Value> _return{Value{std::nullopt}};
     bool _exit{false};
 };

@@ -8,7 +8,7 @@ VirtualMachine::VirtualMachine(Function const& func, std::span<Value> arguments)
 {
     auto id = 0;
     for (auto arg : arguments) {
-        _registers.emplace(Register{id++}, arg);
+        _memory.emplace(Register{id++}, arg);
     }
 
     for (auto const& block : func.blocks) {
@@ -27,7 +27,7 @@ auto VirtualMachine::getReturnValue() const -> std::optional<Value> { return _re
 auto VirtualMachine::operator()(ReturnInst const& inst) -> void
 {
     if (std::holds_alternative<Register>(inst.value)) {
-        _return = _registers.at(std::get<Register>(inst.value));
+        _return = _memory.at(std::get<Register>(inst.value));
     } else {
         _return = inst.value;
     }
@@ -37,7 +37,7 @@ auto VirtualMachine::operator()(ReturnInst const& inst) -> void
 
 auto VirtualMachine::operator()(ConstInst const& inst) -> void
 {
-    _registers.emplace(inst.result, inst.value);
+    _memory.emplace(inst.result, inst.value);
 }
 
 auto VirtualMachine::operator()(AddInst const& inst) -> void
