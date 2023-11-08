@@ -153,7 +153,6 @@ auto Parser::parseBinaryInst(std::string const& src) -> std::optional<Instructio
         auto lhs    = parseValue(matches[4], type).value();
         auto rhs    = parseValue(matches[5], type).value();
 
-#define SNIR_INST_UNARY(Identifier, Name)
 #define SNIR_INST_BINARY(Identifier, Name)                                                           \
     if (op == std::string_view{#Name}) {                                                             \
         return Identifier##Inst{                                                                     \
@@ -164,8 +163,7 @@ auto Parser::parseBinaryInst(std::string const& src) -> std::optional<Instructio
         };                                                                                           \
     }
 
-#include "snir/ir/instructions.def"
-#undef SNIR_INST_UNARY
+#include "snir/ir/instruction_binary.def"
 #undef SNIR_INST_BINARY
     }
 

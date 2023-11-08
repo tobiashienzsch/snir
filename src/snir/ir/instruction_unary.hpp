@@ -32,20 +32,7 @@ struct ReturnInst
         Register result;                                                                             \
         Value value;                                                                                 \
     };
-
-#define SNIR_INST_BINARY(Identifier, Name)                                                           \
-    struct Identifier##Inst                                                                          \
-    {                                                                                                \
-        static constexpr auto name = std::string_view{#Name};                                        \
-        static constexpr auto args = 2;                                                              \
-        Type type;                                                                                   \
-        Register result;                                                                             \
-        Value lhs;                                                                                   \
-        Value rhs;                                                                                   \
-    };
-
-#include "snir/ir/instructions.def"
+#include "snir/ir/instruction_unary.def"
 #undef SNIR_INST_UNARY
-#undef SNIR_INST_BINARY
 
 }  // namespace snir

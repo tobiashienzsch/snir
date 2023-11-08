@@ -1,6 +1,7 @@
 #pragma once
 
-#include "snir/ir/instructions.hpp"
+#include "snir/ir/instruction_binary.hpp"
+#include "snir/ir/instruction_unary.hpp"
 #include "snir/ir/register.hpp"
 #include "snir/ir/type.hpp"
 #include "snir/ir/value.hpp"

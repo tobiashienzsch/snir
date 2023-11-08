@@ -2,7 +2,7 @@
 
 #include "snir/core/variant.hpp"
 #include "snir/ir/function.hpp"
-#include "snir/ir/instructions.hpp"
+#include "snir/ir/instruction.hpp"
 #include "snir/ir/value.hpp"
 
 #include <format>

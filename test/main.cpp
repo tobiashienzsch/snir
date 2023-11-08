@@ -1,7 +1,6 @@
 #include "snir/core/file.hpp"
 #include "snir/ir/function.hpp"
 #include "snir/ir/instruction.hpp"
-#include "snir/ir/instructions.hpp"
 #include "snir/ir/parser.hpp"
 #include "snir/ir/pass/dead_store_elimination.hpp"
 #include "snir/ir/pass/remove_empty_block.hpp"

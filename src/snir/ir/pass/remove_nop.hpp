@@ -13,9 +13,7 @@ struct RemoveNop
     auto operator()(Function& func) -> void
     {
         for (auto& block : func.blocks) {
-            std::erase_if(block, [](Instruction const& inst) {
-                return inst.visit([](auto i) { return std::same_as<decltype(i), NopInst>; });
-            });
+            std::erase_if(block, [](Instruction const& inst) { return inst.hasType<NopInst>(); });
         }
     }
 };
