@@ -13,7 +13,7 @@ VirtualMachine::VirtualMachine(Function const& func, std::span<Value> arguments)
 
     for (auto const& block : func.blocks) {
         for (auto const& inst : block) {
-            println("{}", inst.visit([](auto i) { return i.name; }));
+            // println("Exec: '{}'", inst.visit([](auto i) { return i.name; }));
             inst.visit(*this);
             if (_exit) {
                 return;

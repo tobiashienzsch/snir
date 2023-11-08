@@ -6,6 +6,11 @@
 
 namespace snir::strings {
 
+[[nodiscard]] inline auto contains(std::string_view str, std::string_view sub) noexcept -> bool
+{
+    return str.find(sub) != std::string_view::npos;
+}
+
 [[nodiscard]] inline auto trim(std::string const& str, std::string const& whitespace = " \t")
     -> std::string
 {

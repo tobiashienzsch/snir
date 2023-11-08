@@ -47,6 +47,9 @@ auto Parser::parseModule(std::string const& source) -> std::optional<Module>
 
 auto Parser::parseInstruction(std::string const& source) -> std::optional<Instruction>
 {
+    if (auto inst = parseBinaryInst(source, "fadd"); inst) {
+        return inst;
+    }
     return std::nullopt;
 }
 
@@ -95,10 +98,65 @@ auto Parser::parseBlocks(std::string const& source) -> std::optional<std::vector
         if (str.empty()) {
             continue;
         }
-        blocks.push_back(Block{});
+
+        auto block = parseBlock(str);
+        if (not block) {
+            return std::nullopt;
+        }
+        blocks.push_back(std::move(block.value()));
     }
 
     return blocks;
+}
+
+auto Parser::parseBlock(std::string const& source) -> std::optional<Block>
+{
+    auto block = Block{};
+
+    auto line   = std::string{};
+    auto stream = std::istringstream(source);
+    while (std::getline(stream, line)) {
+        auto inst = parseInstruction(strings::trim(line));
+        if (inst) {
+            block.push_back(inst.value());
+            // return std::nullopt;
+        }
+    }
+
+    return block;
+}
+
+auto Parser::parseBinaryInst(std::string const& source, std::string_view inst)
+    -> std::optional<Instruction>
+{
+    // std::string input = "%5 = fadd double %3 %4";
+
+    auto matches = std::smatch();
+    auto pattern = std::regex(R"(%(\d+) = (\w+) (\w+) %(\d+) %(\d+))");
+    if (std::regex_match(source, matches, pattern)) {
+        std::string op = matches[2];
+        auto type      = parseType(matches[3].str()).value();
+        auto result    = std::stoi(matches[1]);
+        auto lhs       = std::stoi(matches[4]);
+        auto rhs       = std::stoi(matches[5]);
+
+#define SNIR_INST_UNARY(Identifier, Name)
+#define SNIR_INST_BINARY(Identifier, Name)                                                           \
+    if (op == std::string_view{#Name}) {                                                             \
+        return Identifier##Inst{                                                                     \
+            .type   = type,                                                                          \
+            .result = Register{result},                                                              \
+            .lhs    = Register{lhs},                                                                 \
+            .rhs    = Register{rhs},                                                                 \
+        };                                                                                           \
+    }
+
+#include "snir/ir/instructions.def"
+#undef SNIR_INST_UNARY
+#undef SNIR_INST_BINARY
+    }
+
+    return std::nullopt;
 }
 
 }  // namespace snir

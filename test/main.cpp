@@ -128,12 +128,14 @@ auto testPassManager() -> void
         assert(str.find("define i64 @ipow(i64 %0, i64 %1)") != std::string::npos);
     }
 
-    auto opt = snir::PassManager{true};
+    static constexpr auto const logging = false;
+
+    auto opt = snir::PassManager{logging};
     opt.add(snir::DeadStoreElimination{});
     opt.add(snir::RemoveNop{});
     opt.add(snir::RemoveEmptyBlock{});
 
-    auto pm = snir::PassManager{true};
+    auto pm = snir::PassManager{logging};
     pm.add(std::ref(opt));
     pm.add(std::ref(opt));
     pm(nan);

@@ -19,6 +19,9 @@ private:
     [[nodiscard]] auto parseFunctionArguments(std::string const& source)
         -> std::optional<std::vector<Type>>;
     [[nodiscard]] auto parseBlocks(std::string const& source) -> std::optional<std::vector<Block>>;
+    [[nodiscard]] auto parseBlock(std::string const& source) -> std::optional<Block>;
+    [[nodiscard]] auto parseBinaryInst(std::string const& source, std::string_view inst)
+        -> std::optional<Instruction>;
 };
 
 }  // namespace snir
