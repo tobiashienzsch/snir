@@ -14,6 +14,11 @@ struct Parser
     [[nodiscard]] auto parseModule(std::string const& source) -> std::optional<Module>;
     [[nodiscard]] auto parseInstruction(std::string const& source) -> std::optional<Instruction>;
     [[nodiscard]] auto parseType(std::string_view source) -> std::optional<Type>;
+
+private:
+    [[nodiscard]] auto parseFunctionArguments(std::string const& source)
+        -> std::optional<std::vector<Type>>;
+    [[nodiscard]] auto parseBlocks(std::string const& source) -> std::optional<std::vector<Block>>;
 };
 
 }  // namespace snir

@@ -162,8 +162,11 @@ define float @sin(float %0) {
 
 define i64 @ipow(i64 %0, i64 %1) {
 0:
-  %2 = i64 42
-  ret %2
+  %0 = i64 42
+  ret %0
+1:
+  %1 = i64 43
+  ret %1
 }
 )";
 
@@ -177,7 +180,25 @@ define i64 @ipow(i64 %0, i64 %1) {
     assert(parser.parseType("event") == snir::Type::Event);
 
     auto const module = parser.parseModule(text);
-    // assert(module.value().functions.size() == 3);
+    assert(module.value().functions.size() == 3);
+
+    assert(module->functions[0].name == "nan");
+    assert(module->functions[0].type == snir::Type::Double);
+    assert(module->functions[0].arguments.size() == 0);
+    assert(module->functions[0].blocks.size() == 1);
+
+    assert(module->functions[1].name == "sin");
+    assert(module->functions[1].type == snir::Type::Float);
+    assert(module->functions[1].arguments.size() == 1);
+    assert(module->functions[1].arguments[0] == snir::Type::Float);
+    assert(module->functions[1].blocks.size() == 1);
+
+    assert(module->functions[2].name == "ipow");
+    assert(module->functions[2].type == snir::Type::Int64);
+    assert(module->functions[2].arguments.size() == 2);
+    assert(module->functions[2].arguments[0] == snir::Type::Int64);
+    assert(module->functions[2].arguments[1] == snir::Type::Int64);
+    assert(module->functions[2].blocks.size() == 2);
 }
 
 auto testInterpreter() -> void
