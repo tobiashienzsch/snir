@@ -94,6 +94,7 @@ auto testParser() -> void
     assert(checkInstruction<FloatDivInst>("%5 = fdiv double %3 %4"));
 
     assert(checkInstructionType<Type::Int64>("ret i64 %1"));
+    assert(checkInstructionType<Type::Int64>("%5 = icmp eq i64 %0 %1"));
     assert(checkInstructionType<Type::Int64>("%5 = i64 42"));
     assert(checkInstructionType<Type::Float>("%5 = float 42"));
     assert(checkInstructionType<Type::Double>("%5 = double 42"));

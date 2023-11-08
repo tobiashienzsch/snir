@@ -20,9 +20,11 @@ private:
     [[nodiscard]] auto parseBlocks(std::string const& src) -> std::optional<std::vector<Block>>;
     [[nodiscard]] auto parseBlock(std::string const& src) -> std::optional<Block>;
     [[nodiscard]] auto parseBinaryInst(std::string const& src) -> std::optional<Instruction>;
+    [[nodiscard]] auto parseIntCmpInst(std::string const& src) -> std::optional<IntCmpInst>;
     [[nodiscard]] auto parseConstInst(std::string const& src) -> std::optional<ConstInst>;
     [[nodiscard]] auto parseTruncInst(std::string const& src) -> std::optional<TruncInst>;
     [[nodiscard]] auto parseReturnInst(std::string const& src) -> std::optional<ReturnInst>;
+    [[nodiscard]] auto parseCompare(std::string const& src) -> std::optional<Compare>;
     [[nodiscard]] auto parseValue(std::string const& src, Type type) -> std::optional<Value>;
 };
 

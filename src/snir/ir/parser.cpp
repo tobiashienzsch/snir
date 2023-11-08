@@ -59,6 +59,10 @@ auto Parser::parseInstruction(std::string const& src) -> std::optional<Instructi
         return inst.value();
     }
 
+    if (auto inst = parseIntCmpInst(src); inst) {
+        return inst.value();
+    }
+
     if (auto inst = parseReturnInst(src); inst) {
         return inst.value();
     }
@@ -189,6 +193,30 @@ auto Parser::parseConstInst(std::string const& src) -> std::optional<ConstInst>
     return std::nullopt;
 }
 
+auto Parser::parseIntCmpInst(std::string const& src) -> std::optional<IntCmpInst>
+{
+    // <result> = icmp eq i32 4, 5
+    auto matches = std::smatch();
+    auto pattern = std::regex(R"(%(\d+) = icmp (\w+) (\w+) %(\d+) %(\d+))");
+    if (std::regex_match(src, matches, pattern)) {
+        auto const result = Register{std::stoi(matches[1])};
+        auto const kind   = parseCompare(matches[2]).value();
+        auto const type   = parseType(matches[3].str()).value();
+        auto const lhs    = Register{std::stoi(matches[4])};
+        auto const rhs    = Register{std::stoi(matches[5])};
+
+        return IntCmpInst{
+            .type   = type,
+            .kind   = kind,
+            .result = result,
+            .lhs    = lhs,
+            .rhs    = rhs,
+        };
+    }
+
+    return std::nullopt;
+}
+
 auto Parser::parseTruncInst(std::string const& src) -> std::optional<TruncInst>
 {
     // %2 = trunc %1 as float
@@ -217,6 +245,18 @@ auto Parser::parseReturnInst(std::string const& src) -> std::optional<ReturnInst
         auto const operand = std::stoi(matches[2]);
         return ReturnInst{.type = type, .value = Register{operand}};
     }
+
+    return std::nullopt;
+}
+
+auto Parser::parseCompare(std::string const& src) -> std::optional<Compare>
+{
+#define SNIR_INST_COMPARE_OP(Op, Name)                                                               \
+    if (src == std::string_view{#Name}) {                                                            \
+        return Compare::Op;                                                                          \
+    }
+#include "snir/ir/def/compare_op.def"
+#undef SNIR_INST_COMPARE_OP
 
     return std::nullopt;
 }

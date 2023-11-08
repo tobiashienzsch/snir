@@ -63,7 +63,7 @@ auto PrettyPrinter::operator()(IntCmpInst const& inst) -> void
 {
     println(
         _out,
-        "  {} = {} {} {} {}",
+        "  {} = {} {} {} {} {}",
         inst.result,
         IntCmpInst::name,
         inst.kind,
