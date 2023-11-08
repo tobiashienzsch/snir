@@ -72,7 +72,7 @@ private:
     }
 
     std::map<Register, Value> _memory;
-    std::optional<Value> _return{Value{std::nullopt}};
+    std::optional<Value> _return{std::nullopt};
     bool _exit{false};
 };
 

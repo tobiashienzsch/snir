@@ -322,8 +322,7 @@ auto testInterpreter() -> void
 
         auto const func   = Function{.type = Type::Void};
         auto const result = vm.execute(func, {});
-        assert(result.has_value());
-        assert(std::holds_alternative<std::nullopt_t>(result.value()));
+        assert(not result.has_value());
     }
 
     {
