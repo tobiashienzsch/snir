@@ -1,0 +1,18 @@
+// This macro should be defined before including this header:
+// - SNIR_INST_BINARY_OP(Id, Name)
+
+SNIR_INST_BINARY_OP(Add, add)
+SNIR_INST_BINARY_OP(Sub, sub)
+SNIR_INST_BINARY_OP(Mul, mul)
+SNIR_INST_BINARY_OP(Div, div)
+SNIR_INST_BINARY_OP(Mod, mod)
+SNIR_INST_BINARY_OP(And, and)
+SNIR_INST_BINARY_OP(Or, or)
+SNIR_INST_BINARY_OP(Xor, xor)
+SNIR_INST_BINARY_OP(ShiftLeft, shl)
+SNIR_INST_BINARY_OP(ShiftRight, shr)
+
+SNIR_INST_BINARY_OP(FloatAdd, fadd)
+SNIR_INST_BINARY_OP(FloatSub, fsub)
+SNIR_INST_BINARY_OP(FloatMul, fmul)
+SNIR_INST_BINARY_OP(FloatDiv, fdiv)

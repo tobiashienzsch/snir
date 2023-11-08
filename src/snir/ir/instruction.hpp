@@ -1,14 +1,63 @@
 #pragma once
 
-#include "snir/ir/instruction_binary.hpp"
-#include "snir/ir/instruction_unary.hpp"
 #include "snir/ir/register.hpp"
 #include "snir/ir/type.hpp"
 #include "snir/ir/value.hpp"
 
 #include <array>
+#include <string_view>
 
 namespace snir {
+
+struct NopInst
+{
+    static constexpr auto name = std::string_view{"nop"};
+    static constexpr auto args = 0;
+
+    friend auto operator==(NopInst const& lhs, NopInst const& rhs) noexcept -> bool = default;
+};
+
+struct ReturnInst
+{
+    static constexpr auto name = std::string_view{"ret"};
+    static constexpr auto args = 1;
+
+    Type type;
+    Value value;
+
+    friend auto operator==(ReturnInst const& lhs, ReturnInst const& rhs) -> bool = default;
+};
+
+#define SNIR_INST_UNARY_OP(Id, Name)                                                                 \
+    struct Id##Inst                                                                                  \
+    {                                                                                                \
+        static constexpr auto name = std::string_view{#Name};                                        \
+        static constexpr auto args = 1;                                                              \
+        Type type;                                                                                   \
+        Register result;                                                                             \
+        Value value;                                                                                 \
+                                                                                                     \
+        friend auto operator==(Id##Inst const& lhs, Id##Inst const& rhs) -> bool = default;          \
+    };
+#include "snir/ir/inst/unary_op.def"
+#undef SNIR_INST_UNARY_OP
+
+#define SNIR_INST_BINARY_OP(Id, Name)                                                                \
+    struct Id##Inst                                                                                  \
+    {                                                                                                \
+        static constexpr auto name = std::string_view{#Name};                                        \
+        static constexpr auto args = 2;                                                              \
+                                                                                                     \
+        Type type;                                                                                   \
+        Register result;                                                                             \
+        Value lhs;                                                                                   \
+        Value rhs;                                                                                   \
+                                                                                                     \
+        friend auto operator==(Id##Inst const& lhs, Id##Inst const& rhs) -> bool = default;          \
+    };
+
+#include "snir/ir/inst/binary_op.def"
+#undef SNIR_INST_BINARY_OP
 
 struct Instruction
 {
