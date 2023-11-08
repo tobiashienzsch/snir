@@ -51,8 +51,16 @@ auto Parser::parseInstruction(std::string const& source) -> std::optional<Instru
         return inst;
     }
 
-    if (auto ret = parseReturnInst(source); ret) {
-        return ret.value();
+    if (auto inst = parseConstInst(source); inst) {
+        return inst.value();
+    }
+
+    if (auto inst = parseTruncInst(source); inst) {
+        return inst.value();
+    }
+
+    if (auto inst = parseReturnInst(source); inst) {
+        return inst.value();
     }
 
     if (strings::contains(source, "; nop")) {
@@ -159,6 +167,52 @@ auto Parser::parseBinaryInst(std::string const& source) -> std::optional<Instruc
 #include "snir/ir/instructions.def"
 #undef SNIR_INST_UNARY
 #undef SNIR_INST_BINARY
+    }
+
+    return std::nullopt;
+}
+
+auto Parser::parseConstInst(std::string const& source) -> std::optional<ConstInst>
+{
+    auto matches = std::smatch();
+    auto pattern = std::regex(R"(%(\d+) = (\w+) (\d+))");
+    if (std::regex_match(source, matches, pattern)) {
+        auto const result = Register{std::stoi(matches[1])};
+        auto const type   = parseType(matches[2].str()).value();
+        auto const value  = [&]() -> Value {
+            if (type == Type::Int64) {
+                return std::stoi(matches[3]);
+            } else if (type == Type::Float) {
+                return std::stof(matches[3]);
+            } else {
+                return std::stod(matches[3]);
+            }
+        }();
+
+        return ConstInst{
+            .type   = type,
+            .result = result,
+            .value  = value,
+        };
+    }
+
+    return std::nullopt;
+}
+
+auto Parser::parseTruncInst(std::string const& source) -> std::optional<TruncInst>
+{
+    // %2 = trunc %1 as float
+    auto matches = std::smatch();
+    auto pattern = std::regex(R"(%(\d+) = trunc %(\d+) as (\w+))");
+    if (std::regex_match(source, matches, pattern)) {
+        auto const result = Register{std::stoi(matches[1])};
+        auto const type   = parseType(matches[3].str()).value();
+        auto const value  = std::stoi(matches[2]);
+        return TruncInst{
+            .type   = type,
+            .result = result,
+            .value  = value,
+        };
     }
 
     return std::nullopt;

@@ -21,6 +21,8 @@ private:
     [[nodiscard]] auto parseBlocks(std::string const& source) -> std::optional<std::vector<Block>>;
     [[nodiscard]] auto parseBlock(std::string const& source) -> std::optional<Block>;
     [[nodiscard]] auto parseBinaryInst(std::string const& source) -> std::optional<Instruction>;
+    [[nodiscard]] auto parseConstInst(std::string const& source) -> std::optional<ConstInst>;
+    [[nodiscard]] auto parseTruncInst(std::string const& source) -> std::optional<TruncInst>;
     [[nodiscard]] auto parseReturnInst(std::string const& source) -> std::optional<ReturnInst>;
 };
 

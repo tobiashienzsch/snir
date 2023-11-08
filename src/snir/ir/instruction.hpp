@@ -40,7 +40,7 @@ struct Instruction
         return visit([]<typename T>(T const& i) {
             if constexpr (T::args == 2) {
                 return std::array<std::optional<Value>, 2>{i.lhs, i.rhs};
-            } else if constexpr (std::same_as<T, TruncInst> or std::same_as<T, ReturnInst>) {
+            } else if constexpr (requires { T::value; }) {
                 return std::array<std::optional<Value>, 2>{i.value, std::nullopt};
             } else {
                 return std::array<std::optional<Value>, 2>{};

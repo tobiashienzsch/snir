@@ -178,6 +178,8 @@ auto testParser() -> void
     assert(parser.parseType("event") == snir::Type::Event);
 
     assert(checkInstruction<snir::ReturnInst>("ret %1"));
+    assert(checkInstruction<snir::ConstInst>("%5 = i64 42"));
+    assert(checkInstruction<snir::TruncInst>("%5 = trunc %1 as float"));
     assert(checkInstruction<snir::AddInst>("%5 = add i64 %3 %4"));
     assert(checkInstruction<snir::SubInst>("%5 = sub i64 %3 %4"));
     assert(checkInstruction<snir::MulInst>("%5 = mul i64 %3 %4"));
@@ -191,6 +193,9 @@ auto testParser() -> void
     assert(checkInstruction<snir::FloatMulInst>("%5 = fmul double %3 %4"));
     assert(checkInstruction<snir::FloatDivInst>("%5 = fdiv double %3 %4"));
 
+    assert(checkInstructionType<snir::Type::Int64>("%5 = i64 42"));
+    assert(checkInstructionType<snir::Type::Float>("%5 = float 42"));
+    assert(checkInstructionType<snir::Type::Double>("%5 = double 42"));
     assert(checkInstructionType<snir::Type::Int64>("%5 = add i64 %3 %4"));
     assert(checkInstructionType<snir::Type::Int64>("%5 = sub i64 %3 %4"));
     assert(checkInstructionType<snir::Type::Int64>("%5 = mul i64 %3 %4"));
@@ -210,6 +215,16 @@ auto testParser() -> void
         assert(inst.has_value());
         assert(inst->hasType<snir::AddInst>());
         assert(inst->getResultRegister() == snir::Register{5});
+    }
+
+    {
+        auto const* src = "%5 = i64 42";
+        auto const inst = parser.parseInstruction(src);
+        assert(inst.has_value());
+
+        auto const operand = inst->getOperands().at(0).value();
+        assert(std::holds_alternative<int>(operand));
+        assert(std::get<int>(operand) == 42);
     }
 
     {
