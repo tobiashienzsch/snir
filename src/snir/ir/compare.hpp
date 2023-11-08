@@ -8,7 +8,7 @@ namespace snir {
 enum struct Compare
 {
 #define SNIR_INST_COMPARE_OP(Id, Name) Id,
-#include "snir/ir/inst/compare_op.def"
+#include "snir/ir/def/compare_op.def"
 #undef SNIR_INST_COMPARE_OP
 };
 
@@ -22,7 +22,7 @@ struct std::formatter<snir::Compare, char> : std::formatter<std::string_view, ch
     {
         static constexpr auto names = std::array{
 #define SNIR_INST_COMPARE_OP(Id, Name) std::string_view{#Name},
-#include "snir/ir/inst/compare_op.def"
+#include "snir/ir/def/compare_op.def"
 #undef SNIR_INST_COMPARE_OP
         };
 

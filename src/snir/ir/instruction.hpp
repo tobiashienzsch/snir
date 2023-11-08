@@ -54,7 +54,7 @@ struct IntCmpInst
                                                                                                      \
         friend auto operator==(Id##Inst const& lhs, Id##Inst const& rhs) -> bool = default;          \
     };
-#include "snir/ir/inst/unary_op.def"
+#include "snir/ir/def/unary_op.def"
 #undef SNIR_INST_UNARY_OP
 
 #define SNIR_INST_BINARY_OP(Id, Name)                                                                \
@@ -71,7 +71,7 @@ struct IntCmpInst
         friend auto operator==(Id##Inst const& lhs, Id##Inst const& rhs) -> bool = default;          \
     };
 
-#include "snir/ir/inst/binary_op.def"
+#include "snir/ir/def/binary_op.def"
 #undef SNIR_INST_BINARY_OP
 
 struct Instruction

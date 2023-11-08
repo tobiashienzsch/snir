@@ -76,7 +76,7 @@ auto Parser::parseType(std::string_view src) -> std::optional<Type>
     if (src == std::string_view{#Name}) {                                                            \
         return Type::Id;                                                                             \
     }
-#include "snir/ir/type.def"
+#include "snir/ir/def/type.def"
 #undef SNIR_BUILTIN_TYPE
 
     return std::nullopt;
@@ -163,7 +163,7 @@ auto Parser::parseBinaryInst(std::string const& src) -> std::optional<Instructio
         };                                                                                           \
     }
 
-#include "snir/ir/inst/binary_op.def"
+#include "snir/ir/def/binary_op.def"
 #undef SNIR_INST_BINARY_OP
     }
 
