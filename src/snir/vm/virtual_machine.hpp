@@ -1,5 +1,6 @@
 #pragma once
 
+#include "snir/core/exception.hpp"
 #include "snir/core/variant.hpp"
 #include "snir/ir/function.hpp"
 #include "snir/ir/instruction.hpp"
@@ -39,7 +40,7 @@ struct VirtualMachine
     template<typename T>
     auto operator()(T const& inst) -> void
     {
-        throw std::runtime_error{std::format("unhandled instruction '{}'", typeid(T).name())};
+        raisef<std::runtime_error>("unhandled instruction '{}'", typeid(T).name());
     }
 
 private:
@@ -54,11 +55,11 @@ private:
 
         auto operator()(auto v) -> T
         {
-            throw std::runtime_error{std::format(
+            raisef<std::runtime_error>(
                 "type mismatch for instruction: '{}' vs '{}'",
                 typeid(T).name(),
                 typeid(decltype(v)).name()
-            )};
+            );
         }
 
         std::map<Register, Value> const* memory;
@@ -74,8 +75,7 @@ private:
             return;
         }
 
-        throw std::runtime_error{std::format("unsupported type for int instruction: '{}'", inst.type)
-        };
+        raisef<std::runtime_error>("unsupported type for int instruction: '{}'", inst.type);
     }
 
     template<typename Inst, typename Op>
@@ -93,9 +93,7 @@ private:
             return;
         }
 
-        throw std::runtime_error{
-            std::format("unsupported type for float instruction: '{}'", inst.type)
-        };
+        raisef<std::runtime_error>("unsupported type for float instruction: '{}'", inst.type);
     }
 
     std::map<Register, Value> _register;
