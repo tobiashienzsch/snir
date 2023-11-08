@@ -1,9 +1,9 @@
 #pragma once
 
-#include "snir/core/print.hpp"
-#include "snir/ir/function.hpp"
+#include "snir/ir/module.hpp"
 
 #include <functional>
+#include <iostream>
 #include <memory>
 
 namespace snir {
@@ -12,29 +12,15 @@ struct PassManager
 {
     static constexpr auto name = std::string_view{"PassManager"};
 
-    explicit PassManager(bool print = false) : _print{print} {}
+    explicit PassManager(bool log = false, std::ostream& out = std::cout);
+
+    auto operator()(Module& m) -> void;
+    auto operator()(Function& func) -> void;
 
     template<typename PassType>
     auto add(PassType&& p) -> void
     {
         _passes.emplace_back(std::make_unique<Pass<PassType>>(std::forward<PassType>(p)));
-    }
-
-    auto operator()(Module& m) -> void
-    {
-        for (auto& func : m.functions) {
-            std::invoke(*this, func);
-        }
-    }
-
-    auto operator()(Function& func) -> void
-    {
-        for (auto& pass : _passes) {
-            if (_print) {
-                println("function pass on {}: {}", func.name, pass->getName());
-            }
-            pass->run(func);
-        }
     }
 
 private:
@@ -74,7 +60,8 @@ private:
     };
 
     std::vector<std::unique_ptr<PassInterface>> _passes;
-    bool _print;
+    std::reference_wrapper<std::ostream> _out;
+    bool _log;
 };
 
 }  // namespace snir

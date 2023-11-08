@@ -1,4 +1,4 @@
-define double @nan() {
+define double @func() {
 0:
   ; nop
   ; nop
