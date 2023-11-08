@@ -85,11 +85,6 @@ auto VirtualMachine::operator()(ModInst const& inst) -> void
 //     return binaryIntegerInst<std::plus<>>(inst);
 // }
 
-// auto VirtualMachine::operator()(FloatModInst const& inst) -> void
-// {
-//     return binaryIntegerInst<std::plus<>>(inst);
-// }
-
 auto VirtualMachine::operator()(AndInst const& inst) -> void
 {
     return binaryIntegerInst<std::bit_and<>>(inst);

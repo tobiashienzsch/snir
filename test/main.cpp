@@ -143,6 +143,28 @@ auto testPassManager() -> void
     pm(ipow);
 }
 
+template<typename Inst>
+[[nodiscard]] auto checkInstruction(char const* src) -> bool
+{
+    auto parser     = snir::Parser{};
+    auto const inst = parser.parseInstruction(src);
+    return inst.has_value() and inst->hasType<Inst>();
+}
+
+template<snir::Type Type>
+[[nodiscard]] auto checkInstructionType(char const* src) -> bool
+{
+    auto parser     = snir::Parser{};
+    auto const inst = parser.parseInstruction(src);
+    return inst.has_value() and inst->visit([](auto i) {
+        if constexpr (requires { i.type; }) {
+            return i.type == Type;
+        } else {
+            return false;
+        }
+    });
+}
+
 auto testParser() -> void
 {
 
@@ -180,6 +202,34 @@ define i64 @ipow(i64 %0, i64 %1) {
     assert(parser.parseType("double") == snir::Type::Double);
     assert(parser.parseType("block") == snir::Type::Block);
     assert(parser.parseType("event") == snir::Type::Event);
+
+    assert(checkInstruction<snir::AddInst>("%5 = add i64 %3 %4"));
+    assert(checkInstruction<snir::SubInst>("%5 = sub i64 %3 %4"));
+    assert(checkInstruction<snir::MulInst>("%5 = mul i64 %3 %4"));
+    assert(checkInstruction<snir::DivInst>("%5 = div i64 %3 %4"));
+    assert(checkInstruction<snir::ModInst>("%5 = mod i64 %3 %4"));
+    assert(checkInstruction<snir::FloatAddInst>("%5 = fadd double %3 %4"));
+    assert(checkInstruction<snir::FloatSubInst>("%5 = fsub double %3 %4"));
+    assert(checkInstruction<snir::FloatMulInst>("%5 = fmul double %3 %4"));
+    assert(checkInstruction<snir::FloatDivInst>("%5 = fdiv double %3 %4"));
+
+    assert(checkInstructionType<snir::Type::Int64>("%5 = add i64 %3 %4"));
+    assert(checkInstructionType<snir::Type::Int64>("%5 = sub i64 %3 %4"));
+    assert(checkInstructionType<snir::Type::Int64>("%5 = mul i64 %3 %4"));
+    assert(checkInstructionType<snir::Type::Int64>("%5 = div i64 %3 %4"));
+    assert(checkInstructionType<snir::Type::Int64>("%5 = mod i64 %3 %4"));
+    assert(checkInstructionType<snir::Type::Double>("%5 = fadd double %3 %4"));
+    assert(checkInstructionType<snir::Type::Double>("%5 = fsub double %3 %4"));
+    assert(checkInstructionType<snir::Type::Double>("%5 = fmul double %3 %4"));
+    assert(checkInstructionType<snir::Type::Double>("%5 = fdiv double %3 %4"));
+
+    {
+        auto const* src = "%5 = add i64 %3 %4";
+        auto const inst = parser.parseInstruction(src);
+        assert(inst.has_value());
+        assert(inst->hasType<snir::AddInst>());
+        assert(inst->getResultRegister() == snir::Register{5});
+    }
 
     auto const module = parser.parseModule(text);
     assert(module.value().functions.size() == 3);

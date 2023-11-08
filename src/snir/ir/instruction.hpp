@@ -17,6 +17,12 @@ struct Instruction
     explicit(false) Instruction(Inst&& inst) : _holder(std::forward<Inst>(inst))
     {}
 
+    template<typename Inst>
+    [[nodiscard]] auto hasType() const noexcept -> bool
+    {
+        return std::holds_alternative<Inst>(_holder);
+    }
+
     template<typename Visitor>
     auto visit(Visitor&& visitor)
     {
@@ -80,7 +86,6 @@ private:
         FloatSubInst,
         FloatMulInst,
         FloatDivInst,
-        FloatModInst,
         AndInst,
         OrInst,
         XorInst,

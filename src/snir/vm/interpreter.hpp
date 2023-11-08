@@ -26,17 +26,17 @@ struct VirtualMachine
     auto operator()(MulInst const& inst) -> void;
     auto operator()(DivInst const& inst) -> void;
     auto operator()(ModInst const& inst) -> void;
-    // auto operator()(FloatAddInst const& inst) -> void;
-    // auto operator()(FloatSubInst const& inst) -> void;
-    // auto operator()(FloatMulInst const& inst) -> void;
-    // auto operator()(FloatDivInst const& inst) -> void;
-    // auto operator()(FloatModInst const& inst) -> void;
     auto operator()(AndInst const& inst) -> void;
     auto operator()(OrInst const& inst) -> void;
     auto operator()(XorInst const& inst) -> void;
 
     // auto operator()(ShiftLeftInst const& inst) -> void;
     // auto operator()(ShiftRightInst const& inst) -> void;
+
+    // auto operator()(FloatAddInst const& inst) -> void;
+    // auto operator()(FloatSubInst const& inst) -> void;
+    // auto operator()(FloatMulInst const& inst) -> void;
+    // auto operator()(FloatDivInst const& inst) -> void;
 
     template<typename T>
     auto operator()(T const& inst) -> void
