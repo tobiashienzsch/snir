@@ -4,12 +4,13 @@
 
 namespace snir {
 
-struct RemoveEmptyBlock
+struct RemoveEmptyBasicBlock
 {
-    static constexpr auto name = std::string_view{"RemoveEmptyBlock"};
-    RemoveEmptyBlock()         = default;
+    static constexpr auto name = std::string_view{"RemoveEmptyBasicBlock"};
 
-    auto operator()(Function& f) -> void { std::erase_if(f.blocks, &Block::empty); }
+    RemoveEmptyBasicBlock() = default;
+
+    auto operator()(Function& f) -> void { std::erase_if(f.blocks, &BasicBlock::empty); }
 };
 
 }  // namespace snir

@@ -18,8 +18,10 @@ struct Parser
 private:
     [[nodiscard]] static auto readFunctionArgs(std::string const& src)
         -> std::optional<std::vector<Type>>;
-    [[nodiscard]] static auto readBlocks(std::string const& src) -> std::optional<std::vector<Block>>;
-    [[nodiscard]] static auto readBlock(std::string const& src) -> std::optional<Block>;
+    [[nodiscard]] static auto readBasicBlocks(std::string const& src)
+        -> std::optional<std::vector<BasicBlock>>;
+
+    [[nodiscard]] static auto readBasicBlock(std::string const& src) -> std::optional<BasicBlock>;
     [[nodiscard]] static auto readBinaryInst(std::string const& src) -> std::optional<Instruction>;
     [[nodiscard]] static auto readIntCmpInst(std::string const& src) -> std::optional<IntCmpInst>;
     [[nodiscard]] static auto readConstInst(std::string const& src) -> std::optional<ConstInst>;

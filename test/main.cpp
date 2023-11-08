@@ -118,7 +118,7 @@ auto testPassManager() -> void
         auto pm = snir::PassManager{true};
         pm.add(snir::DeadStoreElimination{});
         pm.add(snir::RemoveNop{});
-        pm.add(snir::RemoveEmptyBlock{});
+        pm.add(snir::RemoveEmptyBasicBlock{});
 
         auto optimized = original;
         auto& func     = optimized.functions.at(0);

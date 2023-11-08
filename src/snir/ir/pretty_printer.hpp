@@ -18,7 +18,7 @@ struct PrettyPrinter
 
     auto operator()(Module const& m) -> void;
     auto operator()(Function const& f) -> void;
-    auto operator()(Block const& block) -> void;
+    auto operator()(BasicBlock const& block) -> void;
     auto operator()(Instruction const& inst) -> void;
 
     auto operator()(NopInst const& nop) -> void;

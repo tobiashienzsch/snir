@@ -40,7 +40,7 @@ auto PrettyPrinter::operator()(Function const& f) -> void
     println(_out, "}}\n");
 }
 
-auto PrettyPrinter::operator()(Block const& block) -> void
+auto PrettyPrinter::operator()(BasicBlock const& block) -> void
 {
     std::ranges::for_each(block, std::bind_front(*this));
 }

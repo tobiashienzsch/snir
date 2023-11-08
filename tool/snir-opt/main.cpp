@@ -71,7 +71,7 @@ auto main(int argc, char const* const* argv) -> int
     auto opt = snir::PassManager{args->verbose, std::cout};
     opt.add(snir::DeadStoreElimination{});
     opt.add(snir::RemoveNop{});
-    opt.add(snir::RemoveEmptyBlock{});
+    opt.add(snir::RemoveEmptyBasicBlock{});
     if (args->opt > 0) {
         pm.add(std::ref(opt));
     }

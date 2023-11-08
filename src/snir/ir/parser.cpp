@@ -26,7 +26,7 @@ auto Parser::readModule(std::string const& src) -> std::optional<Module>
             return std::nullopt;
         }
 
-        auto const blocks = readBlocks(matches[4].str());
+        auto const blocks = readBasicBlocks(matches[4].str());
         if (not blocks) {
             return std::nullopt;
         }
@@ -107,9 +107,9 @@ auto Parser::readFunctionArgs(std::string const& src) -> std::optional<std::vect
     return args;
 }
 
-auto Parser::readBlocks(std::string const& src) -> std::optional<std::vector<Block>>
+auto Parser::readBasicBlocks(std::string const& src) -> std::optional<std::vector<BasicBlock>>
 {
-    auto blocks = std::vector<Block>{};
+    auto blocks = std::vector<BasicBlock>{};
 
     auto pattern = std::regex(R"(\d+:)");
     auto it      = std::sregex_token_iterator(src.begin(), src.end(), pattern, -1);
@@ -120,7 +120,7 @@ auto Parser::readBlocks(std::string const& src) -> std::optional<std::vector<Blo
             continue;
         }
 
-        auto block = readBlock(str);
+        auto block = readBasicBlock(str);
         if (not block) {
             return std::nullopt;
         }
@@ -130,9 +130,9 @@ auto Parser::readBlocks(std::string const& src) -> std::optional<std::vector<Blo
     return blocks;
 }
 
-auto Parser::readBlock(std::string const& src) -> std::optional<Block>
+auto Parser::readBasicBlock(std::string const& src) -> std::optional<BasicBlock>
 {
-    auto block = Block{};
+    auto block = BasicBlock{};
 
     auto line   = std::string{};
     auto stream = std::istringstream(src);
