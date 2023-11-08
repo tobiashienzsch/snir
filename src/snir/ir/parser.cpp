@@ -3,6 +3,8 @@
 #include "snir/core/print.hpp"
 #include "snir/core/strings.hpp"
 
+#include <ctre.hpp>
+
 #include <regex>
 
 namespace snir {
@@ -147,16 +149,14 @@ auto Parser::readBasicBlock(std::string const& src) -> std::optional<BasicBlock>
 }
 
 // NOLINTNEXTLINE(readability-function-cognitive-complexity)
-auto Parser::readBinaryInst(std::string const& src) -> std::optional<Instruction>
+auto Parser::readBinaryInst(std::string_view src) -> std::optional<Instruction>
 {
-    auto matches = std::smatch();
-    auto pattern = std::regex(R"(%(\d+) = (\w+) (\w+) (\d+|%\d+) (\d+|%\d+))");
-    if (std::regex_match(src, matches, pattern)) {
-        auto op     = matches[2].str();
-        auto type   = readType(matches[3].str()).value();
-        auto result = Register{std::stoi(matches[1])};
-        auto lhs    = readValue(matches[4], type).value();
-        auto rhs    = readValue(matches[5], type).value();
+    if (auto match = ctre::match<R"(%(\d+) = (\w+) (\w+) (\d+|%\d+) (\d+|%\d+))">(src); match) {
+        auto op     = match.get<2>().to_view();
+        auto type   = readType(match.get<3>().to_view()).value();
+        auto result = Register{std::stoi(match.get<1>().to_string())};
+        auto lhs    = readValue(match.get<4>().to_view(), type).value();
+        auto rhs    = readValue(match.get<5>().to_view(), type).value();
 
 #define SNIR_INST_BINARY_OP(Id, Name)                                                                \
     if (op == std::string_view{#Name}) {                                                             \
@@ -175,14 +175,12 @@ auto Parser::readBinaryInst(std::string const& src) -> std::optional<Instruction
     return std::nullopt;
 }
 
-auto Parser::readConstInst(std::string const& src) -> std::optional<ConstInst>
+auto Parser::readConstInst(std::string_view src) -> std::optional<ConstInst>
 {
-    auto matches = std::smatch();
-    auto pattern = std::regex(R"(%(\d+) = (\w+) ([-+]?(\d+\.\d+|\d+)))");
-    if (std::regex_match(src, matches, pattern)) {
-        auto const result = Register{std::stoi(matches[1])};
-        auto const type   = readType(matches[2].str()).value();
-        auto const value  = readValue(matches[3], type).value();
+    if (auto match = ctre::match<R"(%(\d+) = (\w+) (\d+\.\d+|\d+))">(src); match) {
+        auto const result = Register{std::stoi(match.get<1>().to_string())};
+        auto const type   = readType(match.get<2>().to_view()).value();
+        auto const value  = readValue(match.get<3>().to_view(), type).value();
 
         return ConstInst{
             .type   = type,
@@ -194,17 +192,15 @@ auto Parser::readConstInst(std::string const& src) -> std::optional<ConstInst>
     return std::nullopt;
 }
 
-auto Parser::readIntCmpInst(std::string const& src) -> std::optional<IntCmpInst>
+auto Parser::readIntCmpInst(std::string_view src) -> std::optional<IntCmpInst>
 {
     // <result> = icmp eq i32 4, 5
-    auto matches = std::smatch();
-    auto pattern = std::regex(R"(%(\d+) = icmp (\w+) (\w+) %(\d+) %(\d+))");
-    if (std::regex_match(src, matches, pattern)) {
-        auto const result = Register{std::stoi(matches[1])};
-        auto const kind   = readCompare(matches[2]).value();
-        auto const type   = readType(matches[3].str()).value();
-        auto const lhs    = Register{std::stoi(matches[4])};
-        auto const rhs    = Register{std::stoi(matches[5])};
+    if (auto match = ctre::match<R"(%(\d+) = icmp (\w+) (\w+) %(\d+) %(\d+))">(src); match) {
+        auto const result = Register{std::stoi(match.get<1>().to_string())};
+        auto const kind   = readCompare(match.get<2>().to_view()).value();
+        auto const type   = readType(match.get<3>().to_view()).value();
+        auto const lhs    = Register{std::stoi(match.get<4>().to_string())};
+        auto const rhs    = Register{std::stoi(match.get<5>().to_string())};
 
         return IntCmpInst{
             .type   = type,
@@ -218,15 +214,13 @@ auto Parser::readIntCmpInst(std::string const& src) -> std::optional<IntCmpInst>
     return std::nullopt;
 }
 
-auto Parser::readTruncInst(std::string const& src) -> std::optional<TruncInst>
+auto Parser::readTruncInst(std::string_view src) -> std::optional<TruncInst>
 {
     // %2 = trunc %1 as float
-    auto matches = std::smatch();
-    auto pattern = std::regex(R"(%(\d+) = trunc %(\d+) as (\w+))");
-    if (std::regex_match(src, matches, pattern)) {
-        auto const result = Register{std::stoi(matches[1])};
-        auto const type   = readType(matches[3].str()).value();
-        auto const value  = Register{std::stoi(matches[2])};
+    if (auto match = ctre::match<R"(%(\d+) = trunc %(\d+) as (\w+))">(src); match) {
+        auto const result = Register{std::stoi(match.get<1>().to_string())};
+        auto const value  = Register{std::stoi(match.get<2>().to_string())};
+        auto const type   = readType(match.get<3>().to_view()).value();
         return TruncInst{
             .type   = type,
             .result = result,
@@ -237,20 +231,18 @@ auto Parser::readTruncInst(std::string const& src) -> std::optional<TruncInst>
     return std::nullopt;
 }
 
-auto Parser::readReturnInst(std::string const& src) -> std::optional<ReturnInst>
+auto Parser::readReturnInst(std::string_view src) -> std::optional<ReturnInst>
 {
-    auto matches = std::smatch();
-    auto pattern = std::regex(R"(ret (\w+) %(\d+))");
-    if (std::regex_match(src, matches, pattern)) {
-        auto const type    = readType(matches[1].str()).value();
-        auto const operand = std::stoi(matches[2]);
+    if (auto match = ctre::match<R"(ret (\w+) %(\d+))">(src); match) {
+        auto const type    = readType(match.get<1>()).value();
+        auto const operand = std::stoi(match.get<2>().to_string());
         return ReturnInst{.type = type, .value = Register{operand}};
     }
 
     return std::nullopt;
 }
 
-auto Parser::readCompare(std::string const& src) -> std::optional<Compare>
+auto Parser::readCompare(std::string_view src) -> std::optional<Compare>
 {
 #define SNIR_INST_COMPARE_OP(Op, Name)                                                               \
     if (src == std::string_view{#Name}) {                                                            \
@@ -262,20 +254,23 @@ auto Parser::readCompare(std::string const& src) -> std::optional<Compare>
     return std::nullopt;
 }
 
-auto Parser::readValue(std::string const& src, Type type) -> std::optional<Value>
+auto Parser::readValue(std::string_view src, Type type) -> std::optional<Value>
 {
-    if (src.starts_with("%")) {
-        return Register{std::stoi(src.substr(1))};
-    }
-
-    if (type == Type::Int64) {
-        return std::stoi(src);
-    }
-    if (type == Type::Float) {
-        return std::stof(src);
-    }
-    if (type == Type::Double) {
-        return std::stod(src);
+    if (auto const m = ctre::match<R"((%[0-9]+)|([\d]+(|\.[\d]+)))">(src); m) {
+        if (m.get<1>()) {
+            return Register{std::stoi(m.get<1>().to_string().substr(1))};
+        } else if (m.get<2>()) {
+            auto const str = m.get<2>().to_string();
+            if (type == Type::Int64) {
+                return std::stoi(str);
+            }
+            if (type == Type::Float) {
+                return std::stof(str);
+            }
+            if (type == Type::Double) {
+                return std::stod(str);
+            }
+        }
     }
 
     return std::nullopt;

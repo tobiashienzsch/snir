@@ -325,16 +325,20 @@ auto testInterpreter() -> void  // NOLINT(readability-function-cognitive-complex
 
     {
         // empty function
-
-        auto const func   = Function{.type = Type::Void};
+        auto const func   = Function{.type = Type::Void, .name = {}, .arguments = {}, .blocks = {}};
         auto const result = Interpreter::execute(func, {});
         assert(not result.has_value());
     }
 
     {
         // function arg mismatch
+        auto const func = Function{
+            .type      = Type::Void,
+            .name      = {},
+            .arguments = std::vector{Type::Double},
+            .blocks    = {},
+        };
 
-        auto const func   = Function{.type = Type::Void, .arguments = std::vector{Type::Double}};
         auto const result = Interpreter::execute(func, {});
         assert(not result.has_value());
     }

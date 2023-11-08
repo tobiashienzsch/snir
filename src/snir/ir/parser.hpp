@@ -22,13 +22,13 @@ private:
         -> std::optional<std::vector<BasicBlock>>;
 
     [[nodiscard]] static auto readBasicBlock(std::string const& src) -> std::optional<BasicBlock>;
-    [[nodiscard]] static auto readBinaryInst(std::string const& src) -> std::optional<Instruction>;
-    [[nodiscard]] static auto readIntCmpInst(std::string const& src) -> std::optional<IntCmpInst>;
-    [[nodiscard]] static auto readConstInst(std::string const& src) -> std::optional<ConstInst>;
-    [[nodiscard]] static auto readTruncInst(std::string const& src) -> std::optional<TruncInst>;
-    [[nodiscard]] static auto readReturnInst(std::string const& src) -> std::optional<ReturnInst>;
-    [[nodiscard]] static auto readCompare(std::string const& src) -> std::optional<Compare>;
-    [[nodiscard]] static auto readValue(std::string const& src, Type type) -> std::optional<Value>;
+    [[nodiscard]] static auto readBinaryInst(std::string_view src) -> std::optional<Instruction>;
+    [[nodiscard]] static auto readIntCmpInst(std::string_view src) -> std::optional<IntCmpInst>;
+    [[nodiscard]] static auto readConstInst(std::string_view src) -> std::optional<ConstInst>;
+    [[nodiscard]] static auto readTruncInst(std::string_view src) -> std::optional<TruncInst>;
+    [[nodiscard]] static auto readReturnInst(std::string_view src) -> std::optional<ReturnInst>;
+    [[nodiscard]] static auto readCompare(std::string_view src) -> std::optional<Compare>;
+    [[nodiscard]] static auto readValue(std::string_view src, Type type) -> std::optional<Value>;
 };
 
 }  // namespace snir
