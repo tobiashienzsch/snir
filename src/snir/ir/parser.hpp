@@ -23,6 +23,7 @@ private:
     [[nodiscard]] auto parseConstInst(std::string const& src) -> std::optional<ConstInst>;
     [[nodiscard]] auto parseTruncInst(std::string const& src) -> std::optional<TruncInst>;
     [[nodiscard]] auto parseReturnInst(std::string const& src) -> std::optional<ReturnInst>;
+    [[nodiscard]] auto parseValue(std::string const& src, Type type) -> std::optional<Value>;
 };
 
 }  // namespace snir

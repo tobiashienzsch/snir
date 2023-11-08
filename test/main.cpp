@@ -265,7 +265,11 @@ auto testParser() -> void
             assert(nan.blocks.size() == 1);
 
             auto const& block = nan.blocks[0];
-            // assert(block.size() == 4);
+            assert(block.size() == 4);
+            assert(block.at(0).hasType<snir::ConstInst>());
+            assert(block.at(1).hasType<snir::ConstInst>());
+            assert(block.at(2).hasType<snir::FloatAddInst>());
+            assert(block.at(3).hasType<snir::ReturnInst>());
         }
 
         {

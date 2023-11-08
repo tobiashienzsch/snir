@@ -145,22 +145,22 @@ auto Parser::parseBlock(std::string const& src) -> std::optional<Block>
 auto Parser::parseBinaryInst(std::string const& src) -> std::optional<Instruction>
 {
     auto matches = std::smatch();
-    auto pattern = std::regex(R"(%(\d+) = (\w+) (\w+) %(\d+) %(\d+))");
+    auto pattern = std::regex(R"(%(\d+) = (\w+) (\w+) (\d+|%\d+) (\d+|%\d+))");
     if (std::regex_match(src, matches, pattern)) {
-        std::string op = matches[2];
-        auto type      = parseType(matches[3].str()).value();
-        auto result    = std::stoi(matches[1]);
-        auto lhs       = std::stoi(matches[4]);
-        auto rhs       = std::stoi(matches[5]);
+        auto op     = matches[2].str();
+        auto type   = parseType(matches[3].str()).value();
+        auto result = Register{std::stoi(matches[1])};
+        auto lhs    = parseValue(matches[4], type).value();
+        auto rhs    = parseValue(matches[5], type).value();
 
 #define SNIR_INST_UNARY(Identifier, Name)
 #define SNIR_INST_BINARY(Identifier, Name)                                                           \
     if (op == std::string_view{#Name}) {                                                             \
         return Identifier##Inst{                                                                     \
             .type   = type,                                                                          \
-            .result = Register{result},                                                              \
-            .lhs    = Register{lhs},                                                                 \
-            .rhs    = Register{rhs},                                                                 \
+            .result = result,                                                                        \
+            .lhs    = lhs,                                                                           \
+            .rhs    = rhs,                                                                           \
         };                                                                                           \
     }
 
@@ -175,19 +175,11 @@ auto Parser::parseBinaryInst(std::string const& src) -> std::optional<Instructio
 auto Parser::parseConstInst(std::string const& src) -> std::optional<ConstInst>
 {
     auto matches = std::smatch();
-    auto pattern = std::regex(R"(%(\d+) = (\w+) (\d+))");
+    auto pattern = std::regex(R"(%(\d+) = (\w+) ([-+]?(\d+\.\d+|\d+)))");
     if (std::regex_match(src, matches, pattern)) {
         auto const result = Register{std::stoi(matches[1])};
         auto const type   = parseType(matches[2].str()).value();
-        auto const value  = [&]() -> Value {
-            if (type == Type::Int64) {
-                return std::stoi(matches[3]);
-            } else if (type == Type::Float) {
-                return std::stof(matches[3]);
-            } else {
-                return std::stod(matches[3]);
-            }
-        }();
+        auto const value  = parseValue(matches[3], type).value();
 
         return ConstInst{
             .type   = type,
@@ -225,6 +217,23 @@ auto Parser::parseReturnInst(std::string const& src) -> std::optional<ReturnInst
     if (std::regex_match(src, matches, pattern)) {
         auto operand = std::stoi(matches[1]);
         return ReturnInst{.type = {}, .value = Register{operand}};
+    }
+
+    return std::nullopt;
+}
+
+auto Parser::parseValue(std::string const& src, Type type) -> std::optional<Value>
+{
+    if (src.starts_with("%")) {
+        return Register{std::stoi(src.substr(1))};
+    }
+
+    if (type == Type::Int64) {
+        return std::stoi(src);
+    } else if (type == Type::Float) {
+        return std::stof(src);
+    } else {
+        return std::stod(src);
     }
 
     return std::nullopt;
