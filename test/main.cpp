@@ -257,25 +257,29 @@ auto testInterpreter() -> void
 
     {
         // return files/i64_*.ll
-        auto tests = std::vector<std::pair<std::string, int>>{};
-        tests.emplace_back("./test/files/i64_add.ll", 42 + 143);
-        tests.emplace_back("./test/files/i64_and.ll", 42 & 143);
-        tests.emplace_back("./test/files/i64_blocks.ll", 9);
-        tests.emplace_back("./test/files/i64_const.ll", 42);
-        tests.emplace_back("./test/files/i64_icmp_eq_1.ll", 0);
-        tests.emplace_back("./test/files/i64_icmp_eq_2.ll", 1);
-        tests.emplace_back("./test/files/i64_icmp_ne_1.ll", 1);
-        tests.emplace_back("./test/files/i64_icmp_ne_2.ll", 0);
-        tests.emplace_back("./test/files/i64_div.ll", 42 / 2);
-        tests.emplace_back("./test/files/i64_mul.ll", 42 * 143);
-        tests.emplace_back("./test/files/i64_or.ll", 42 | 143);
-        tests.emplace_back("./test/files/i64_mod.ll", 42 % 3);
-        tests.emplace_back("./test/files/i64_shl.ll", 42 << 2);
-        tests.emplace_back("./test/files/i64_shr.ll", 42 >> 2);
-        tests.emplace_back("./test/files/i64_sub.ll", 42 - 143);
-        tests.emplace_back("./test/files/i64_xor.ll", 42 ^ 143);
+        auto tests = std::vector<std::tuple<std::string, int, std::vector<Value>>>{};
+        tests.emplace_back("./test/files/i64_add.ll", 42 + 143, std::vector<Value>{});
+        tests.emplace_back("./test/files/i64_and.ll", 42 & 143, std::vector<Value>{});
+        tests.emplace_back("./test/files/i64_args_1.ll", 42, std::vector<Value>{42});
+        tests.emplace_back("./test/files/i64_args_1.ll", 143, std::vector<Value>{143});
+        tests.emplace_back("./test/files/i64_args_2.ll", 42 + 2, std::vector<Value>{42, 2});
+        tests.emplace_back("./test/files/i64_args_2.ll", 143 + 2, std::vector<Value>{143, 2});
+        tests.emplace_back("./test/files/i64_blocks.ll", 9, std::vector<Value>{});
+        tests.emplace_back("./test/files/i64_const.ll", 42, std::vector<Value>{});
+        tests.emplace_back("./test/files/i64_icmp_eq_1.ll", 0, std::vector<Value>{});
+        tests.emplace_back("./test/files/i64_icmp_eq_2.ll", 1, std::vector<Value>{});
+        tests.emplace_back("./test/files/i64_icmp_ne_1.ll", 1, std::vector<Value>{});
+        tests.emplace_back("./test/files/i64_icmp_ne_2.ll", 0, std::vector<Value>{});
+        tests.emplace_back("./test/files/i64_div.ll", 42 / 2, std::vector<Value>{});
+        tests.emplace_back("./test/files/i64_mul.ll", 42 * 143, std::vector<Value>{});
+        tests.emplace_back("./test/files/i64_or.ll", 42 | 143, std::vector<Value>{});
+        tests.emplace_back("./test/files/i64_mod.ll", 42 % 3, std::vector<Value>{});
+        tests.emplace_back("./test/files/i64_shl.ll", 42 << 2, std::vector<Value>{});
+        tests.emplace_back("./test/files/i64_shr.ll", 42 >> 2, std::vector<Value>{});
+        tests.emplace_back("./test/files/i64_sub.ll", 42 - 143, std::vector<Value>{});
+        tests.emplace_back("./test/files/i64_xor.ll", 42 ^ 143, std::vector<Value>{});
 
-        for (auto const& [path, expected] : tests) {
+        for (auto const& [path, expected, args] : tests) {
             println("execute: {}", path);
 
             auto src    = readFile(path).value();
@@ -284,7 +288,7 @@ auto testInterpreter() -> void
             assert(module.has_value());
             assert(module->functions.size() == 1);
 
-            auto result = Interpreter::execute(module->functions.at(0), {});
+            auto result = Interpreter::execute(module->functions.at(0), args);
             assert(result.has_value());
             assert(std::holds_alternative<int>(result.value()));
             assert(std::get<int>(result.value()) == expected);
@@ -293,13 +297,12 @@ auto testInterpreter() -> void
 
     {
         // return files/float_*.ll
-        auto tests = std::vector<std::pair<std::string, float>>{
-            std::pair{"./test/files/float_add.ll",   42.0f + 143.0f},
-            std::pair{"./test/files/float_div.ll",   42.0f / 2.0f  },
-            std::pair{"./test/files/float_mul.ll",   42.0f * 143.0f},
-            std::pair{"./test/files/float_sub.ll",   42.0f - 143.0f},
-            std::pair{"./test/files/float_trunc.ll", 42.0f - 143.0f},
-        };
+        auto tests = std::vector<std::pair<std::string, float>>{};
+        tests.emplace_back("./test/files/float_add.ll", 42.0f + 143.0f);
+        tests.emplace_back("./test/files/float_div.ll", 42.0f / 2.0f);
+        tests.emplace_back("./test/files/float_mul.ll", 42.0f * 143.0f);
+        tests.emplace_back("./test/files/float_sub.ll", 42.0f - 143.0f);
+        tests.emplace_back("./test/files/float_trunc.ll", 42.0f - 143.0f);
 
         for (auto const& [path, expected] : tests) {
             println("execute: {}", path);
@@ -319,13 +322,12 @@ auto testInterpreter() -> void
 
     {
         // return files/double_*.ll
-        auto tests = std::vector<std::pair<std::string, double>>{
-            std::pair{"./test/files/double_add.ll",   42.0 + 143.0},
-            std::pair{"./test/files/double_div.ll",   42.0 / 2.0  },
-            std::pair{"./test/files/double_mul.ll",   42.0 * 143.0},
-            std::pair{"./test/files/double_sub.ll",   42.0 - 143.0},
-            std::pair{"./test/files/double_trunc.ll", 42.0 - 143.0},
-        };
+        auto tests = std::vector<std::pair<std::string, double>>{};
+        tests.emplace_back("./test/files/double_add.ll", 42.0 + 143.0);
+        tests.emplace_back("./test/files/double_div.ll", 42.0 / 2.0);
+        tests.emplace_back("./test/files/double_mul.ll", 42.0 * 143.0);
+        tests.emplace_back("./test/files/double_sub.ll", 42.0 - 143.0);
+        tests.emplace_back("./test/files/double_trunc.ll", 42.0 - 143.0);
 
         for (auto const& [path, expected] : tests) {
             println("execute: {}", path);
@@ -348,14 +350,13 @@ auto testInterpreter() -> void
         auto const unsupported_int_float = "unsupported type for int instruction: 'float'";
         auto const unsupported_float_i64 = "unsupported type for float instruction: 'i64'";
 
-        auto const tests = std::vector<std::pair<std::string, std::string>>{
-            std::make_pair("./test/files/mismatch_float_add_0.ll", mismatch),
-            std::make_pair("./test/files/mismatch_float_add_1.ll", unsupported_int_float),
-            std::make_pair("./test/files/mismatch_float_add_2.ll", unsupported_float_i64),
-            std::make_pair("./test/files/mismatch_float_div.ll", mismatch),
-            std::make_pair("./test/files/mismatch_float_mul.ll", mismatch),
-            std::make_pair("./test/files/mismatch_float_sub.ll", mismatch),
-        };
+        auto tests = std::vector<std::pair<std::string, std::string>>{};
+        tests.emplace_back("./test/files/mismatch_float_add_0.ll", mismatch);
+        tests.emplace_back("./test/files/mismatch_float_add_1.ll", unsupported_int_float);
+        tests.emplace_back("./test/files/mismatch_float_add_2.ll", unsupported_float_i64);
+        tests.emplace_back("./test/files/mismatch_float_div.ll", mismatch);
+        tests.emplace_back("./test/files/mismatch_float_mul.ll", mismatch);
+        tests.emplace_back("./test/files/mismatch_float_sub.ll", mismatch);
 
         for (auto const& [path, expected] : tests) {
             println("execute: {}", path);
