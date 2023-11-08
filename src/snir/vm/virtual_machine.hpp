@@ -52,36 +52,50 @@ private:
 
         auto operator()(T v) -> T { return static_cast<T>(v); }
 
-        auto operator()(auto) -> T { throw std::runtime_error{"invalid type"}; }
+        auto operator()(auto v) -> T
+        {
+            throw std::runtime_error{std::format(
+                "type mismatch for instruction: '{}' vs '{}'",
+                typeid(T).name(),
+                typeid(decltype(v)).name()
+            )};
+        }
 
         std::map<Register, Value> const* memory;
     };
 
-    template<typename Op, typename Inst>
-    auto binaryIntegerInst(Inst const& inst) -> void
+    template<typename Inst, typename Op>
+    auto binaryIntegerInst(Inst const& inst, Op op) -> void
     {
-        if (inst.type != Type::Int64) {
-            throw std::runtime_error{"unsupported type"};
+        if (inst.type == Type::Int64) {
+            auto lhs = std::visit(ValueAs<int>{_register}, inst.lhs);
+            auto rhs = std::visit(ValueAs<int>{_register}, inst.rhs);
+            _register.emplace(inst.result, op(lhs, rhs));
+            return;
         }
 
-        auto lhs = std::visit(ValueAs<int>{_register}, inst.lhs);
-        auto rhs = std::visit(ValueAs<int>{_register}, inst.rhs);
-        _register.emplace(inst.result, Op{}(lhs, rhs));
+        throw std::runtime_error{std::format("unsupported type for int instruction: '{}'", inst.type)
+        };
     }
 
     template<typename Inst, typename Op>
     auto binaryFloatInst(Inst const& inst, Op op) -> void
     {
         if (inst.type == Type::Float) {
-            auto lhs = std::visit(ValueAs<float>{_register}, inst.lhs);
-            auto rhs = std::visit(ValueAs<float>{_register}, inst.rhs);
+            auto const lhs = std::visit(ValueAs<float>{_register}, inst.lhs);
+            auto const rhs = std::visit(ValueAs<float>{_register}, inst.rhs);
+            _register.emplace(inst.result, op(lhs, rhs));
+            return;
+        } else if (inst.type == Type::Double) {
+            auto const lhs = std::visit(ValueAs<double>{_register}, inst.lhs);
+            auto const rhs = std::visit(ValueAs<double>{_register}, inst.rhs);
             _register.emplace(inst.result, op(lhs, rhs));
             return;
         }
 
-        auto lhs = std::visit(ValueAs<double>{_register}, inst.lhs);
-        auto rhs = std::visit(ValueAs<double>{_register}, inst.rhs);
-        _register.emplace(inst.result, op(lhs, rhs));
+        throw std::runtime_error{
+            std::format("unsupported type for float instruction: '{}'", inst.type)
+        };
     }
 
     std::map<Register, Value> _register;
