@@ -266,7 +266,7 @@ auto testInterpreter() -> void
         tests.push_back(std::pair{"./test/files/i64_or.ll", 42 | 143});
         tests.push_back(std::pair{"./test/files/i64_mod.ll", 42 % 3});
         tests.push_back(std::pair{"./test/files/i64_shl.ll", 42 << 2});
-        tests.push_back(std::pair{"./test/files/i64_shr.ll", 42 >> 0});
+        tests.push_back(std::pair{"./test/files/i64_shr.ll", 42 >> 2});
         tests.push_back(std::pair{"./test/files/i64_sub.ll", 42 - 143});
         tests.push_back(std::pair{"./test/files/i64_xor.ll", 42 ^ 143});
 

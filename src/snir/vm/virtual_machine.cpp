@@ -104,7 +104,7 @@ auto VirtualMachine::operator()(ShiftLeftInst const& inst) -> void
 
 auto VirtualMachine::operator()(ShiftRightInst const& inst) -> void
 {
-    return binaryIntegerInst(inst, [](auto lhs, auto rhs) { return lhs << rhs; });
+    return binaryIntegerInst(inst, [](auto lhs, auto rhs) { return lhs >> rhs; });
 }
 
 auto VirtualMachine::operator()(FloatAddInst const& inst) -> void
