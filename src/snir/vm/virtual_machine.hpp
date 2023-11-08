@@ -50,9 +50,11 @@ private:
     template<typename T>
     struct ValueAs
     {
-        explicit ValueAs(std::map<Register, Value> const& regs) : memory{&regs} {}
+        explicit ValueAs(std::map<Register, Value> const& regs) : _memory{&regs} {}
 
-        auto operator()(Register reg) -> T { return std::visit(*this, memory->at(reg)); }
+        // Only 1 level of recursion
+        // NOLINTNEXTLINE(misc-no-recursion)
+        auto operator()(Register reg) -> T { return std::visit(*this, _memory->at(reg)); }
 
         auto operator()(T v) -> T { return static_cast<T>(v); }
 
@@ -65,15 +67,18 @@ private:
             );
         }
 
-        std::map<Register, Value> const* memory;
+    private:
+        std::map<Register, Value> const* _memory;
     };
 
     template<typename T>
     struct CastTo
     {
-        explicit CastTo(std::map<Register, Value> const& regs) : memory{&regs} {}
+        explicit CastTo(std::map<Register, Value> const& regs) : _memory{&regs} {}
 
-        auto operator()(Register reg) -> T { return std::visit(*this, memory->at(reg)); }
+        // Only 1 level of recursion
+        // NOLINTNEXTLINE(misc-no-recursion)
+        auto operator()(Register reg) -> T { return std::visit(*this, _memory->at(reg)); }
 
         auto operator()(auto v) -> T { return static_cast<T>(v); }
 
@@ -82,7 +87,8 @@ private:
             raisef<std::runtime_error>("can't cast void to '{}'", typeid(T).name());
         }
 
-        std::map<Register, Value> const* memory;
+    private:
+        std::map<Register, Value> const* _memory;
     };
 
     template<typename Inst, typename Op>

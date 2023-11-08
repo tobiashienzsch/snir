@@ -101,12 +101,16 @@ auto VirtualMachine::operator()(XorInst const& inst) -> void
 
 auto VirtualMachine::operator()(ShiftLeftInst const& inst) -> void
 {
-    return binaryIntegerInst(inst, [](auto lhs, auto rhs) { return lhs << rhs; });
+    return binaryIntegerInst(inst, []<typename T>(T lhs, T rhs) {
+        return static_cast<T>(std::uint64_t(lhs) << std::uint64_t(rhs));
+    });
 }
 
 auto VirtualMachine::operator()(ShiftRightInst const& inst) -> void
 {
-    return binaryIntegerInst(inst, [](auto lhs, auto rhs) { return lhs >> rhs; });
+    return binaryIntegerInst(inst, []<typename T>(T lhs, T rhs) {
+        return static_cast<T>(std::uint64_t(lhs) >> std::uint64_t(rhs));
+    });
 }
 
 auto VirtualMachine::operator()(IntCmpInst const& inst) -> void

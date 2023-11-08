@@ -17,7 +17,7 @@
 
 namespace {
 
-auto testVector() -> void
+auto testVector() -> void  // NOLINT(readability-function-cognitive-complexity)
 {
     auto test = []<typename T>(T val) {  // NOLINT(readability-function-cognitive-complexity)
         using Vec = snir::StaticVector<T, 2>;
@@ -343,7 +343,7 @@ auto testInterpreter() -> void  // NOLINT(readability-function-cognitive-complex
         // return files/i64_*.ll
         auto tests = std::vector<std::tuple<std::string, int, std::vector<Value>>>{};
         tests.emplace_back("./test/files/i64_add.ll", 42 + 143, std::vector<Value>{});
-        tests.emplace_back("./test/files/i64_and.ll", 42 & 143, std::vector<Value>{});
+        tests.emplace_back("./test/files/i64_and.ll", int(42U & 143U), std::vector<Value>{});
         tests.emplace_back("./test/files/i64_args_1.ll", 42, std::vector<Value>{42});
         tests.emplace_back("./test/files/i64_args_1.ll", 143, std::vector<Value>{143});
         tests.emplace_back("./test/files/i64_args_2.ll", 42 + 2, std::vector<Value>{42, 2});
@@ -356,12 +356,12 @@ auto testInterpreter() -> void  // NOLINT(readability-function-cognitive-complex
         tests.emplace_back("./test/files/i64_icmp_ne_2.ll", 0, std::vector<Value>{});
         tests.emplace_back("./test/files/i64_div.ll", 42 / 2, std::vector<Value>{});
         tests.emplace_back("./test/files/i64_mul.ll", 42 * 143, std::vector<Value>{});
-        tests.emplace_back("./test/files/i64_or.ll", 42 | 143, std::vector<Value>{});
+        tests.emplace_back("./test/files/i64_or.ll", int(42U | 143U), std::vector<Value>{});
         tests.emplace_back("./test/files/i64_mod.ll", 42 % 3, std::vector<Value>{});
-        tests.emplace_back("./test/files/i64_shl.ll", 42 << 2, std::vector<Value>{});
-        tests.emplace_back("./test/files/i64_shr.ll", 42 >> 2, std::vector<Value>{});
+        tests.emplace_back("./test/files/i64_shl.ll", int(42U << 2U), std::vector<Value>{});
+        tests.emplace_back("./test/files/i64_shr.ll", int(42U >> 2U), std::vector<Value>{});
         tests.emplace_back("./test/files/i64_sub.ll", 42 - 143, std::vector<Value>{});
-        tests.emplace_back("./test/files/i64_xor.ll", 42 ^ 143, std::vector<Value>{});
+        tests.emplace_back("./test/files/i64_xor.ll", int(42U ^ 143U), std::vector<Value>{});
 
         for (auto const& [path, expected, args] : tests) {
             println("execute: {}", path);

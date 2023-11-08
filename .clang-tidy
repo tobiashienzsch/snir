@@ -26,8 +26,6 @@ Checks: >
   -readability-identifier-length,
 
   -*-magic-numbers,
-  -*-non-private-member-variables-in-classes,
-  -*-vararg,
 
 WarningsAsErrors: "*"
 FormatStyle: none
