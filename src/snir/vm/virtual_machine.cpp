@@ -47,7 +47,6 @@ auto VirtualMachine::operator()(TruncInst const& inst) -> void
         _register.emplace(inst.result, std::visit(CastTo<int>{_register}, inst.value));
         return;
     } else if (inst.type == Type::Float) {
-        println("float");
         _register.emplace(inst.result, std::visit(CastTo<float>{_register}, inst.value));
         return;
     } else if (inst.type == Type::Double) {

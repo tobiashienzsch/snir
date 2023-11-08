@@ -116,7 +116,7 @@ auto testPassManager() -> void
             },
     };
 
-    static constexpr auto const logging = false;
+    static constexpr auto const logging = true;
 
     auto opt = snir::PassManager{logging};
     opt.add(snir::DeadStoreElimination{});
@@ -348,6 +348,7 @@ auto testInterpreter() -> void
         auto tests = std::vector<std::pair<std::string, int>>{};
         tests.push_back(std::pair{"./test/files/i64_add.ll", 42 + 143});
         tests.push_back(std::pair{"./test/files/i64_and.ll", 42 & 143});
+        tests.push_back(std::pair{"./test/files/i64_blocks.ll", 9});
         tests.push_back(std::pair{"./test/files/i64_const.ll", 42});
         tests.push_back(std::pair{"./test/files/i64_div.ll", 42 / 2});
         tests.push_back(std::pair{"./test/files/i64_mul.ll", 42 * 143});
@@ -371,12 +372,6 @@ auto testInterpreter() -> void
             assert(result.has_value());
             assert(std::holds_alternative<int>(result.value()));
             assert(std::get<int>(result.value()) == expected);
-
-            auto stream  = std::stringstream{};
-            auto printer = snir::PrettyPrinter{stream};
-            printer(module.value());
-            auto reconstructed = parser.parseModule(stream.str());
-            assert(module == reconstructed);
         }
     }
 
@@ -403,12 +398,6 @@ auto testInterpreter() -> void
             assert(result.has_value());
             assert(std::holds_alternative<float>(result.value()));
             assert(std::get<float>(result.value()) == expected);
-
-            auto stream  = std::stringstream{};
-            auto printer = snir::PrettyPrinter{stream};
-            printer(module.value());
-            auto reconstructed = parser.parseModule(stream.str());
-            assert(module == reconstructed);
         }
     }
 
@@ -435,12 +424,6 @@ auto testInterpreter() -> void
             assert(result.has_value());
             assert(std::holds_alternative<double>(result.value()));
             assert(std::get<double>(result.value()) == expected);
-
-            auto stream  = std::stringstream{};
-            auto printer = snir::PrettyPrinter{stream};
-            printer(module.value());
-            auto reconstructed = parser.parseModule(stream.str());
-            assert(module == reconstructed);
         }
     }
     {
@@ -479,6 +462,28 @@ auto testInterpreter() -> void
     }
 }
 
+auto testPrettyPrinter() -> void
+{
+    for (auto const entry : std::filesystem::directory_iterator{"./test/files"}) {
+        snir::println("pretty-print/parse: {}", entry.path().string());
+
+        auto src    = snir::readFile(entry.path()).value();
+        auto parser = snir::Parser{};
+        auto module = parser.parseModule(src);
+        assert(module.has_value());
+
+        auto stream  = std::stringstream{};
+        auto printer = snir::PrettyPrinter{stream};
+        printer(module.value());
+
+        auto reconstructed = parser.parseModule(stream.str());
+        if (module.value() != reconstructed.value()) {
+            snir::println("'{}'", stream.str());
+            assert(false);
+        }
+    }
+}
+
 }  // namespace
 
 auto main() -> int
@@ -486,5 +491,6 @@ auto main() -> int
     testPassManager();
     testParser();
     testInterpreter();
+    testPrettyPrinter();
     return 0;
 }
