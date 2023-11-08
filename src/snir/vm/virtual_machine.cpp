@@ -23,6 +23,8 @@ VirtualMachine::VirtualMachine(Function const& func, std::span<Value const> argu
 
 auto VirtualMachine::getReturnValue() const -> std::optional<Value> { return _return; }
 
+auto VirtualMachine::operator()(NopInst const& /*inst*/) -> void {}
+
 auto VirtualMachine::operator()(ReturnInst const& inst) -> void
 {
     if (auto const* reg = std::get_if<Register>(&inst.value); reg != nullptr) {

@@ -20,6 +20,7 @@ struct VirtualMachine
 
     [[nodiscard]] auto getReturnValue() const -> std::optional<Value>;
 
+    auto operator()(NopInst const& inst) -> void;
     auto operator()(ReturnInst const& inst) -> void;
     auto operator()(ConstInst const& inst) -> void;
     auto operator()(AddInst const& inst) -> void;
