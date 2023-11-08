@@ -23,14 +23,20 @@ struct Instruction
         return std::holds_alternative<Inst>(_holder);
     }
 
+    template<typename Inst>
+    [[nodiscard]] auto get() const -> Inst const&
+    {
+        return std::get<Inst>(_holder);
+    }
+
     template<typename Visitor>
-    auto visit(Visitor&& visitor)
+    auto visit(Visitor&& visitor) -> decltype(auto)
     {
         return std::visit(std::forward<Visitor>(visitor), _holder);
     }
 
     template<typename Visitor>
-    auto visit(Visitor&& visitor) const
+    auto visit(Visitor&& visitor) const -> decltype(auto)
     {
         return std::visit(std::forward<Visitor>(visitor), _holder);
     }

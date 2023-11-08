@@ -207,7 +207,7 @@ auto Parser::parseTruncInst(std::string const& src) -> std::optional<TruncInst>
     if (std::regex_match(src, matches, pattern)) {
         auto const result = Register{std::stoi(matches[1])};
         auto const type   = parseType(matches[3].str()).value();
-        auto const value  = std::stoi(matches[2]);
+        auto const value  = Register{std::stoi(matches[2])};
         return TruncInst{
             .type   = type,
             .result = result,

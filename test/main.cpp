@@ -256,23 +256,51 @@ auto testParser() -> void
         auto const module = parser.parseModule(text);
         assert(module.value().functions.size() == 3);
 
-        assert(module->functions[0].name == "nan");
-        assert(module->functions[0].type == snir::Type::Double);
-        assert(module->functions[0].arguments.size() == 0);
-        assert(module->functions[0].blocks.size() == 1);
+        auto const& funcs = module->functions;
+        {
+            auto const& nan = funcs[0];
+            assert(nan.name == "nan");
+            assert(nan.type == snir::Type::Double);
+            assert(nan.arguments.size() == 0);
+            assert(nan.blocks.size() == 1);
 
-        assert(module->functions[1].name == "sin");
-        assert(module->functions[1].type == snir::Type::Float);
-        assert(module->functions[1].arguments.size() == 1);
-        assert(module->functions[1].arguments[0] == snir::Type::Float);
-        assert(module->functions[1].blocks.size() == 1);
+            auto const& block = nan.blocks[0];
+            // assert(block.size() == 4);
+        }
 
-        assert(module->functions[2].name == "ipow");
-        assert(module->functions[2].type == snir::Type::Int64);
-        assert(module->functions[2].arguments.size() == 2);
-        assert(module->functions[2].arguments[0] == snir::Type::Int64);
-        assert(module->functions[2].arguments[1] == snir::Type::Int64);
-        assert(module->functions[2].blocks.size() == 2);
+        {
+            auto const& sin = funcs[1];
+            assert(sin.name == "sin");
+            assert(sin.type == snir::Type::Float);
+            assert(sin.arguments.size() == 1);
+            assert(sin.arguments[0] == snir::Type::Float);
+            assert(sin.blocks.size() == 1);
+
+            auto const& block = sin.blocks[0];
+            assert(block.size() == 3);
+
+            auto const i0 = block.at(0);
+            assert(i0.hasType<snir::ConstInst>());
+            assert(i0.get<snir::ConstInst>().result == snir::Register{1});
+            assert(std::get<double>(i0.get<snir::ConstInst>().value) == 42.0);
+
+            auto const i1 = block.at(1);
+            assert(i1.hasType<snir::TruncInst>());
+            assert(i1.get<snir::TruncInst>().type == snir::Type::Float);
+            assert(i1.get<snir::TruncInst>().result == snir::Register{2});
+            assert(std::get<snir::Register>(i1.get<snir::TruncInst>().value) == snir::Register{1});
+
+            auto const i2 = block.at(2);
+            assert(i2.hasType<snir::ReturnInst>());
+            assert(std::get<snir::Register>(i2.get<snir::ReturnInst>().value) == snir::Register{2});
+        }
+
+        assert(funcs[2].name == "ipow");
+        assert(funcs[2].type == snir::Type::Int64);
+        assert(funcs[2].arguments.size() == 2);
+        assert(funcs[2].arguments[0] == snir::Type::Int64);
+        assert(funcs[2].arguments[1] == snir::Type::Int64);
+        assert(funcs[2].blocks.size() == 2);
     }
 }
 
