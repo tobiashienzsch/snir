@@ -18,117 +18,28 @@ namespace {
 
 auto testPassManager() -> void
 {
+    auto parser = snir::Parser{};
 
-    auto nan = snir::Function{
-        .type = snir::Type::Double,
-        .name = "nan",
-        .blocks =
-            {
-                snir::Block{
-                    snir::NopInst{},
-                    snir::NopInst{},
-                },
+    for (auto const test : {
+             std::string{"test/files/opt_dead_store.ll"},
+             std::string{"test/files/opt_empty_block.ll"},
+         }) {
 
-                snir::Block{
-                    snir::ConstInst{
-                        .type = snir::Type::Int64,
-                        .result = snir::Register{0},
-                        .value = 1,
-                    },
-                    snir::ConstInst{
-                        .type = snir::Type::Int64,
-                        .result = snir::Register{1},
-                        .value = 2,
-                    },
-                    snir::AddInst{
-                        .type = snir::Type::Int64,
-                        .result = snir::Register{2},
-                        .lhs = snir::Register{0},
-                        .rhs = snir::Register{1},
-                    },
-                },
+        auto const src      = snir::readFile(test).value();
+        auto const original = parser.parseModule(src).value();
 
-                snir::Block{
-                    snir::ConstInst{
-                        .type = snir::Type::Double,
-                        .result = snir::Register{3},
-                        .value = 2.0,
-                    },
-                    snir::ConstInst{
-                        .type = snir::Type::Double,
-                        .result = snir::Register{4},
-                        .value = 1.14159265359,
-                    },
-                    snir::FloatAddInst{
-                        .type = snir::Type::Double,
-                        .result = snir::Register{5},
-                        .lhs = snir::Register{3},
-                        .rhs = snir::Register{4},
-                    },
-                    snir::ReturnInst{
-                        .type = snir::Type::Double,
-                        .value = snir::Register{5},
-                    },
-                },
-            },
-    };
-    auto sin = snir::Function{
-        .type = snir::Type::Float,
-        .name = "sin",
-        .arguments = {snir::Type::Float},
-        .blocks =
-            {
-                snir::Block{
-                    snir::ConstInst{
-                        .type = snir::Type::Double,
-                        .result = snir::Register{1},
-                        .value = 42,
-                    },
-                    snir::TruncInst{
-                        .type = snir::Type::Float,
-                        .result = snir::Register{2},
-                        .value = snir::Register{1},
-                    },
-                    snir::ReturnInst{
-                        .type = snir::Type::Float,
-                        .value = snir::Register{2},
-                    },
-                },
-            },
-    };
-    auto ipow = snir::Function{
-        .type = snir::Type::Int64,
-        .name = "ipow",
-        .arguments = {snir::Type::Int64, snir::Type::Int64},
-        .blocks =
-            {
-                snir::Block{
-                    snir::ConstInst{
-                        .type = snir::Type::Int64,
-                        .result = snir::Register{2},
-                        .value = 42,
-                    },
-                    snir::ReturnInst{
-                        .type = snir::Type::Int64,
-                        .value = snir::Register{2},
-                    },
-                },
-            },
-    };
+        auto pm = snir::PassManager{true};
+        pm.add(snir::DeadStoreElimination{});
+        pm.add(snir::RemoveNop{});
+        pm.add(snir::RemoveEmptyBlock{});
 
-    static constexpr auto const logging = true;
+        auto optimized = original;
+        auto& func     = optimized.functions.at(0);
 
-    auto opt = snir::PassManager{logging};
-    opt.add(snir::DeadStoreElimination{});
-    opt.add(snir::RemoveNop{});
-    opt.add(snir::RemoveEmptyBlock{});
-
-    auto pm = snir::PassManager{logging};
-    pm.add(std::ref(opt));
-    pm.add(std::ref(opt));
-    pm(nan);
-    pm(sin);
-    pm(ipow);
+        assert(func == original.functions.at(0));
+        pm(func);
+        assert(func != original.functions.at(0));
+    }
 }
 
 template<typename Inst>
