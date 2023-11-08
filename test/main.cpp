@@ -198,6 +198,7 @@ auto testParser() -> void
     assert(checkInstructionType<Type::Double>("%5 = fsub double %3 %4"));
     assert(checkInstructionType<Type::Double>("%5 = fmul double %3 %4"));
     assert(checkInstructionType<Type::Double>("%5 = fdiv double %3 %4"));
+    assert(checkInstructionType<Type::Float>("%5 = trunc %4 as float"));
 
     {
         auto const* src = "%5 = add i64 %3 %4";
@@ -382,10 +383,11 @@ auto testInterpreter() -> void
     {
         // return files/float_*.ll
         auto tests = std::vector<std::pair<std::string, float>>{
-            std::pair{"./test/files/float_add.ll", 42.0f + 143.0f},
-            std::pair{"./test/files/float_div.ll", 42.0f / 2.0f  },
-            std::pair{"./test/files/float_mul.ll", 42.0f * 143.0f},
-            std::pair{"./test/files/float_sub.ll", 42.0f - 143.0f},
+            std::pair{"./test/files/float_add.ll",   42.0f + 143.0f},
+            std::pair{"./test/files/float_div.ll",   42.0f / 2.0f  },
+            std::pair{"./test/files/float_mul.ll",   42.0f * 143.0f},
+            std::pair{"./test/files/float_sub.ll",   42.0f - 143.0f},
+            std::pair{"./test/files/float_trunc.ll", 42.0f - 143.0f},
         };
 
         for (auto const& [path, expected] : tests) {
@@ -413,10 +415,11 @@ auto testInterpreter() -> void
     {
         // return files/double_*.ll
         auto tests = std::vector<std::pair<std::string, double>>{
-            std::pair{"./test/files/double_add.ll", 42.0f + 143.0f},
-            std::pair{"./test/files/double_div.ll", 42.0f / 2.0f  },
-            std::pair{"./test/files/double_mul.ll", 42.0f * 143.0f},
-            std::pair{"./test/files/double_sub.ll", 42.0f - 143.0f},
+            std::pair{"./test/files/double_add.ll",   42.0 + 143.0},
+            std::pair{"./test/files/double_div.ll",   42.0 / 2.0  },
+            std::pair{"./test/files/double_mul.ll",   42.0 * 143.0},
+            std::pair{"./test/files/double_sub.ll",   42.0 - 143.0},
+            std::pair{"./test/files/double_trunc.ll", 42.0 - 143.0},
         };
 
         for (auto const& [path, expected] : tests) {

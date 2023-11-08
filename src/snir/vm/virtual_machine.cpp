@@ -41,6 +41,23 @@ auto VirtualMachine::operator()(ConstInst const& inst) -> void
     _register.emplace(inst.result, inst.value);
 }
 
+auto VirtualMachine::operator()(TruncInst const& inst) -> void
+{
+    if (inst.type == Type::Int64) {
+        _register.emplace(inst.result, std::visit(CastTo<int>{_register}, inst.value));
+        return;
+    } else if (inst.type == Type::Float) {
+        println("float");
+        _register.emplace(inst.result, std::visit(CastTo<float>{_register}, inst.value));
+        return;
+    } else if (inst.type == Type::Double) {
+        _register.emplace(inst.result, std::visit(CastTo<double>{_register}, inst.value));
+        return;
+    }
+
+    raisef<std::runtime_error>("unsupported type for trunc instruction: '{}'", inst.type);
+}
+
 auto VirtualMachine::operator()(AddInst const& inst) -> void
 {
     return binaryIntegerInst(inst, std::plus{});

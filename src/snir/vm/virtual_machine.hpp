@@ -23,6 +23,7 @@ struct VirtualMachine
     auto operator()(NopInst const& inst) -> void;
     auto operator()(ReturnInst const& inst) -> void;
     auto operator()(ConstInst const& inst) -> void;
+    auto operator()(TruncInst const& inst) -> void;
     auto operator()(AddInst const& inst) -> void;
     auto operator()(SubInst const& inst) -> void;
     auto operator()(MulInst const& inst) -> void;
@@ -61,6 +62,23 @@ private:
                 typeid(T).name(),
                 typeid(decltype(v)).name()
             );
+        }
+
+        std::map<Register, Value> const* memory;
+    };
+
+    template<typename T>
+    struct CastTo
+    {
+        explicit CastTo(std::map<Register, Value> const& regs) : memory{&regs} {}
+
+        auto operator()(Register reg) -> T { return std::visit(*this, memory->at(reg)); }
+
+        auto operator()(auto v) -> T { return static_cast<T>(v); }
+
+        auto operator()(Void) -> T
+        {
+            raisef<std::runtime_error>("can't cast void to '{}'", typeid(T).name());
         }
 
         std::map<Register, Value> const* memory;
