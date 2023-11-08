@@ -5,8 +5,6 @@
 
 #include <ctre.hpp>
 
-#include <sstream>
-
 namespace snir {
 
 auto Parser::readModule(std::string_view src) -> std::optional<Module>
@@ -121,10 +119,8 @@ auto Parser::readBasicBlock(std::string_view src) -> std::optional<BasicBlock>
 {
     auto block = BasicBlock{};
 
-    auto line   = std::string{};
-    auto stream = std::istringstream(std::string{src});
-    while (std::getline(stream, line)) {
-        auto inst = readInstruction(strings::trim(line));
+    for (auto match : ctre::split<R"(\n)">(src)) {
+        auto inst = readInstruction(strings::trim(match, " \t"));
         if (inst) {
             block.push_back(inst.value());
         }
