@@ -7,21 +7,21 @@
 
 namespace snir {
 
-auto Parser::parseModule(std::string const& source) -> std::optional<Module>
+auto Parser::parseModule(std::string const& src) -> std::optional<Module>
 {
     auto module = Module{};
 
     auto matches = std::smatch{};
-    auto search  = std::string::const_iterator(source.cbegin());
+    auto search  = std::string::const_iterator(src.cbegin());
     auto pattern = std::regex(R"(define\s+(\w+)\s+@(\w+)\(([^)]*)\)\s*\{([^}]*)\})");
 
-    while (std::regex_search(search, source.cend(), matches, pattern)) {
+    while (std::regex_search(search, src.cend(), matches, pattern)) {
         auto const type = parseType(matches[1].str());
         if (not type) {
             return std::nullopt;
         }
 
-        auto const arguments = parseFunctionArguments(matches[3].str());
+        auto const arguments = parseFunctionArgs(matches[3].str());
         if (not arguments) {
             return std::nullopt;
         }
@@ -45,35 +45,35 @@ auto Parser::parseModule(std::string const& source) -> std::optional<Module>
     return module;
 }
 
-auto Parser::parseInstruction(std::string const& source) -> std::optional<Instruction>
+auto Parser::parseInstruction(std::string const& src) -> std::optional<Instruction>
 {
-    if (auto inst = parseBinaryInst(source); inst) {
+    if (auto inst = parseBinaryInst(src); inst) {
         return inst;
     }
 
-    if (auto inst = parseConstInst(source); inst) {
+    if (auto inst = parseConstInst(src); inst) {
         return inst.value();
     }
 
-    if (auto inst = parseTruncInst(source); inst) {
+    if (auto inst = parseTruncInst(src); inst) {
         return inst.value();
     }
 
-    if (auto inst = parseReturnInst(source); inst) {
+    if (auto inst = parseReturnInst(src); inst) {
         return inst.value();
     }
 
-    if (strings::contains(source, "; nop")) {
+    if (strings::contains(src, "; nop")) {
         return NopInst{};
     }
 
     return std::nullopt;
 }
 
-auto Parser::parseType(std::string_view source) -> std::optional<Type>
+auto Parser::parseType(std::string_view src) -> std::optional<Type>
 {
 #define SNIR_BUILTIN_TYPE(Identifier, Name)                                                          \
-    if (source == std::string_view{#Name}) {                                                         \
+    if (src == std::string_view{#Name}) {                                                            \
         return Type::Identifier;                                                                     \
     }
 #include "snir/ir/type.def"
@@ -82,15 +82,15 @@ auto Parser::parseType(std::string_view source) -> std::optional<Type>
     return std::nullopt;
 }
 
-auto Parser::parseFunctionArguments(std::string const& source) -> std::optional<std::vector<Type>>
+auto Parser::parseFunctionArgs(std::string const& src) -> std::optional<std::vector<Type>>
 {
     auto args = std::vector<Type>{};
 
     auto matches = std::smatch{};
-    auto search  = std::string::const_iterator(source.cbegin());
+    auto search  = std::string::const_iterator(src.cbegin());
     auto pattern = std::regex(R"(\s*([a-zA-Z_]\w*)\s+%[0-9]+(?:\s*,\s*|$))");
 
-    while (std::regex_search(search, source.cend(), matches, pattern)) {
+    while (std::regex_search(search, src.cend(), matches, pattern)) {
         auto const type = parseType(matches[1].str());
         if (not type) {
             return std::nullopt;
@@ -103,12 +103,12 @@ auto Parser::parseFunctionArguments(std::string const& source) -> std::optional<
     return args;
 }
 
-auto Parser::parseBlocks(std::string const& source) -> std::optional<std::vector<Block>>
+auto Parser::parseBlocks(std::string const& src) -> std::optional<std::vector<Block>>
 {
     auto blocks = std::vector<Block>{};
 
     auto pattern = std::regex(R"(\d+:)");
-    auto it      = std::sregex_token_iterator(source.begin(), source.end(), pattern, -1);
+    auto it      = std::sregex_token_iterator(src.begin(), src.end(), pattern, -1);
     auto end     = std::sregex_token_iterator{};
     for (; it != end; ++it) {
         auto const str = strings::trim(it->str(), " \t\n");
@@ -126,12 +126,12 @@ auto Parser::parseBlocks(std::string const& source) -> std::optional<std::vector
     return blocks;
 }
 
-auto Parser::parseBlock(std::string const& source) -> std::optional<Block>
+auto Parser::parseBlock(std::string const& src) -> std::optional<Block>
 {
     auto block = Block{};
 
     auto line   = std::string{};
-    auto stream = std::istringstream(source);
+    auto stream = std::istringstream(src);
     while (std::getline(stream, line)) {
         auto inst = parseInstruction(strings::trim(line));
         if (inst) {
@@ -142,11 +142,11 @@ auto Parser::parseBlock(std::string const& source) -> std::optional<Block>
     return block;
 }
 
-auto Parser::parseBinaryInst(std::string const& source) -> std::optional<Instruction>
+auto Parser::parseBinaryInst(std::string const& src) -> std::optional<Instruction>
 {
     auto matches = std::smatch();
     auto pattern = std::regex(R"(%(\d+) = (\w+) (\w+) %(\d+) %(\d+))");
-    if (std::regex_match(source, matches, pattern)) {
+    if (std::regex_match(src, matches, pattern)) {
         std::string op = matches[2];
         auto type      = parseType(matches[3].str()).value();
         auto result    = std::stoi(matches[1]);
@@ -172,11 +172,11 @@ auto Parser::parseBinaryInst(std::string const& source) -> std::optional<Instruc
     return std::nullopt;
 }
 
-auto Parser::parseConstInst(std::string const& source) -> std::optional<ConstInst>
+auto Parser::parseConstInst(std::string const& src) -> std::optional<ConstInst>
 {
     auto matches = std::smatch();
     auto pattern = std::regex(R"(%(\d+) = (\w+) (\d+))");
-    if (std::regex_match(source, matches, pattern)) {
+    if (std::regex_match(src, matches, pattern)) {
         auto const result = Register{std::stoi(matches[1])};
         auto const type   = parseType(matches[2].str()).value();
         auto const value  = [&]() -> Value {
@@ -199,12 +199,12 @@ auto Parser::parseConstInst(std::string const& source) -> std::optional<ConstIns
     return std::nullopt;
 }
 
-auto Parser::parseTruncInst(std::string const& source) -> std::optional<TruncInst>
+auto Parser::parseTruncInst(std::string const& src) -> std::optional<TruncInst>
 {
     // %2 = trunc %1 as float
     auto matches = std::smatch();
     auto pattern = std::regex(R"(%(\d+) = trunc %(\d+) as (\w+))");
-    if (std::regex_match(source, matches, pattern)) {
+    if (std::regex_match(src, matches, pattern)) {
         auto const result = Register{std::stoi(matches[1])};
         auto const type   = parseType(matches[3].str()).value();
         auto const value  = std::stoi(matches[2]);
@@ -218,11 +218,11 @@ auto Parser::parseTruncInst(std::string const& source) -> std::optional<TruncIns
     return std::nullopt;
 }
 
-auto Parser::parseReturnInst(std::string const& source) -> std::optional<ReturnInst>
+auto Parser::parseReturnInst(std::string const& src) -> std::optional<ReturnInst>
 {
     auto matches = std::smatch();
     auto pattern = std::regex(R"(ret %(\d+))");
-    if (std::regex_match(source, matches, pattern)) {
+    if (std::regex_match(src, matches, pattern)) {
         auto operand = std::stoi(matches[1]);
         return ReturnInst{.type = {}, .value = Register{operand}};
     }

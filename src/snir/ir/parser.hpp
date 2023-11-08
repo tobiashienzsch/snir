@@ -11,19 +11,18 @@ struct Parser
 {
     Parser() = default;
 
-    [[nodiscard]] auto parseModule(std::string const& source) -> std::optional<Module>;
-    [[nodiscard]] auto parseInstruction(std::string const& source) -> std::optional<Instruction>;
-    [[nodiscard]] auto parseType(std::string_view source) -> std::optional<Type>;
+    [[nodiscard]] auto parseModule(std::string const& src) -> std::optional<Module>;
+    [[nodiscard]] auto parseInstruction(std::string const& src) -> std::optional<Instruction>;
+    [[nodiscard]] auto parseType(std::string_view src) -> std::optional<Type>;
 
 private:
-    [[nodiscard]] auto parseFunctionArguments(std::string const& source)
-        -> std::optional<std::vector<Type>>;
-    [[nodiscard]] auto parseBlocks(std::string const& source) -> std::optional<std::vector<Block>>;
-    [[nodiscard]] auto parseBlock(std::string const& source) -> std::optional<Block>;
-    [[nodiscard]] auto parseBinaryInst(std::string const& source) -> std::optional<Instruction>;
-    [[nodiscard]] auto parseConstInst(std::string const& source) -> std::optional<ConstInst>;
-    [[nodiscard]] auto parseTruncInst(std::string const& source) -> std::optional<TruncInst>;
-    [[nodiscard]] auto parseReturnInst(std::string const& source) -> std::optional<ReturnInst>;
+    [[nodiscard]] auto parseFunctionArgs(std::string const& src) -> std::optional<std::vector<Type>>;
+    [[nodiscard]] auto parseBlocks(std::string const& src) -> std::optional<std::vector<Block>>;
+    [[nodiscard]] auto parseBlock(std::string const& src) -> std::optional<Block>;
+    [[nodiscard]] auto parseBinaryInst(std::string const& src) -> std::optional<Instruction>;
+    [[nodiscard]] auto parseConstInst(std::string const& src) -> std::optional<ConstInst>;
+    [[nodiscard]] auto parseTruncInst(std::string const& src) -> std::optional<TruncInst>;
+    [[nodiscard]] auto parseReturnInst(std::string const& src) -> std::optional<ReturnInst>;
 };
 
 }  // namespace snir
