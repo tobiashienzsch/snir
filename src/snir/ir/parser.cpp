@@ -5,49 +5,42 @@
 
 #include <ctre.hpp>
 
-#include <regex>
+#include <sstream>
 
 namespace snir {
 
-auto Parser::readModule(std::string const& src) -> std::optional<Module>
+auto Parser::readModule(std::string_view src) -> std::optional<Module>
 {
     auto module = Module{};
 
-    auto matches = std::smatch{};
-    auto search  = std::string::const_iterator(src.cbegin());
-    auto pattern = std::regex(R"(define\s+(\w+)\s+@(\w+)\(([^)]*)\)\s*\{([^}]*)\})");
-
-    while (std::regex_search(search, src.cend(), matches, pattern)) {
-        auto const type = readType(matches[1].str());
+    for (auto match : ctre::range<R"(define\s+(\w+)\s+@(\w+)\(([^)]*)\)\s*\{([^}]*)\})">(src)) {
+        auto const type = readType(match.get<1>().to_view());
         if (not type) {
             return std::nullopt;
         }
 
-        auto const arguments = readFunctionArgs(matches[3].str());
+        auto const arguments = readFunctionArgs(match.get<3>().to_string());
         if (not arguments) {
             return std::nullopt;
         }
 
-        auto const blocks = readBasicBlocks(matches[4].str());
+        auto const blocks = readBasicBlocks(match.get<4>().to_string());
         if (not blocks) {
             return std::nullopt;
         }
 
         module.functions.push_back(Function{
             .type      = type.value(),
-            .name      = matches[2].str(),
+            .name      = match.get<2>().to_string(),
             .arguments = arguments.value(),
             .blocks    = blocks.value(),
         });
-
-        // Update the search start position
-        search = matches.suffix().first;
     }
 
     return module;
 }
 
-auto Parser::readInstruction(std::string const& src) -> std::optional<Instruction>
+auto Parser::readInstruction(std::string_view src) -> std::optional<Instruction>
 {
     if (auto inst = readBinaryInst(src); inst) {
         return inst;
@@ -88,36 +81,28 @@ auto Parser::readType(std::string_view src) -> std::optional<Type>
     return std::nullopt;
 }
 
-auto Parser::readFunctionArgs(std::string const& src) -> std::optional<std::vector<Type>>
+auto Parser::readFunctionArgs(std::string_view src) -> std::optional<std::vector<Type>>
 {
     auto args = std::vector<Type>{};
 
-    auto matches = std::smatch{};
-    auto search  = std::string::const_iterator(src.cbegin());
-    auto pattern = std::regex(R"(\s*([a-zA-Z_]\w*)\s+%[0-9]+(?:\s*,\s*|$))");
-
-    while (std::regex_search(search, src.cend(), matches, pattern)) {
-        auto const type = readType(matches[1].str());
+    for (auto match : ctre::range<R"(\s*([a-zA-Z_]\w*)\s+%[0-9]+(?:\s*,\s*|$))">(src)) {
+        auto const type = readType(match.get<1>());
         if (not type) {
             return std::nullopt;
         }
 
         args.push_back(type.value());
-        search = matches.suffix().first;
     }
 
     return args;
 }
 
-auto Parser::readBasicBlocks(std::string const& src) -> std::optional<std::vector<BasicBlock>>
+auto Parser::readBasicBlocks(std::string_view src) -> std::optional<std::vector<BasicBlock>>
 {
     auto blocks = std::vector<BasicBlock>{};
 
-    auto pattern = std::regex(R"(\d+:)");
-    auto it      = std::sregex_token_iterator(src.begin(), src.end(), pattern, -1);
-    auto end     = std::sregex_token_iterator{};
-    for (; it != end; ++it) {
-        auto const str = strings::trim(it->str(), " \t\n");
+    for (auto match : ctre::split<R"(\d+:)">(src)) {
+        auto const str = strings::trim(match.to_string(), " \t\n");
         if (str.empty()) {
             continue;
         }
@@ -132,12 +117,12 @@ auto Parser::readBasicBlocks(std::string const& src) -> std::optional<std::vecto
     return blocks;
 }
 
-auto Parser::readBasicBlock(std::string const& src) -> std::optional<BasicBlock>
+auto Parser::readBasicBlock(std::string_view src) -> std::optional<BasicBlock>
 {
     auto block = BasicBlock{};
 
     auto line   = std::string{};
-    auto stream = std::istringstream(src);
+    auto stream = std::istringstream(std::string{src});
     while (std::getline(stream, line)) {
         auto inst = readInstruction(strings::trim(line));
         if (inst) {

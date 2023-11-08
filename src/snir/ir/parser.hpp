@@ -11,17 +11,17 @@ struct Parser
 {
     Parser() = default;
 
-    [[nodiscard]] static auto readModule(std::string const& src) -> std::optional<Module>;
-    [[nodiscard]] static auto readInstruction(std::string const& src) -> std::optional<Instruction>;
+    [[nodiscard]] static auto readModule(std::string_view src) -> std::optional<Module>;
+    [[nodiscard]] static auto readInstruction(std::string_view src) -> std::optional<Instruction>;
     [[nodiscard]] static auto readType(std::string_view src) -> std::optional<Type>;
 
 private:
-    [[nodiscard]] static auto readFunctionArgs(std::string const& src)
+    [[nodiscard]] static auto readFunctionArgs(std::string_view src)
         -> std::optional<std::vector<Type>>;
-    [[nodiscard]] static auto readBasicBlocks(std::string const& src)
+    [[nodiscard]] static auto readBasicBlocks(std::string_view src)
         -> std::optional<std::vector<BasicBlock>>;
 
-    [[nodiscard]] static auto readBasicBlock(std::string const& src) -> std::optional<BasicBlock>;
+    [[nodiscard]] static auto readBasicBlock(std::string_view src) -> std::optional<BasicBlock>;
     [[nodiscard]] static auto readBinaryInst(std::string_view src) -> std::optional<Instruction>;
     [[nodiscard]] static auto readIntCmpInst(std::string_view src) -> std::optional<IntCmpInst>;
     [[nodiscard]] static auto readConstInst(std::string_view src) -> std::optional<ConstInst>;
