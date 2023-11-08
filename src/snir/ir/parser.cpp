@@ -211,10 +211,11 @@ auto Parser::parseTruncInst(std::string const& src) -> std::optional<TruncInst>
 auto Parser::parseReturnInst(std::string const& src) -> std::optional<ReturnInst>
 {
     auto matches = std::smatch();
-    auto pattern = std::regex(R"(ret %(\d+))");
+    auto pattern = std::regex(R"(ret (\w+) %(\d+))");
     if (std::regex_match(src, matches, pattern)) {
-        auto operand = std::stoi(matches[1]);
-        return ReturnInst{.type = {}, .value = Register{operand}};
+        auto const type    = parseType(matches[1].str()).value();
+        auto const operand = std::stoi(matches[2]);
+        return ReturnInst{.type = type, .value = Register{operand}};
     }
 
     return std::nullopt;

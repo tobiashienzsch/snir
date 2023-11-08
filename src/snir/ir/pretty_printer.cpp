@@ -57,7 +57,7 @@ auto PrettyPrinter::operator()(snir::TruncInst const& trunc) -> void
 
 auto PrettyPrinter::operator()(snir::ReturnInst const& ret) -> void
 {
-    println(_out, "  {} {}", snir::ReturnInst::name, ret.value);
+    println(_out, "  {} {} {}", snir::ReturnInst::name, ret.type, ret.value);
 }
 
 }  // namespace snir

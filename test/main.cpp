@@ -168,53 +168,56 @@ template<snir::Type Type>
 
 auto testParser() -> void
 {
-    auto parser = snir::Parser{};
-    assert(parser.parseType("void") == snir::Type::Void);
-    assert(parser.parseType("i1") == snir::Type::Bool);
-    assert(parser.parseType("i64") == snir::Type::Int64);
-    assert(parser.parseType("float") == snir::Type::Float);
-    assert(parser.parseType("double") == snir::Type::Double);
-    assert(parser.parseType("block") == snir::Type::Block);
-    assert(parser.parseType("event") == snir::Type::Event);
+    using namespace snir;
 
-    assert(checkInstruction<snir::ReturnInst>("ret %1"));
-    assert(checkInstruction<snir::ConstInst>("%5 = i64 42"));
-    assert(checkInstruction<snir::TruncInst>("%5 = trunc %1 as float"));
-    assert(checkInstruction<snir::AddInst>("%5 = add i64 %3 %4"));
-    assert(checkInstruction<snir::SubInst>("%5 = sub i64 %3 %4"));
-    assert(checkInstruction<snir::MulInst>("%5 = mul i64 %3 %4"));
-    assert(checkInstruction<snir::DivInst>("%5 = div i64 %3 %4"));
-    assert(checkInstruction<snir::ModInst>("%5 = mod i64 %3 %4"));
-    assert(checkInstruction<snir::AndInst>("%5 = and i64 %3 %4"));
-    assert(checkInstruction<snir::OrInst>("%5 = or i64 %3 %4"));
-    assert(checkInstruction<snir::XorInst>("%5 = xor i64 %3 %4"));
-    assert(checkInstruction<snir::FloatAddInst>("%5 = fadd double %3 %4"));
-    assert(checkInstruction<snir::FloatSubInst>("%5 = fsub double %3 %4"));
-    assert(checkInstruction<snir::FloatMulInst>("%5 = fmul double %3 %4"));
-    assert(checkInstruction<snir::FloatDivInst>("%5 = fdiv double %3 %4"));
+    auto parser = Parser{};
+    assert(parser.parseType("void") == Type::Void);
+    assert(parser.parseType("i1") == Type::Bool);
+    assert(parser.parseType("i64") == Type::Int64);
+    assert(parser.parseType("float") == Type::Float);
+    assert(parser.parseType("double") == Type::Double);
+    assert(parser.parseType("block") == Type::Block);
+    assert(parser.parseType("event") == Type::Event);
 
-    assert(checkInstructionType<snir::Type::Int64>("%5 = i64 42"));
-    assert(checkInstructionType<snir::Type::Float>("%5 = float 42"));
-    assert(checkInstructionType<snir::Type::Double>("%5 = double 42"));
-    assert(checkInstructionType<snir::Type::Int64>("%5 = add i64 %3 %4"));
-    assert(checkInstructionType<snir::Type::Int64>("%5 = sub i64 %3 %4"));
-    assert(checkInstructionType<snir::Type::Int64>("%5 = mul i64 %3 %4"));
-    assert(checkInstructionType<snir::Type::Int64>("%5 = div i64 %3 %4"));
-    assert(checkInstructionType<snir::Type::Int64>("%5 = mod i64 %3 %4"));
-    assert(checkInstructionType<snir::Type::Int64>("%5 = and i64 %3 %4"));
-    assert(checkInstructionType<snir::Type::Int64>("%5 = or i64 %3 %4"));
-    assert(checkInstructionType<snir::Type::Int64>("%5 = xor i64 %3 %4"));
-    assert(checkInstructionType<snir::Type::Double>("%5 = fadd double %3 %4"));
-    assert(checkInstructionType<snir::Type::Double>("%5 = fsub double %3 %4"));
-    assert(checkInstructionType<snir::Type::Double>("%5 = fmul double %3 %4"));
-    assert(checkInstructionType<snir::Type::Double>("%5 = fdiv double %3 %4"));
+    assert(checkInstruction<ReturnInst>("ret i64 %1"));
+    assert(checkInstruction<ConstInst>("%5 = i64 42"));
+    assert(checkInstruction<TruncInst>("%5 = trunc %1 as float"));
+    assert(checkInstruction<AddInst>("%5 = add i64 %3 %4"));
+    assert(checkInstruction<SubInst>("%5 = sub i64 %3 %4"));
+    assert(checkInstruction<MulInst>("%5 = mul i64 %3 %4"));
+    assert(checkInstruction<DivInst>("%5 = div i64 %3 %4"));
+    assert(checkInstruction<ModInst>("%5 = mod i64 %3 %4"));
+    assert(checkInstruction<AndInst>("%5 = and i64 %3 %4"));
+    assert(checkInstruction<OrInst>("%5 = or i64 %3 %4"));
+    assert(checkInstruction<XorInst>("%5 = xor i64 %3 %4"));
+    assert(checkInstruction<FloatAddInst>("%5 = fadd double %3 %4"));
+    assert(checkInstruction<FloatSubInst>("%5 = fsub double %3 %4"));
+    assert(checkInstruction<FloatMulInst>("%5 = fmul double %3 %4"));
+    assert(checkInstruction<FloatDivInst>("%5 = fdiv double %3 %4"));
+
+    assert(checkInstructionType<Type::Int64>("ret i64 %1"));
+    assert(checkInstructionType<Type::Int64>("%5 = i64 42"));
+    assert(checkInstructionType<Type::Float>("%5 = float 42"));
+    assert(checkInstructionType<Type::Double>("%5 = double 42"));
+    assert(checkInstructionType<Type::Int64>("%5 = add i64 %3 %4"));
+    assert(checkInstructionType<Type::Int64>("%5 = sub i64 %3 %4"));
+    assert(checkInstructionType<Type::Int64>("%5 = mul i64 %3 %4"));
+    assert(checkInstructionType<Type::Int64>("%5 = div i64 %3 %4"));
+    assert(checkInstructionType<Type::Int64>("%5 = mod i64 %3 %4"));
+    assert(checkInstructionType<Type::Int64>("%5 = and i64 %3 %4"));
+    assert(checkInstructionType<Type::Int64>("%5 = or i64 %3 %4"));
+    assert(checkInstructionType<Type::Int64>("%5 = xor i64 %3 %4"));
+    assert(checkInstructionType<Type::Double>("%5 = fadd double %3 %4"));
+    assert(checkInstructionType<Type::Double>("%5 = fsub double %3 %4"));
+    assert(checkInstructionType<Type::Double>("%5 = fmul double %3 %4"));
+    assert(checkInstructionType<Type::Double>("%5 = fdiv double %3 %4"));
 
     {
         auto const* src = "%5 = add i64 %3 %4";
         auto const inst = parser.parseInstruction(src);
         assert(inst.has_value());
-        assert(inst->hasType<snir::AddInst>());
-        assert(inst->getResultRegister() == snir::Register{5});
+        assert(inst->hasType<AddInst>());
+        assert(inst->getResultRegister() == Register{5});
     }
 
     {
@@ -228,31 +231,32 @@ auto testParser() -> void
     }
 
     {
-        auto const* src = "ret %5";
+        auto const* src = "ret i64 %5";
         auto const inst = parser.parseInstruction(src);
         assert(inst.has_value());
-        assert(inst->getOperandRegisters().at(0).value() == snir::Register{5});
+        assert(inst->get<ReturnInst>().type == Type::Int64);
+        assert(std::get<Register>(inst->get<ReturnInst>().value) == Register{5});
     }
 
     {
-        auto const text   = snir::readFile("./test/files/func.ll").value();
+        auto const text   = readFile("./test/files/func.ll").value();
         auto const module = parser.parseModule(text);
         assert(module.value().functions.size() == 1);
 
         auto const& func = module.value().functions[0];
         assert(func.name == "foo");
-        assert(func.type == snir::Type::Double);
+        assert(func.type == Type::Double);
         assert(func.arguments.size() == 2);
         assert(func.blocks.size() == 1);
 
         auto const& block = func.blocks[0];
         assert(block.size() == 2);
-        assert(block.at(0).hasType<snir::NopInst>());
-        assert(block.at(1).hasType<snir::FloatAddInst>());
+        assert(block.at(0).hasType<NopInst>());
+        assert(block.at(1).hasType<FloatAddInst>());
     }
 
     {
-        auto const text   = snir::readFile("./test/files/funcs.ll").value();
+        auto const text   = readFile("./test/files/funcs.ll").value();
         auto const module = parser.parseModule(text);
         assert(module.value().functions.size() == 3);
 
@@ -260,7 +264,7 @@ auto testParser() -> void
         {
             auto const& nan = funcs[0];
             assert(nan.name == "nan");
-            assert(nan.type == snir::Type::Double);
+            assert(nan.type == Type::Double);
             assert(nan.arguments.size() == 0);
             assert(nan.blocks.size() == 1);
 
@@ -268,61 +272,61 @@ auto testParser() -> void
             assert(block.size() == 4);
 
             auto const i0 = block.at(0);
-            assert(i0.hasType<snir::ConstInst>());
-            assert(i0.get<snir::ConstInst>().type == snir::Type::Double);
-            assert(i0.get<snir::ConstInst>().result == snir::Register{3});
-            assert(std::get<double>(i0.get<snir::ConstInst>().value) == 2.0);
+            assert(i0.hasType<ConstInst>());
+            assert(i0.get<ConstInst>().type == Type::Double);
+            assert(i0.get<ConstInst>().result == Register{3});
+            assert(std::get<double>(i0.get<ConstInst>().value) == 2.0);
 
             auto const i1 = block.at(1);
-            assert(i1.hasType<snir::ConstInst>());
-            assert(i1.get<snir::ConstInst>().type == snir::Type::Double);
-            assert(i1.get<snir::ConstInst>().result == snir::Register{4});
-            assert(std::get<double>(i1.get<snir::ConstInst>().value) == 4.0);
+            assert(i1.hasType<ConstInst>());
+            assert(i1.get<ConstInst>().type == Type::Double);
+            assert(i1.get<ConstInst>().result == Register{4});
+            assert(std::get<double>(i1.get<ConstInst>().value) == 4.0);
 
             auto const i2 = block.at(2);
-            assert(i2.hasType<snir::FloatAddInst>());
-            assert(i2.get<snir::FloatAddInst>().type == snir::Type::Double);
-            assert(i2.get<snir::FloatAddInst>().result == snir::Register{5});
-            assert(std::get<snir::Register>(i2.get<snir::FloatAddInst>().lhs) == snir::Register{3});
-            assert(std::get<snir::Register>(i2.get<snir::FloatAddInst>().rhs) == snir::Register{4});
+            assert(i2.hasType<FloatAddInst>());
+            assert(i2.get<FloatAddInst>().type == Type::Double);
+            assert(i2.get<FloatAddInst>().result == Register{5});
+            assert(std::get<Register>(i2.get<FloatAddInst>().lhs) == Register{3});
+            assert(std::get<Register>(i2.get<FloatAddInst>().rhs) == Register{4});
 
             auto const i3 = block.at(3);
-            assert(i3.hasType<snir::ReturnInst>());
-            assert(std::get<snir::Register>(i3.get<snir::ReturnInst>().value) == snir::Register{5});
+            assert(i3.hasType<ReturnInst>());
+            assert(std::get<Register>(i3.get<ReturnInst>().value) == Register{5});
         }
 
         {
             auto const& sin = funcs[1];
             assert(sin.name == "sin");
-            assert(sin.type == snir::Type::Float);
+            assert(sin.type == Type::Float);
             assert(sin.arguments.size() == 1);
-            assert(sin.arguments[0] == snir::Type::Float);
+            assert(sin.arguments[0] == Type::Float);
             assert(sin.blocks.size() == 1);
 
             auto const& block = sin.blocks[0];
             assert(block.size() == 3);
 
             auto const i0 = block.at(0);
-            assert(i0.hasType<snir::ConstInst>());
-            assert(i0.get<snir::ConstInst>().result == snir::Register{1});
-            assert(std::get<double>(i0.get<snir::ConstInst>().value) == 42.0);
+            assert(i0.hasType<ConstInst>());
+            assert(i0.get<ConstInst>().result == Register{1});
+            assert(std::get<double>(i0.get<ConstInst>().value) == 42.0);
 
             auto const i1 = block.at(1);
-            assert(i1.hasType<snir::TruncInst>());
-            assert(i1.get<snir::TruncInst>().type == snir::Type::Float);
-            assert(i1.get<snir::TruncInst>().result == snir::Register{2});
-            assert(std::get<snir::Register>(i1.get<snir::TruncInst>().value) == snir::Register{1});
+            assert(i1.hasType<TruncInst>());
+            assert(i1.get<TruncInst>().type == Type::Float);
+            assert(i1.get<TruncInst>().result == Register{2});
+            assert(std::get<Register>(i1.get<TruncInst>().value) == Register{1});
 
             auto const i2 = block.at(2);
-            assert(i2.hasType<snir::ReturnInst>());
-            assert(std::get<snir::Register>(i2.get<snir::ReturnInst>().value) == snir::Register{2});
+            assert(i2.hasType<ReturnInst>());
+            assert(std::get<Register>(i2.get<ReturnInst>().value) == Register{2});
         }
 
         assert(funcs[2].name == "ipow");
-        assert(funcs[2].type == snir::Type::Int64);
+        assert(funcs[2].type == Type::Int64);
         assert(funcs[2].arguments.size() == 2);
-        assert(funcs[2].arguments[0] == snir::Type::Int64);
-        assert(funcs[2].arguments[1] == snir::Type::Int64);
+        assert(funcs[2].arguments[0] == Type::Int64);
+        assert(funcs[2].arguments[1] == Type::Int64);
         assert(funcs[2].blocks.size() == 2);
     }
 }

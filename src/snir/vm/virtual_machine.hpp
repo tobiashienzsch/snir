@@ -38,10 +38,10 @@ struct VirtualMachine
     auto operator()(FloatMulInst const& inst) -> void;
     auto operator()(FloatDivInst const& inst) -> void;
 
-    template<typename T>
-    auto operator()(T const& inst) -> void
+    template<typename Inst>
+    auto operator()(Inst const& inst) -> void
     {
-        raisef<std::runtime_error>("unhandled instruction '{}'", typeid(T).name());
+        raisef<std::runtime_error>("unhandled instruction '{}'", Inst::name);
     }
 
 private:
