@@ -100,15 +100,17 @@ auto VirtualMachine::operator()(XorInst const& inst) -> void
     return binaryIntegerInst<std::bit_xor<>>(inst);
 }
 
-// auto VirtualMachine::operator()(ShiftLeftInst const& inst) -> void
-// {
-//     return binaryIntegerInst<std::plus<>>(inst);
-// }
+auto VirtualMachine::operator()(ShiftLeftInst const& inst) -> void
+{
+    auto shiftLeft = [](auto lhs, auto rhs) { return lhs << rhs; };
+    return binaryIntegerInst<decltype(shiftLeft)>(inst);
+}
 
-// auto VirtualMachine::operator()(ShiftRightInst const& inst) -> void
-// {
-//     return binaryIntegerInst<std::plus<>>(inst);
-// }
+auto VirtualMachine::operator()(ShiftRightInst const& inst) -> void
+{
+    auto shiftRight = [](auto lhs, auto rhs) { return lhs << rhs; };
+    return binaryIntegerInst<decltype(shiftRight)>(inst);
+}
 
 auto Interpreter::execute(Function const& func, std::span<Value> arguments) -> std::optional<Value>
 {

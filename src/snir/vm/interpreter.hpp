@@ -29,9 +29,8 @@ struct VirtualMachine
     auto operator()(AndInst const& inst) -> void;
     auto operator()(OrInst const& inst) -> void;
     auto operator()(XorInst const& inst) -> void;
-
-    // auto operator()(ShiftLeftInst const& inst) -> void;
-    // auto operator()(ShiftRightInst const& inst) -> void;
+    auto operator()(ShiftLeftInst const& inst) -> void;
+    auto operator()(ShiftRightInst const& inst) -> void;
 
     // auto operator()(FloatAddInst const& inst) -> void;
     // auto operator()(FloatSubInst const& inst) -> void;

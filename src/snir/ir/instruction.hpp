@@ -81,6 +81,7 @@ struct Instruction
 private:
     using Holder = std::variant<
         NopInst,
+        ReturnInst,
         ConstInst,
         TruncInst,
         AddInst,
@@ -88,14 +89,15 @@ private:
         MulInst,
         DivInst,
         ModInst,
-        FloatAddInst,
-        FloatSubInst,
-        FloatMulInst,
-        FloatDivInst,
         AndInst,
         OrInst,
         XorInst,
-        ReturnInst>;
+        ShiftLeftInst,
+        ShiftRightInst,
+        FloatAddInst,
+        FloatSubInst,
+        FloatMulInst,
+        FloatDivInst>;
 
     Holder _holder;
 };
