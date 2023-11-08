@@ -107,6 +107,17 @@ auto VirtualMachine::operator()(ShiftRightInst const& inst) -> void
     return binaryIntegerInst(inst, [](auto lhs, auto rhs) { return lhs >> rhs; });
 }
 
+auto VirtualMachine::operator()(IntCmpInst const& inst) -> void
+{
+    return binaryIntegerInst(inst, [kind = inst.kind]<typename T>(T lhs, T rhs) {
+        switch (kind) {
+            case Compare::Equal: return static_cast<T>(lhs == rhs);
+            case Compare::NotEqual: return static_cast<T>(lhs != rhs);
+        }
+        raisef<std::runtime_error>("unimplemented compare kind '{}'", kind);
+    });
+}
+
 auto VirtualMachine::operator()(FloatAddInst const& inst) -> void
 {
     return binaryFloatInst(inst, std::plus{});

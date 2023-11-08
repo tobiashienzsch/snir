@@ -20,6 +20,13 @@ struct PassManager
         _passes.emplace_back(std::make_unique<Pass<PassType>>(std::forward<PassType>(p)));
     }
 
+    auto operator()(Module& m) -> void
+    {
+        for (auto& func : m.functions) {
+            std::invoke(*this, func);
+        }
+    }
+
     auto operator()(Function& func) -> void
     {
         for (auto& pass : _passes) {

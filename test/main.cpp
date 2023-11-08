@@ -258,18 +258,22 @@ auto testInterpreter() -> void
     {
         // return files/i64_*.ll
         auto tests = std::vector<std::pair<std::string, int>>{};
-        tests.push_back(std::pair{"./test/files/i64_add.ll", 42 + 143});
-        tests.push_back(std::pair{"./test/files/i64_and.ll", 42 & 143});
-        tests.push_back(std::pair{"./test/files/i64_blocks.ll", 9});
-        tests.push_back(std::pair{"./test/files/i64_const.ll", 42});
-        tests.push_back(std::pair{"./test/files/i64_div.ll", 42 / 2});
-        tests.push_back(std::pair{"./test/files/i64_mul.ll", 42 * 143});
-        tests.push_back(std::pair{"./test/files/i64_or.ll", 42 | 143});
-        tests.push_back(std::pair{"./test/files/i64_mod.ll", 42 % 3});
-        tests.push_back(std::pair{"./test/files/i64_shl.ll", 42 << 2});
-        tests.push_back(std::pair{"./test/files/i64_shr.ll", 42 >> 2});
-        tests.push_back(std::pair{"./test/files/i64_sub.ll", 42 - 143});
-        tests.push_back(std::pair{"./test/files/i64_xor.ll", 42 ^ 143});
+        tests.emplace_back("./test/files/i64_add.ll", 42 + 143);
+        tests.emplace_back("./test/files/i64_and.ll", 42 & 143);
+        tests.emplace_back("./test/files/i64_blocks.ll", 9);
+        tests.emplace_back("./test/files/i64_const.ll", 42);
+        tests.emplace_back("./test/files/i64_icmp_eq_1.ll", 0);
+        tests.emplace_back("./test/files/i64_icmp_eq_2.ll", 1);
+        tests.emplace_back("./test/files/i64_icmp_ne_1.ll", 1);
+        tests.emplace_back("./test/files/i64_icmp_ne_2.ll", 0);
+        tests.emplace_back("./test/files/i64_div.ll", 42 / 2);
+        tests.emplace_back("./test/files/i64_mul.ll", 42 * 143);
+        tests.emplace_back("./test/files/i64_or.ll", 42 | 143);
+        tests.emplace_back("./test/files/i64_mod.ll", 42 % 3);
+        tests.emplace_back("./test/files/i64_shl.ll", 42 << 2);
+        tests.emplace_back("./test/files/i64_shr.ll", 42 >> 2);
+        tests.emplace_back("./test/files/i64_sub.ll", 42 - 143);
+        tests.emplace_back("./test/files/i64_xor.ll", 42 ^ 143);
 
         for (auto const& [path, expected] : tests) {
             println("execute: {}", path);
