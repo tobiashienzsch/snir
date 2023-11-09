@@ -2,6 +2,7 @@
 
 #include "snir/core/static_vector.hpp"
 #include "snir/ir/compare.hpp"
+#include "snir/ir/label.hpp"
 #include "snir/ir/register.hpp"
 #include "snir/ir/type.hpp"
 #include "snir/ir/value.hpp"
@@ -42,6 +43,18 @@ struct IntCmpInst
     Value rhs;
 
     friend auto operator==(IntCmpInst const& lhs, IntCmpInst const& rhs) -> bool = default;
+};
+
+struct BranchInst
+{
+    static constexpr auto name = std::string_view{"br"};
+    static constexpr auto args = 1;
+
+    Label iftrue;
+    std::optional<Label> iffalse;
+    std::optional<Value> condition;
+
+    friend auto operator==(BranchInst const& lhs, BranchInst const& rhs) -> bool = default;
 };
 
 #define SNIR_INST_UNARY_OP(Id, Name)                                                                 \
@@ -165,7 +178,8 @@ private:
         FloatAddInst,
         FloatSubInst,
         FloatMulInst,
-        FloatDivInst>;
+        FloatDivInst,
+        BranchInst>;
 
     Holder _holder;
 };

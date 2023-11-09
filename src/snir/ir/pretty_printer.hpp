@@ -26,6 +26,7 @@ struct PrettyPrinter
     auto operator()(TruncInst const& trunc) -> void;
     auto operator()(IntCmpInst const& inst) -> void;
     auto operator()(ReturnInst const& ret) -> void;
+    auto operator()(BranchInst const& ret) -> void;
 
     template<typename Inst>
         requires(Inst::args == 2)

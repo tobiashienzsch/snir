@@ -11,12 +11,25 @@ VirtualMachine::VirtualMachine(Function const& func, std::span<Value const> argu
         _register.emplace(Register{id++}, arg);
     }
 
-    for (auto const& block : func.blocks) {
+    if (func.blocks.empty()) {
+        return;
+    }
+
+    auto i = 0UL;
+    while (true) {
+        auto const& block = func.blocks[i];
         for (auto const& inst : block) {
             inst.visit(*this);
             if (_exit) {
                 return;
             }
+        }
+
+        if (_nextBlock) {
+            i          = *_nextBlock;
+            _nextBlock = std::nullopt;
+        } else {
+            ++i;
         }
     }
 }
@@ -24,6 +37,16 @@ VirtualMachine::VirtualMachine(Function const& func, std::span<Value const> argu
 auto VirtualMachine::getReturnValue() const -> std::optional<Value> { return _return; }
 
 auto VirtualMachine::operator()(NopInst const& /*inst*/) -> void {}
+
+auto VirtualMachine::operator()(BranchInst const& inst) -> void
+{
+    if (not inst.condition.has_value()) {
+        _nextBlock = static_cast<size_t>(inst.iftrue);
+        return;
+    }
+
+    raisef<std::runtime_error>("unimplemented conditional branch 'br'");
+}
 
 auto VirtualMachine::operator()(ReturnInst const& inst) -> void
 {

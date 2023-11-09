@@ -108,8 +108,8 @@ auto testVector() -> void  // NOLINT(readability-function-cognitive-complexity)
 auto testPassManager() -> void
 {
     for (auto const& test : {
-             std::string{"test/files/opt_dead_store.ll"},
-             std::string{"test/files/opt_empty_block.ll"},
+             std::string{"./test/files/opt_dead_store.ll"},
+             std::string{"./test/files/opt_empty_block.ll"},
          }) {
 
         auto const src      = snir::readFile(test).value();
@@ -162,6 +162,8 @@ auto testParser() -> void  // NOLINT(readability-function-cognitive-complexity)
     assert(snir::Parser::readType("event") == Type::Event);
 
     assert(checkInstruction<ReturnInst>("ret i64 %1"));
+    assert(checkInstruction<BranchInst>("br label %1"));
+    assert(checkInstruction<BranchInst>("br i1 %0, label %1, label %2"));
     assert(checkInstruction<ConstInst>("%5 = i64 42"));
     assert(checkInstruction<TruncInst>("%5 = trunc %1 as float"));
     assert(checkInstruction<AddInst>("%5 = add i64 %3 %4"));
@@ -353,6 +355,7 @@ auto testInterpreter() -> void  // NOLINT(readability-function-cognitive-complex
         tests.emplace_back("./test/files/i64_args_2.ll", 42 + 2, std::vector<Value>{42, 2});
         tests.emplace_back("./test/files/i64_args_2.ll", 143 + 2, std::vector<Value>{143, 2});
         tests.emplace_back("./test/files/i64_blocks.ll", 9, std::vector<Value>{});
+        tests.emplace_back("./test/files/i64_branch.ll", 9, std::vector<Value>{});
         tests.emplace_back("./test/files/i64_const.ll", 42, std::vector<Value>{});
         tests.emplace_back("./test/files/i64_icmp_eq_1.ll", 0, std::vector<Value>{});
         tests.emplace_back("./test/files/i64_icmp_eq_2.ll", 1, std::vector<Value>{});

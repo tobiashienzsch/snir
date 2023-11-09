@@ -26,6 +26,7 @@ private:
     [[nodiscard]] static auto readIntCmpInst(std::string_view src) -> std::optional<IntCmpInst>;
     [[nodiscard]] static auto readConstInst(std::string_view src) -> std::optional<ConstInst>;
     [[nodiscard]] static auto readTruncInst(std::string_view src) -> std::optional<TruncInst>;
+    [[nodiscard]] static auto readBranchInst(std::string_view src) -> std::optional<BranchInst>;
     [[nodiscard]] static auto readReturnInst(std::string_view src) -> std::optional<ReturnInst>;
     [[nodiscard]] static auto readCompare(std::string_view src) -> std::optional<Compare>;
     [[nodiscard]] static auto readValue(std::string_view src, Type type) -> std::optional<Value>;

@@ -76,9 +76,16 @@ auto PrettyPrinter::operator()(IntCmpInst const& inst) -> void
     );
 }
 
-auto PrettyPrinter::operator()(ReturnInst const& ret) -> void
+auto PrettyPrinter::operator()(ReturnInst const& inst) -> void
 {
-    println(_out, "  {} {} {}", ReturnInst::name, ret.type, ret.value);
+    println(_out, "  {} {} {}", ReturnInst::name, inst.type, inst.value);
+}
+
+auto PrettyPrinter::operator()(BranchInst const& inst) -> void
+{
+    if (not inst.condition.has_value()) {
+        println(_out, "  {} label {}", BranchInst::name, inst.iftrue);
+    }
 }
 
 }  // namespace snir

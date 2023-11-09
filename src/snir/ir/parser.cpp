@@ -60,6 +60,10 @@ auto Parser::readInstruction(std::string_view src) -> std::optional<Instruction>
         return inst.value();
     }
 
+    if (auto inst = readBranchInst(src); inst) {
+        return inst.value();
+    }
+
     if (strings::contains(src, "; nop")) {
         return NopInst{};
     }
@@ -207,6 +211,23 @@ auto Parser::readTruncInst(std::string_view src) -> std::optional<TruncInst>
             .result = result,
             .value  = value,
         };
+    }
+
+    return std::nullopt;
+}
+
+auto Parser::readBranchInst(std::string_view src) -> std::optional<BranchInst>
+{
+    if (auto match = ctre::match<R"(br i1 %(\d+), label %(\d+), label %(\d+))">(src); match) {
+        auto const condition = Register{strings::parse<int>(match.get<1>())};
+        auto const iftrue    = Label{strings::parse<int>(match.get<2>())};
+        auto const iffalse   = Label{strings::parse<int>(match.get<3>())};
+        return BranchInst{.iftrue = iftrue, .iffalse = iffalse, .condition = condition};
+    }
+
+    if (auto match = ctre::match<R"(br label %(\d+))">(src); match) {
+        auto const iftrue = Label{strings::parse<int>(match.get<1>())};
+        return BranchInst{.iftrue = iftrue, .iffalse = std::nullopt, .condition = std::nullopt};
     }
 
     return std::nullopt;
