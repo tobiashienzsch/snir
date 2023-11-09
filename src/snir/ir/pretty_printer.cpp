@@ -59,14 +59,14 @@ auto PrettyPrinter::operator()(ConstInst const& inst) -> void
 
 auto PrettyPrinter::operator()(TruncInst const& inst) -> void
 {
-    println(_out, "  {} = {} {} as {}", inst.result, TruncInst::name, inst.value, inst.type);
+    println(_out, "  {} = {} {} to {}", inst.result, TruncInst::name, inst.value, inst.type);
 }
 
 auto PrettyPrinter::operator()(IntCmpInst const& inst) -> void
 {
     println(
         _out,
-        "  {} = {} {} {} {} {}",
+        "  {} = {} {} {} {}, {}",
         inst.result,
         IntCmpInst::name,
         inst.kind,

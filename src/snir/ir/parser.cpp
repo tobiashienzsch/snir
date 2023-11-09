@@ -136,7 +136,7 @@ auto Parser::readBasicBlock(std::string_view src) -> std::optional<BasicBlock>
 // NOLINTNEXTLINE(readability-function-cognitive-complexity)
 auto Parser::readBinaryInst(std::string_view src) -> std::optional<Instruction>
 {
-    if (auto match = ctre::match<R"(%(\d+) = (\w+) (\w+) (\d+|%\d+) (\d+|%\d+))">(src); match) {
+    if (auto match = ctre::match<R"(%(\d+) = (\w+) (\w+) (\d+|%\d+), (\d+|%\d+))">(src); match) {
         auto op     = match.get<2>().to_view();
         auto type   = readType(match.get<3>().to_view()).value();
         auto result = Register{strings::parse<int>(match.get<1>())};
@@ -180,7 +180,7 @@ auto Parser::readConstInst(std::string_view src) -> std::optional<ConstInst>
 auto Parser::readIntCmpInst(std::string_view src) -> std::optional<IntCmpInst>
 {
     // <result> = icmp eq i32 4, 5
-    if (auto match = ctre::match<R"(%(\d+) = icmp (\w+) (\w+) %(\d+) %(\d+))">(src); match) {
+    if (auto match = ctre::match<R"(%(\d+) = icmp (\w+) (\w+) %(\d+), %(\d+))">(src); match) {
         auto const result = Register{strings::parse<int>(match.get<1>())};
         auto const kind   = readCompare(match.get<2>().to_view()).value();
         auto const type   = readType(match.get<3>().to_view()).value();
@@ -201,8 +201,8 @@ auto Parser::readIntCmpInst(std::string_view src) -> std::optional<IntCmpInst>
 
 auto Parser::readTruncInst(std::string_view src) -> std::optional<TruncInst>
 {
-    // %2 = trunc %1 as float
-    if (auto match = ctre::match<R"(%(\d+) = trunc %(\d+) as (\w+))">(src); match) {
+    // %2 = trunc %1 to float
+    if (auto match = ctre::match<R"(%(\d+) = trunc %(\d+) to (\w+))">(src); match) {
         auto const result = Register{strings::parse<int>(match.get<1>())};
         auto const value  = Register{strings::parse<int>(match.get<2>())};
         auto const type   = readType(match.get<3>().to_view()).value();

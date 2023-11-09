@@ -32,7 +32,7 @@ struct PrettyPrinter
         requires(Inst::args == 2)
     auto operator()(Inst const& inst) -> void
     {
-        println(_out, "  {} = {} {} {} {}", inst.result, inst.name, inst.type, inst.lhs, inst.rhs);
+        println(_out, "  {} = {} {} {}, {}", inst.result, inst.name, inst.type, inst.lhs, inst.rhs);
     }
 
     template<typename Inst>
