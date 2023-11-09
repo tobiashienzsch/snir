@@ -78,6 +78,10 @@ auto PrettyPrinter::operator()(IntCmpInst const& inst) -> void
 
 auto PrettyPrinter::operator()(ReturnInst const& inst) -> void
 {
+    if (inst.type == Type::Void) {
+        println(_out, "  {} {}", ReturnInst::name, inst.value);
+        return;
+    }
     println(_out, "  {} {} {}", ReturnInst::name, inst.type, inst.value);
 }
 

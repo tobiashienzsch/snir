@@ -241,6 +241,12 @@ auto Parser::readReturnInst(std::string_view src) -> std::optional<ReturnInst>
         return ReturnInst{.type = type, .value = operand};
     }
 
+    if (auto match = ctre::match<R"(ret (\w+))">(src); match) {
+        if (match.get<1>() == "void") {
+            return ReturnInst{.type = Type::Void, .value = Void{}};
+        }
+    }
+
     return std::nullopt;
 }
 
