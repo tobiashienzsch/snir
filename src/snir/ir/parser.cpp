@@ -261,7 +261,8 @@ auto Parser::readValue(std::string_view src, Type type) -> std::optional<Value>
     if (auto const m = ctre::match<R"((%[0-9]+)|([\d]+(|\.[\d]+)))">(src); m) {
         if (m.get<1>()) {
             return Register{strings::parse<int>(m.get<1>().to_view().substr(1))};
-        } else if (m.get<2>()) {
+        }
+        if (m.get<2>()) {
             if (type == Type::Int64) {
                 return strings::parse<int>(m.get<2>());
             }

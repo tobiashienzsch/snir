@@ -32,10 +32,10 @@ namespace snir::strings {
 template<typename NumberType>
 [[nodiscard]] auto tryParse(std::string_view str) -> std::optional<NumberType>
 {
-    auto value        = NumberType{};
-    auto const first  = str.data();
-    auto const last   = std::next(str.data(), std::ranges::ssize(str));
-    auto const result = std::from_chars(first, last, value);
+    auto value              = NumberType{};
+    auto const* const first = str.data();
+    auto const* const last  = std::next(str.data(), std::ranges::ssize(str));
+    auto const result       = std::from_chars(first, last, value);
     if (result.ec == std::errc{}) {
         return value;
     }

@@ -52,14 +52,14 @@ auto PrettyPrinter::operator()(NopInst const& /*nop*/) -> void
     println(_out, "  ; {}", snir::NopInst::name);
 }
 
-auto PrettyPrinter::operator()(ConstInst const& constant) -> void
+auto PrettyPrinter::operator()(ConstInst const& inst) -> void
 {
-    println(_out, "  {} = {} {}", constant.result, constant.type, constant.value);
+    println(_out, "  {} = {} {}", inst.result, inst.type, inst.value);
 }
 
-auto PrettyPrinter::operator()(TruncInst const& trunc) -> void
+auto PrettyPrinter::operator()(TruncInst const& inst) -> void
 {
-    println(_out, "  {} = {} {} as {}", trunc.result, TruncInst::name, trunc.value, trunc.type);
+    println(_out, "  {} = {} {} as {}", inst.result, TruncInst::name, inst.value, inst.type);
 }
 
 auto PrettyPrinter::operator()(IntCmpInst const& inst) -> void

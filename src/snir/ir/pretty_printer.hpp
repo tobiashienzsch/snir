@@ -22,17 +22,23 @@ struct PrettyPrinter
     auto operator()(Instruction const& inst) -> void;
 
     auto operator()(NopInst const& nop) -> void;
-    auto operator()(ConstInst const& constant) -> void;
-    auto operator()(TruncInst const& trunc) -> void;
+    auto operator()(ConstInst const& inst) -> void;
+    auto operator()(TruncInst const& inst) -> void;
     auto operator()(IntCmpInst const& inst) -> void;
-    auto operator()(ReturnInst const& ret) -> void;
-    auto operator()(BranchInst const& ret) -> void;
+    auto operator()(ReturnInst const& inst) -> void;
+    auto operator()(BranchInst const& inst) -> void;
 
     template<typename Inst>
         requires(Inst::args == 2)
     auto operator()(Inst const& inst) -> void
     {
         println(_out, "  {} = {} {} {} {}", inst.result, inst.name, inst.type, inst.lhs, inst.rhs);
+    }
+
+    template<typename Inst>
+    auto operator()(Inst const& /*inst*/) -> void
+    {
+        raisef<std::runtime_error>("unhandled instruction '{}' in PrettyPrinter", Inst::name);
     }
 
 private:
