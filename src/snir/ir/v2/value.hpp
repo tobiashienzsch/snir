@@ -2,9 +2,13 @@
 
 #include "snir/ecs/handle.hpp"
 #include "snir/ecs/storage.hpp"
+#include "snir/ir/v2/type.hpp"
 #include "snir/ir/v2/value_id.hpp"
 #include "snir/ir/v2/value_kind.hpp"
 #include "snir/ir/v2/value_registry.hpp"
+
+#include <variant>
+#include <vector>
 
 namespace snir::v2 {
 
@@ -13,6 +17,11 @@ using Value = snir::Handle<ValueId>;
 struct Name
 {
     std::string text;
+};
+
+struct FunctionArgs
+{
+    std::vector<Type> args;
 };
 
 struct Literal

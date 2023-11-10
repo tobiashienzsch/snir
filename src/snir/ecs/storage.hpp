@@ -1,7 +1,5 @@
 #pragma once
 
-#include "snir/core/print.hpp"
-
 #include <cassert>
 #include <map>
 #include <optional>
@@ -30,7 +28,6 @@ struct DenseStorage final : StorageBase
     template<typename... Args>
     auto emplace(unsigned index, Args&&... args) -> decltype(auto)
     {
-        println("Dense::emplace");
         if (_vec.size() <= index) {
             _vec.resize(index + 1);
         }
@@ -68,7 +65,6 @@ struct SparseStorage final : StorageBase
     template<typename... Args>
     auto emplace(unsigned index, Args&&... args) -> decltype(auto)
     {
-        println("Sparse::emplace");
         return _map.emplace(index, std::forward<Args>(args)...).first->second;
     }
 

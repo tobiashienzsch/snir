@@ -1,7 +1,9 @@
+#include "snir/core/file.hpp"
 #include "snir/core/print.hpp"
 #include "snir/ir/v2/compare_kind.hpp"
 #include "snir/ir/v2/inst_kind.hpp"
-#include "snir/ir/v2/module_registry.hpp"
+#include "snir/ir/v2/parser.hpp"
+#include "snir/ir/v2/registry.hpp"
 #include "snir/ir/v2/type.hpp"
 #include "snir/ir/v2/value_kind.hpp"
 
@@ -14,7 +16,7 @@ auto test() -> void
 {
     using namespace snir::v2;
 
-    auto reg = ModuleRegistry{};
+    auto reg = Registry{};
 
     auto func = reg.create(ValueKind::Function);
     func.emplace<Name>("func");
@@ -37,10 +39,20 @@ auto test() -> void
     snir::println("{} {}", int(add.get<InstKind>()), add.get<Type>());
 }
 
+auto test_parser() -> void
+{
+    auto reg    = snir::v2::Registry{};
+    auto parser = snir::v2::Parser{reg};
+    auto module = parser.read(snir::readFile("./test/files/funcs.ll").value_or(""));
+    assert(module.has_value());
+    assert(module->functions.size() == 3);
+}
+
 }  // namespace
 
 auto main() -> int
 {
     test();
+    test_parser();
     return 0;
 }

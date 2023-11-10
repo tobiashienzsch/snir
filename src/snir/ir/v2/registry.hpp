@@ -5,9 +5,9 @@
 
 namespace snir::v2 {
 
-struct ModuleRegistry
+struct Registry
 {
-    ModuleRegistry() = default;
+    Registry() = default;
 
     [[nodiscard]] auto create(InstKind kind) -> Inst;
     [[nodiscard]] auto create(ValueKind kind) -> Value;
