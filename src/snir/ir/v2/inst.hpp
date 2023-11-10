@@ -21,32 +21,19 @@ struct Operands
     StaticVector<ValueId, 2> list;
 };
 
-struct UnconditionalBranch
+struct Branch
 {
-    ValueId label;
-};
-
-struct ConditionalBranch
-{
-    ValueId condition;
+    std::optional<ValueId> condition;
     ValueId iftrue;
-    ValueId iffalse;
+    std::optional<ValueId> iffalse;
 };
 
 }  // namespace snir::v2
 
 template<>
-struct snir::StorageTraits<snir::v2::InstId, snir::v2::UnconditionalBranch>
+struct snir::StorageTraits<snir::v2::InstId, snir::v2::Branch>
 {
     using IdType        = snir::v2::InstId;
-    using ComponentType = snir::v2::UnconditionalBranch;
-    using StorageType   = SparseStorage<snir::v2::UnconditionalBranch>;
-};
-
-template<>
-struct snir::StorageTraits<snir::v2::InstId, snir::v2::ConditionalBranch>
-{
-    using IdType        = snir::v2::InstId;
-    using ComponentType = snir::v2::ConditionalBranch;
-    using StorageType   = SparseStorage<snir::v2::ConditionalBranch>;
+    using ComponentType = snir::v2::Branch;
+    using StorageType   = SparseStorage<snir::v2::Branch>;
 };

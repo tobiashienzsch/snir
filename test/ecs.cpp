@@ -2,9 +2,9 @@
 #include "snir/core/print.hpp"
 #include "snir/ir/v2/compare_kind.hpp"
 #include "snir/ir/v2/inst_kind.hpp"
+#include "snir/ir/v2/module.hpp"
 #include "snir/ir/v2/parser.hpp"
 #include "snir/ir/v2/printer.hpp"
-#include "snir/ir/v2/registry.hpp"
 #include "snir/ir/v2/type.hpp"
 #include "snir/ir/v2/value_kind.hpp"
 
@@ -17,20 +17,20 @@ auto test() -> void
 {
     using namespace snir::v2;
 
-    auto reg = Registry{};
+    auto mod = Module{};
 
-    auto func = reg.create(ValueKind::Function);
+    auto func = mod.create(ValueKind::Function);
     func.emplace<Name>("func");
     func.emplace<Type>(Type::Void);
     func.patch<Type>([](auto& type) { type = Type::Double; });
 
-    auto view         = reg.getValueRegistry().view<Name, Type>();
+    auto view         = mod.getValues().view<Name, Type>();
     auto [name, type] = view.get(func.getId());
 
-    auto add = reg.create(InstKind::Add);
+    auto add = mod.create(InstKind::Add);
     add.emplace<Type>(Type::Float);
 
-    auto br = reg.create(InstKind::IntCmp);
+    auto br = mod.create(InstKind::IntCmp);
     br.emplace<Type>(Type::Int64);
     br.emplace<CompareKind>(CompareKind::Equal);
     br.emplace<Result>(ValueId{2});
@@ -42,14 +42,14 @@ auto test() -> void
 
 auto test_parser() -> void
 {
-    auto reg    = snir::v2::Registry{};
-    auto parser = snir::v2::Parser{reg};
-    auto module = parser.readModule(snir::readFile("./test/files/funcs.ll").value_or(""));
-    assert(module.has_value());
-    assert(module->getFunctions().size() == 3);
+    for (auto const& entry : std::filesystem::directory_iterator{"./test/files"}) {
+        auto parser = snir::v2::Parser{};
+        auto module = parser.readModule(snir::readFile(entry).value());
+        assert(module.has_value());
 
-    auto printer = snir::v2::Printer{std::cout};
-    printer(*module);
+        auto printer = snir::v2::Printer{std::cout};
+        printer(*module);
+    }
 }
 
 }  // namespace

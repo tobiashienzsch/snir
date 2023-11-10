@@ -8,6 +8,7 @@
 #include "snir/ir/v2/value_kind.hpp"
 #include "snir/ir/v2/value_registry.hpp"
 
+#include <format>
 #include <variant>
 #include <vector>
 
@@ -27,6 +28,7 @@ struct Name
 
 struct BasicBlock
 {
+    ValueId label;
     std::vector<InstId> instructions;
 };
 
@@ -73,4 +75,15 @@ struct snir::StorageTraits<snir::v2::ValueId, snir::v2::FuncBody>
     using IdType        = snir::v2::ValueId;
     using ComponentType = snir::v2::FuncBody;
     using StorageType   = SparseStorage<snir::v2::FuncBody>;
+};
+
+template<>
+struct std::formatter<snir::v2::Literal, char> : std::formatter<std::string_view, char>
+{
+    template<typename FormatContext>
+    auto format(snir::v2::Literal literal, FormatContext& fc) const
+    {
+        auto str = std::visit([](auto val) { return std::format("{}", val); }, literal.value);
+        return std::formatter<std::string_view, char>::format(str, fc);
+    }
 };

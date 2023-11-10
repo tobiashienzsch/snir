@@ -1,7 +1,7 @@
 #pragma once
 
-#include "snir/ir/v2/registry.hpp"
-#include "snir/ir/v2/value_id.hpp"
+#include "snir/ir/v2/inst.hpp"
+#include "snir/ir/v2/value.hpp"
 
 #include <vector>
 
@@ -9,18 +9,24 @@ namespace snir::v2 {
 
 struct Module
 {
-    explicit Module(Registry& registry) : _registry{registry} {}
+    Module() = default;
 
-    auto getRegistry() -> Registry& { return _registry; }
+    [[nodiscard]] auto create(InstKind kind) -> Inst;
+    [[nodiscard]] auto create(ValueKind kind) -> Value;
 
-    auto getRegistry() const -> Registry const& { return _registry; }
+    [[nodiscard]] auto getInsts() -> InstRegistry&;
+    [[nodiscard]] auto getInsts() const -> InstRegistry const&;
+
+    [[nodiscard]] auto getValues() -> ValueRegistry&;
+    [[nodiscard]] auto getValues() const -> ValueRegistry const&;
 
     auto getFunctions() -> std::vector<ValueId>& { return _functions; }
 
     auto getFunctions() const -> std::vector<ValueId> const& { return _functions; }
 
 private:
-    std::reference_wrapper<Registry> _registry;
+    InstRegistry _instRegistry;
+    ValueRegistry _valueRegistry;
     std::vector<ValueId> _functions;
 };
 

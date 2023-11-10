@@ -10,8 +10,8 @@ target_sources(snir
         snir/ir/parser.cpp
         snir/ir/pass_manager.cpp
         snir/ir/pretty_printer.cpp
+        snir/ir/v2/module.cpp
         snir/ir/v2/parser.cpp
-        snir/ir/v2/registry.cpp
         snir/vm/interpreter.cpp
         snir/vm/virtual_machine.cpp
 )

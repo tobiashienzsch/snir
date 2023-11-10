@@ -25,7 +25,7 @@ struct Handle
     template<typename Component>
     auto get() -> decltype(auto)
     {
-        return std::get<0>(_reg->template view<Component>().get(_id));
+        return _reg->template view<Component>().get(_id);
     }
 
     template<typename Component, typename... Args>

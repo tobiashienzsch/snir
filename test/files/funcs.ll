@@ -17,7 +17,7 @@ define float @sin(float %0) {
 define i64 @ipow(i64 %0, i64 %1) {
 0:
   %0 = i64 42
-  ret %0
+  ret i64 %0
 1:
   %1 = i64 43
   ret i64 %1
