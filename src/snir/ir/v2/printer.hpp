@@ -4,6 +4,7 @@
 #include "snir/ir/v2/value.hpp"
 
 #include <algorithm>
+#include <iterator>
 #include <ostream>
 
 namespace snir::v2 {
@@ -30,18 +31,22 @@ struct Printer
         }
     }
 
-    auto operator()(Module&, FuncArguments const& args) -> void
+    auto operator()(Module& mod, FuncArguments const& args) -> void
     {
         if (args.args.empty()) {
-            ++_nextLocalValueId;
-            return print(_out, "() #0");
+            return print(_out, "()");
         }
 
-        print(_out, "({} %{}", args.args.at(0), _nextLocalValueId++);
-        std::ranges::for_each(args.args, [this](auto arg) {
-            print(_out, ", {} %{}", arg, _nextLocalValueId++);
-        });
-        print(_out, ") #{}", _nextLocalValueId++);
+        auto func = mod.getValues().view<Type>();
+        auto a0   = args.args.at(0);
+
+        print(_out, "({} %{}", func.get(a0), getLocalId(a0));
+        std::ranges::for_each(
+            std::ranges::next(std::ranges::begin(args.args)),
+            std::ranges::end(args.args),
+            [this, &func](auto arg) { print(_out, ", {} %{}", func.get(arg), getLocalId(arg)); }
+        );
+        print(_out, ")");
     }
 
     auto operator()(Module& mod, FuncBody const& body) -> void
@@ -55,34 +60,45 @@ struct Printer
 
     auto operator()(Module& mod, BasicBlock const& block) -> void
     {
-        auto& reg     = mod.getInsts();
-        auto view     = reg.view<InstKind, Type>();
-        auto result   = reg.view<Result>();
-        auto operands = reg.view<Operands>();
-        auto compare  = reg.view<CompareKind>();
-        auto literal  = reg.view<Literal>();
-        auto branch   = reg.view<Branch>();
+        auto& insts   = mod.getInsts();
+        auto common   = insts.view<InstKind, Type>();
+        auto result   = insts.view<Result>();
+        auto operands = insts.view<Operands>();
+        auto compare  = insts.view<CompareKind>();
+        auto literal  = insts.view<Literal>();
+        auto branch   = insts.view<Branch>();
+
+        auto& values   = mod.getValues();
+        auto valueKind = values.view<ValueKind>();
+
+        auto formatValue = [&](auto val) {
+            auto kind = valueKind.get(val);
+            if (kind == ValueKind::Register) {
+                return std::format("%{}", getLocalId(val));
+            }
+            return std::format("{}", int(val));
+        };
 
         println(_out, "{}:", getLocalId(block.label));
 
         for (auto const inst : block.instructions) {
-            auto const [kind, type] = view.get(inst);
+            auto const [kind, type] = common.get(inst);
             switch (kind) {
                 case InstKind::Nop: {
                     println(_out, "  ; {}", kind);
                     break;
                 }
                 case InstKind::Const: {
-                    auto const res   = int(result.get(inst).id);
+                    auto const res   = formatValue(result.get(inst).id);
                     auto const value = literal.get(inst);
-                    println(_out, "  %{} = {} {}", res, type, value);
+                    println(_out, "  {} = {} {}", res, type, value);
                     break;
                 }
                 case InstKind::Return: {
                     if (type == Type::Void) {
                         println(_out, "  {} {}", kind, type);
                     } else {
-                        auto const value = int(operands.get(inst).list[0]);
+                        auto const value = formatValue(operands.get(inst).list[0]);
                         println(_out, "  {} {} {}", kind, type, value);
                     }
                     break;
@@ -113,25 +129,25 @@ struct Printer
                 case InstKind::FloatSub:
                 case InstKind::FloatMul:
                 case InstKind::FloatDiv: {
-                    auto const res = int(result.get(inst).id);
-                    auto const lhs = int(operands.get(inst).list[0]);
-                    auto const rhs = int(operands.get(inst).list[1]);
-                    println(_out, "  %{} = {} {} {}, {}", res, kind, type, lhs, rhs);
+                    auto const res = formatValue(result.get(inst).id);
+                    auto const lhs = formatValue(operands.get(inst).list[0]);
+                    auto const rhs = formatValue(operands.get(inst).list[1]);
+                    println(_out, "  {} = {} {} {}, {}", res, kind, type, lhs, rhs);
                     break;
                 }
 
                 case InstKind::IntCmp: {
-                    auto const res = int(result.get(inst).id);
+                    auto const res = formatValue(result.get(inst).id);
                     auto const cmp = compare.get(inst);
-                    auto const lhs = int(operands.get(inst).list[0]);
-                    auto const rhs = int(operands.get(inst).list[1]);
-                    println(_out, "  %{} = {} {} {} {}, {}", res, kind, cmp, type, lhs, rhs);
+                    auto const lhs = formatValue(operands.get(inst).list[0]);
+                    auto const rhs = formatValue(operands.get(inst).list[1]);
+                    println(_out, "  {} = {} {} {} {}, {}", res, kind, cmp, type, lhs, rhs);
                     break;
                 }
                 case InstKind::Trunc: {
-                    auto const res   = int(result.get(inst).id);
-                    auto const value = int(operands.get(inst).list[0]);
-                    println(_out, "  %{} = {} {} to {}", res, kind, value, type);
+                    auto const res   = formatValue(result.get(inst).id);
+                    auto const value = formatValue(operands.get(inst).list[0]);
+                    println(_out, "  {} = {} {} to {}", res, kind, value, type);
                     break;
                 }
             }

@@ -34,7 +34,7 @@ struct BasicBlock
 
 struct FuncArguments
 {
-    std::vector<Type> args;
+    std::vector<ValueId> args;
 };
 
 struct FuncBody

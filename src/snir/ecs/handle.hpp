@@ -40,6 +40,9 @@ struct Handle
         return _reg->template patch<Component>(_id, std::forward<Func>(func));
     }
 
+    // NOLINTNEXTLINE(hicpp-explicit-conversions)
+    [[nodiscard]] operator Id() const noexcept { return _id; }
+
 private:
     Registry<Id>* _reg;
     Id _id;
