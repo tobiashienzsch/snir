@@ -13,9 +13,14 @@ struct Parser
 {
     explicit Parser(Registry& registry);
 
-    [[nodiscard]] auto read(std::string_view source) -> std::optional<Module>;
+    [[nodiscard]] auto readModule(std::string_view source) -> std::optional<Module>;
+    [[nodiscard]] auto readInst(std::string_view source) -> std::optional<Inst>;
 
 private:
+    [[nodiscard]] auto readBasicBlocks(std::string_view source)
+        -> std::optional<std::vector<BasicBlock>>;
+    [[nodiscard]] auto readBasicBlock(std::string_view source) -> std::optional<BasicBlock>;
+
     Registry* _registry;
 };
 

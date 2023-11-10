@@ -65,7 +65,8 @@ struct SparseStorage final : StorageBase
     template<typename... Args>
     auto emplace(unsigned index, Args&&... args) -> decltype(auto)
     {
-        return _map.emplace(index, std::forward<Args>(args)...).first->second;
+        _map.emplace(index, std::forward<Args>(args)...);
+        return get(index);
     }
 
     template<typename... Func>

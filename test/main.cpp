@@ -260,7 +260,7 @@ auto testParser() -> void  // NOLINT(readability-function-cognitive-complexity)
             assert(nan.blocks.size() == 1);
 
             auto const& block = nan.blocks[0];
-            assert(block.size() == 4);
+            assert(block.size() == 5);
 
             auto const i0 = block.at(0);
             assert(i0.hasType<ConstInst>());

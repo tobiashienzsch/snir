@@ -4,6 +4,7 @@ define double @nan() {
   %4 = double 4.0
   %5 = fadd double %3, %4
   ret double %5
+  ; nop
 }
 
 define float @sin(float %0) {

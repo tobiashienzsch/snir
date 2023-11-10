@@ -43,7 +43,7 @@ auto test_parser() -> void
 {
     auto reg    = snir::v2::Registry{};
     auto parser = snir::v2::Parser{reg};
-    auto module = parser.read(snir::readFile("./test/files/funcs.ll").value_or(""));
+    auto module = parser.readModule(snir::readFile("./test/files/funcs.ll").value_or(""));
     assert(module.has_value());
     assert(module->functions.size() == 3);
 }
