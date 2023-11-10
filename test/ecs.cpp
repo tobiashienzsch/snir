@@ -3,6 +3,7 @@
 #include "snir/ir/v2/compare_kind.hpp"
 #include "snir/ir/v2/inst_kind.hpp"
 #include "snir/ir/v2/parser.hpp"
+#include "snir/ir/v2/printer.hpp"
 #include "snir/ir/v2/registry.hpp"
 #include "snir/ir/v2/type.hpp"
 #include "snir/ir/v2/value_kind.hpp"
@@ -45,7 +46,10 @@ auto test_parser() -> void
     auto parser = snir::v2::Parser{reg};
     auto module = parser.readModule(snir::readFile("./test/files/funcs.ll").value_or(""));
     assert(module.has_value());
-    assert(module->functions.size() == 3);
+    assert(module->getFunctions().size() == 3);
+
+    auto printer = snir::v2::Printer{std::cout};
+    printer(*module);
 }
 
 }  // namespace

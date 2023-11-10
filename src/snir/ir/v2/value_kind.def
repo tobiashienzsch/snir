@@ -1,0 +1,8 @@
+// This macro should be defined before including this header:
+// - SNIR_VALUE(Id, Name)
+
+SNIR_VALUE(Register, register)
+SNIR_VALUE(Label, label)
+SNIR_VALUE(Literal, literal)
+SNIR_VALUE(Function, function)
+SNIR_VALUE(Global, global)

@@ -86,22 +86,23 @@ Parser::Parser(Registry& registry) : _registry{&registry} {}
 
 auto Parser::readModule(std::string_view source) -> std::optional<Module>
 {
-    auto module = Module{};
+    auto module = Module{*_registry};
 
     for (auto match : ctre::range<R"(define\s+(\w+)\s+@(\w+)\(([^)]*)\)\s*\{([^}]*)\})">(source)) {
-        auto func  = _registry->create(ValueKind::Function);
-        auto type  = func.emplace<Type>(parseType(match.get<1>()).value());
-        auto name  = func.emplace<Name>(match.get<2>().to_string());
-        auto& args = func.emplace<FunctionArguments>(parseArguments(match.get<3>()).value());
-        auto& body = func.emplace<FunctionBody>(FunctionBody{});
+        auto func = _registry->create(ValueKind::Function);
+        func.emplace<Type>(parseType(match.get<1>()).value());
+        func.emplace<Name>(match.get<2>().to_string());
+        func.emplace<FuncArguments>(parseArguments(match.get<3>()).value());
 
-        println("define {} @{}({}) {{ {} }}", type, name.text, args.args.size(), body.blocks.size());
         auto const blocks = readBasicBlocks(match.get<4>().to_string());
         if (not blocks) {
             return std::nullopt;
         }
 
-        module.functions.push_back(func.getId());
+        auto& body  = func.emplace<FuncBody>(FuncBody{});
+        body.blocks = *blocks;
+
+        module.getFunctions().push_back(func.getId());
     }
 
     return module;

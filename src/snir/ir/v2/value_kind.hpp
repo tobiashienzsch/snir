@@ -6,10 +6,9 @@ namespace snir::v2 {
 
 enum struct ValueKind : std::uint8_t
 {
-    Register,
-    Label,
-    Literal,
-    Function,
+#define SNIR_VALUE(Id, Name) Id,
+#include "snir/ir/v2/value_kind.def"
+#undef SNIR_VALUE
 };
 
 }  // namespace snir::v2

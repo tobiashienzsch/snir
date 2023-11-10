@@ -30,14 +30,15 @@ struct BasicBlock
     std::vector<InstId> instructions;
 };
 
-struct FunctionArguments
+struct FuncArguments
 {
     std::vector<Type> args;
 };
 
-struct FunctionBody
+struct FuncBody
 {
-    std::map<ValueId, BasicBlock> blocks;
+    // std::map<ValueId, BasicBlock> blocks;
+    std::vector<BasicBlock> blocks;
 };
 
 }  // namespace snir::v2
@@ -59,17 +60,17 @@ struct snir::StorageTraits<snir::v2::ValueId, snir::v2::Name>
 };
 
 template<>
-struct snir::StorageTraits<snir::v2::ValueId, snir::v2::FunctionArguments>
+struct snir::StorageTraits<snir::v2::ValueId, snir::v2::FuncArguments>
 {
     using IdType        = snir::v2::ValueId;
-    using ComponentType = snir::v2::FunctionArguments;
-    using StorageType   = SparseStorage<snir::v2::FunctionArguments>;
+    using ComponentType = snir::v2::FuncArguments;
+    using StorageType   = SparseStorage<snir::v2::FuncArguments>;
 };
 
 template<>
-struct snir::StorageTraits<snir::v2::ValueId, snir::v2::FunctionBody>
+struct snir::StorageTraits<snir::v2::ValueId, snir::v2::FuncBody>
 {
     using IdType        = snir::v2::ValueId;
-    using ComponentType = snir::v2::FunctionBody;
-    using StorageType   = SparseStorage<snir::v2::FunctionBody>;
+    using ComponentType = snir::v2::FuncBody;
+    using StorageType   = SparseStorage<snir::v2::FuncBody>;
 };
