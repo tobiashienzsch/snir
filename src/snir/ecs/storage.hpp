@@ -18,24 +18,24 @@ struct StorageBase
 template<typename Component>
 struct DenseStorage final : StorageBase
 {
-    DenseStorage()  = default;
-    ~DenseStorage() = default;
+    DenseStorage()           = default;
+    ~DenseStorage() override = default;
 
     [[nodiscard]] auto get(unsigned index) -> decltype(auto)
     {
-        assert(index < vec.size());
-        return vec[index];
+        assert(index < _vec.size());
+        return _vec[index];
     }
 
     template<typename... Args>
     auto emplace(unsigned index, Args&&... args) -> decltype(auto)
     {
         println("Dense::emplace");
-        if (vec.size() <= index) {
-            vec.resize(index + 1);
+        if (_vec.size() <= index) {
+            _vec.resize(index + 1);
         }
 
-        auto& comp = vec[index];
+        auto& comp = _vec[index];
         comp       = Component(std::forward<Args>(args)...);
         return comp;
     }
@@ -43,21 +43,21 @@ struct DenseStorage final : StorageBase
     template<typename... Func>
     auto patch(unsigned index, Func&&... func) -> decltype(auto)
     {
-        assert(index < vec.size());
-        auto& comp = vec[index];
+        assert(index < _vec.size());
+        auto& comp = _vec[index];
         (std::forward<Func>(func)(comp), ...);
         return comp;
     }
 
 private:
-    std::vector<Component> vec{};
+    std::vector<Component> _vec{};
 };
 
 template<typename Component>
 struct SparseStorage final : StorageBase
 {
-    SparseStorage()  = default;
-    ~SparseStorage() = default;
+    SparseStorage()           = default;
+    ~SparseStorage() override = default;
 
     [[nodiscard]] auto get(unsigned index) -> decltype(auto)
     {

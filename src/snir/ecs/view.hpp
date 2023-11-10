@@ -3,13 +3,14 @@
 #include "snir/ecs/storage.hpp"
 
 #include <tuple>
+#include <utility>
 
 namespace snir {
 
 template<typename Id, typename... Comps>
 struct View
 {
-    explicit View(std::tuple<StorageTypeFor<Id, Comps>*...> storage) : _storage{storage} {}
+    explicit View(std::tuple<StorageTypeFor<Id, Comps>*...> storage) : _storage{std::move(storage)} {}
 
     [[nodiscard]] auto get(Id id) -> std::tuple<Comps&...>
     {
