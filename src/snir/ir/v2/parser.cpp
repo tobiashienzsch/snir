@@ -60,24 +60,39 @@ auto parseInstKind(std::string_view source) -> InstKind
 
 auto parseLiteral(std::string_view src, Type type) -> Literal
 {
-    if (auto const m = ctre::match<R"((%[0-9]+)|([\d]+(|\.[\d]+)))">(src); m) {
-        if (m.get<1>()) {
-            // return Register{strings::parse<int>(m.get<1>().substr(1))};
+    if (auto const m = ctre::match<R"(([\d]+(|\.[\d]+)))">(src); m) {
+        if (type == Type::Int64) {
+            return Literal{strings::parse<std::int64_t>(m.get<1>())};
         }
-        if (m.get<2>()) {
-            if (type == Type::Int64) {
-                return Literal{strings::parse<std::int64_t>(m.get<2>())};
-            }
-            if (type == Type::Float) {
-                return Literal{strings::parse<float>(m.get<2>())};
-            }
-            if (type == Type::Double) {
-                return Literal{strings::parse<double>(m.get<2>())};
-            }
+        if (type == Type::Float) {
+            return Literal{strings::parse<float>(m.get<1>())};
+        }
+        if (type == Type::Double) {
+            return Literal{strings::parse<double>(m.get<1>())};
         }
     }
 
     raisef<std::invalid_argument>("failed to parse '{}' as Literal", src);
+}
+
+enum struct IdentifierKind
+{
+    Global,
+    Local,
+};
+
+[[nodiscard]] auto parseIdentifier(std::string_view src)
+    -> std::pair<IdentifierKind, std::string_view>
+{
+    if (auto const m = ctre::match<R"(([%@][a-zA-Z0-9$._]+))">(src); m) {
+        auto str = m.get<1>().view();
+        if (str.starts_with("%")) {
+            return {IdentifierKind::Local, str.substr(1)};
+        }
+        return {IdentifierKind::Global, str.substr(1)};
+    }
+
+    raisef<std::invalid_argument>("failed to parse '{}' as Operand", src);
 }
 
 [[nodiscard]] auto parseArguments(std::string_view source) -> std::vector<Type>
@@ -92,7 +107,8 @@ auto parseLiteral(std::string_view src, Type type) -> Literal
 // NOLINTNEXTLINE(readability-function-cognitive-complexity)
 auto parseBinaryInst(Module& module, std::string_view source) -> std::optional<Inst>
 {
-    if (auto match = ctre::match<R"(%(\d+) = (\w+) (\w+) %(\d+), %(\d+))">(source); match) {
+    // ([%@][a-zA-Z0-9$._]+)
+    if (auto match = ctre::match<R"(%(\d+)\s+=\s+(\w+)\s+(\w+)\s+%(\d+),\s+%(\d+))">(source); match) {
         auto kind   = parseInstKind(match.get<2>());
         auto type   = parseType(match.get<3>());
         auto result = strings::parse<int>(match.get<1>());
@@ -111,7 +127,7 @@ auto parseBinaryInst(Module& module, std::string_view source) -> std::optional<I
 
 auto parseConstInst(Module& module, std::string_view source) -> std::optional<Inst>
 {
-    if (auto match = ctre::match<R"(%(\d+) = (\w+) (\d+\.\d+|\d+))">(source); match) {
+    if (auto match = ctre::match<R"(%(\d+)\s+=\s+(\w+)\s+(\d+\.\d+|\d+))">(source); match) {
         auto const result  = strings::parse<int>(match.get<1>());
         auto const type    = parseType(match.get<2>());
         auto const literal = parseLiteral(match.get<3>(), type);
@@ -129,7 +145,8 @@ auto parseConstInst(Module& module, std::string_view source) -> std::optional<In
 auto parseIntCmpInst(Module& module, std::string_view src) -> std::optional<Inst>
 {
     // <result> = icmp eq i32 4, 5
-    if (auto match = ctre::match<R"(%(\d+) = icmp (\w+) (\w+) %(\d+), %(\d+))">(src); match) {
+    auto match = ctre::match<R"(%(\d+)\s+=\s+icmp\s+(\w+)\s+(\w+)\s+%(\d+),\s+%(\d+))">(src);
+    if (match) {
         auto const result = ValueId{strings::parse<int>(match.get<1>())};
         auto const cmp    = parseCompareKind(match.get<2>());
         auto const type   = parseType(match.get<3>());
@@ -150,7 +167,7 @@ auto parseIntCmpInst(Module& module, std::string_view src) -> std::optional<Inst
 auto parseTruncInst(Module& module, std::string_view src) -> std::optional<Inst>
 {
     // %2 = trunc %1 to float
-    if (auto match = ctre::match<R"(%(\d+) = trunc %(\d+) to (\w+))">(src); match) {
+    if (auto match = ctre::match<R"(%(\d+)\s+=\s+trunc\s+%(\d+)\s+to\s+(\w+))">(src); match) {
         auto const result = ValueId{strings::parse<int>(match.get<1>())};
         auto const value  = ValueId{strings::parse<int>(match.get<2>())};
         auto const type   = parseType(match.get<3>());
@@ -167,9 +184,10 @@ auto parseTruncInst(Module& module, std::string_view src) -> std::optional<Inst>
 
 auto parseReturnInst(Module& module, std::string_view src) -> std::optional<Inst>
 {
-    if (auto match = ctre::match<R"(ret (\w+) %(\d+))">(src); match) {
-        auto const type    = parseType(match.get<1>());
-        auto const operand = ValueId{strings::parse<int>(match.get<2>())};
+    if (auto match = ctre::match<R"(ret\s+(\w+)\s+(\S+))">(src); match) {
+        auto const type            = parseType(match.get<1>());
+        auto const [opKind, opSrc] = parseIdentifier(match.get<2>());
+        auto const operand         = ValueId{strings::parse<int>(opSrc)};
 
         auto ret = module.create(InstKind::Return);
         ret.emplace<Type>(type);
@@ -177,7 +195,7 @@ auto parseReturnInst(Module& module, std::string_view src) -> std::optional<Inst
         return ret;
     }
 
-    if (auto match = ctre::match<R"(ret (\w+))">(src); match) {
+    if (auto match = ctre::match<R"(ret\s+(\w+))">(src); match) {
         if (match.get<1>() == "void") {
             auto ret = module.create(InstKind::Return);
             ret.emplace<Type>(Type::Void);
@@ -191,8 +209,8 @@ auto parseReturnInst(Module& module, std::string_view src) -> std::optional<Inst
 
 auto parseBranchInst(Module& module, std::string_view src) -> std::optional<Inst>
 {
-    if (auto match = ctre::match<R"(br label %(\d+))">(src); match) {
-        auto const iftrue = ValueId{strings::parse<int>(match.get<1>())};
+    if (auto match = ctre::match<R"(br\s+label\s+(\S+))">(src); match) {
+        auto const iftrue = ValueId{strings::parse<int>(match.get<1>().view().substr(1))};
 
         auto br = module.create(InstKind::Branch);
         br.emplace<Type>(Type::Bool);
@@ -202,7 +220,8 @@ auto parseBranchInst(Module& module, std::string_view src) -> std::optional<Inst
         return br;
     }
 
-    if (auto match = ctre::match<R"(br i1 %(\d+), label %(\d+), label %(\d+))">(src); match) {
+    if (auto match = ctre::match<R"(br\s+i1\s+%(\d+),\s+label\s+%(\d+),\s+label\s+%(\d+))">(src);
+        match) {
         auto const condition = ValueId{strings::parse<int>(match.get<1>())};
         auto const iftrue    = ValueId{strings::parse<int>(match.get<2>())};
         auto const iffalse   = ValueId{strings::parse<int>(match.get<3>())};
@@ -302,7 +321,7 @@ auto Parser::readBasicBlocks(std::string_view source) -> std::optional<std::vect
 
 auto Parser::readBasicBlock(std::string_view source) -> std::optional<BasicBlock>
 {
-    auto block = BasicBlock{};
+    auto block = BasicBlock{.label = _current->create(ValueKind::Label).getId()};
 
     for (auto match : ctre::split<R"(\n)">(source)) {
         if (auto inst = readInst(strings::trim(match, " \t")); inst) {

@@ -47,6 +47,7 @@ auto test_parser() -> void
         auto module = parser.readModule(snir::readFile(entry).value());
         assert(module.has_value());
 
+        snir::println("; {}", entry.path().string());
         auto printer = snir::v2::Printer{std::cout};
         printer(*module);
     }

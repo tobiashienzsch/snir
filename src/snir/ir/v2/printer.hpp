@@ -3,6 +3,7 @@
 #include "snir/ir/v2/module.hpp"
 #include "snir/ir/v2/value.hpp"
 
+#include <algorithm>
 #include <ostream>
 
 namespace snir::v2 {
@@ -17,26 +18,30 @@ struct Printer
         auto view  = vals.view<Type, Name, FuncArguments, FuncBody>();
 
         for (auto funcId : module.getFunctions()) {
+            _nextLocalValueId = 0;
+
             auto func = Value{vals, funcId};
 
             auto const [type, name, args, body] = view.get(func.getId());
             print(_out, "define {} @{}", type, name.text);
             (*this)(module, args);
             (*this)(module, body);
+            println(_out, "");
         }
     }
 
     auto operator()(Module&, FuncArguments const& args) -> void
     {
         if (args.args.empty()) {
-            return print(_out, "()");
+            ++_nextLocalValueId;
+            return print(_out, "() #0");
         }
 
-        print(_out, "({}", args.args.at(0));
-        for (auto arg : args.args) {
-            print(_out, ", {}", arg);
-        }
-        print(_out, ")");
+        print(_out, "({} %{}", args.args.at(0), _nextLocalValueId++);
+        std::ranges::for_each(args.args, [this](auto arg) {
+            print(_out, ", {} %{}", arg, _nextLocalValueId++);
+        });
+        print(_out, ") #{}", _nextLocalValueId++);
     }
 
     auto operator()(Module& mod, FuncBody const& body) -> void
@@ -58,7 +63,7 @@ struct Printer
         auto literal  = reg.view<Literal>();
         auto branch   = reg.view<Branch>();
 
-        println(_out, "{}:", int(block.label));
+        println(_out, "{}:", getLocalId(block.label));
 
         for (auto const inst : block.instructions) {
             auto const [kind, type] = view.get(inst);
@@ -85,7 +90,7 @@ struct Printer
                 case InstKind::Branch: {
                     auto br = branch.get(inst);
                     if (not br.condition) {
-                        println(_out, "  {} label {}", kind, int(br.iftrue));
+                        println(_out, "  {} label {}", kind, getLocalId(br.iftrue));
                     } else {
                     }
                     break;
@@ -134,7 +139,20 @@ struct Printer
     }
 
 private:
+    [[nodiscard]] auto getLocalId(ValueId value) -> int
+    {
+        if (auto found = _localValueIds.find(value); found != _localValueIds.end()) {
+            return found->second;
+        }
+
+        auto id = _nextLocalValueId++;
+        _localValueIds.emplace(value, id);
+        return id;
+    }
+
     std::reference_wrapper<std::ostream> _out;
+    int _nextLocalValueId{0};
+    std::map<ValueId, int> _localValueIds{};
 };
 
 }  // namespace snir::v2
