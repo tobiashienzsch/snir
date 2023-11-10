@@ -12,6 +12,7 @@
 
 #undef NDEBUG
 #include <cassert>
+#include <map>
 #include <sstream>
 #include <utility>
 
