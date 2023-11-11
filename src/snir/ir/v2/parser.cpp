@@ -97,7 +97,7 @@ enum struct IdentifierKind
 
 }  // namespace
 
-Parser::Parser(Module& module) : _module{&module} {}
+Parser::Parser(Registry& module) : _module{&module} {}
 
 auto Parser::read(std::string_view source) -> std::string
 {

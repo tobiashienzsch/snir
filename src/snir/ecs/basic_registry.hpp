@@ -11,9 +11,9 @@
 namespace snir {
 
 template<typename Id>
-struct Registry
+struct BasicRegistry
 {
-    Registry() = default;
+    BasicRegistry() = default;
 
     [[nodiscard]] auto create() -> Id
     {

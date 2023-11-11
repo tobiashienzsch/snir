@@ -1,6 +1,6 @@
 #pragma once
 
-#include "snir/ecs/registry.hpp"
+#include "snir/ecs/basic_registry.hpp"
 
 namespace snir {
 
@@ -8,17 +8,17 @@ template<typename Id>
 struct Handle
 {
     using IdType       = Id;
-    using RegistryType = Registry<Id>;
+    using RegistryType = BasicRegistry<Id>;
 
     Handle() = default;
 
-    Handle(Registry<Id>& registry, Id id) : _reg{&registry}, _id{id} {}
+    Handle(BasicRegistry<Id>& registry, Id id) : _reg{&registry}, _id{id} {}
 
-    [[nodiscard]] static auto create(Registry<Id>& reg) -> Handle { return {reg, reg.create()}; }
+    [[nodiscard]] static auto create(BasicRegistry<Id>& reg) -> Handle { return {reg, reg.create()}; }
 
     [[nodiscard]] auto isValid() const noexcept -> bool { return _reg != nullptr; }
 
-    [[nodiscard]] auto getRegistry() const noexcept -> Registry<Id>* { return _reg; }
+    [[nodiscard]] auto getRegistry() const noexcept -> BasicRegistry<Id>* { return _reg; }
 
     [[nodiscard]] auto getId() const noexcept -> Id { return _id; }
 
@@ -44,7 +44,7 @@ struct Handle
     [[nodiscard]] operator Id() const noexcept { return _id; }
 
 private:
-    Registry<Id>* _reg;
+    BasicRegistry<Id>* _reg;
     Id _id;
 };
 

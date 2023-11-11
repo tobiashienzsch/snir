@@ -87,8 +87,16 @@ auto main(int argc, char const* const* argv) -> int
     pm(module);
 
     // Execute
-    auto result = snir::Interpreter::execute(module.functions.at(0), {});
-    snir::println("{}", result.value());
+    {
+        auto const start  = std::chrono::steady_clock::now();
+        auto const result = snir::Interpreter::execute(module.functions.at(0), {});
+        if (args->verbose) {
+            auto const stop  = std::chrono::steady_clock::now();
+            auto const delta = std::chrono::duration_cast<std::chrono::microseconds>(stop - start);
+            snir::println("execute: {}", delta);
+        }
+        snir::println("Return: {}", result.value());
+    }
 
     return 0;
 }
