@@ -97,25 +97,27 @@ enum struct IdentifierKind
 
 }  // namespace
 
-auto Parser::readModule(std::string_view source) -> std::optional<Module>
+Parser::Parser(Module& module) : _module{&module} {}
+
+auto Parser::read(std::string_view source) -> std::string
 {
-    auto module = Module{};
-    _module     = std::addressof(module);
+    try {
+        for (auto m : ctre::range<R"(define\s+(\w+)\s+@(\w+)\(([^)]*)\)\s*\{([^}]*)\})">(source)) {
+            _locals.clear();
 
-    for (auto match : ctre::range<R"(define\s+(\w+)\s+@(\w+)\(([^)]*)\)\s*\{([^}]*)\})">(source)) {
-        _locals.clear();
+            auto func = _module->create(ValueKind::Function);
+            func.emplace<Type>(parseType(m.get<1>()));
+            func.emplace<Name>(m.get<2>().to_string());
+            func.emplace<FuncArguments>(readArguments(m.get<3>()));
+            func.emplace<FuncBody>(readBlocks(m.get<4>()));
 
-        auto func = module.create(ValueKind::Function);
-        func.emplace<Type>(parseType(match.get<1>()));
-        func.emplace<Name>(match.get<2>().to_string());
-        func.emplace<FuncArguments>(readArguments(match.get<3>()));
-        func.emplace<FuncBody>(readBlocks(match.get<4>()));
-
-        module.getFunctions().push_back(func.getId());
+            _module->getFunctions().push_back(func.getId());
+        }
+    } catch (std::exception const& e) {
+        return e.what();
     }
 
-    _module = nullptr;
-    return module;
+    return {};
 }
 
 auto Parser::readArguments(std::string_view source) -> std::vector<ValueId>

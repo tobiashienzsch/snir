@@ -43,13 +43,14 @@ auto test() -> void
 auto testParser() -> void
 {
     for (auto const& entry : std::filesystem::directory_iterator{"./test/files"}) {
-        auto parser = snir::v2::Parser{};
-        auto module = parser.readModule(snir::readFile(entry).value());
-        assert(module.has_value());
+        auto module = snir::v2::Module{};
+        auto parser = snir::v2::Parser{module};
+        auto error  = parser.read(snir::readFile(entry).value());
+        assert(error.empty());
 
         snir::println("; {}", entry.path().string());
         auto printer = snir::v2::Printer{std::cout};
-        printer(*module);
+        printer(module);
     }
 }
 

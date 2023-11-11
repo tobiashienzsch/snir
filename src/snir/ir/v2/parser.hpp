@@ -10,15 +10,15 @@ namespace snir::v2 {
 
 struct Parser
 {
-    Parser() = default;
+    explicit Parser(Module& module);
 
-    [[nodiscard]] auto readModule(std::string_view src) -> std::optional<Module>;
-    [[nodiscard]] auto readInst(std::string_view src) -> std::optional<Inst>;
+    [[nodiscard]] auto read(std::string_view src) -> std::string;
 
 private:
     [[nodiscard]] auto readArguments(std::string_view src) -> std::vector<ValueId>;
     [[nodiscard]] auto readBlocks(std::string_view src) -> std::vector<BasicBlock>;
     [[nodiscard]] auto readBlock(std::string_view src) -> BasicBlock;
+    [[nodiscard]] auto readInst(std::string_view src) -> std::optional<Inst>;
     [[nodiscard]] auto readBinaryInst(std::string_view src) -> std::optional<Inst>;
     [[nodiscard]] auto readConstInst(std::string_view src) -> std::optional<Inst>;
     [[nodiscard]] auto readIntCmpInst(std::string_view src) -> std::optional<Inst>;
