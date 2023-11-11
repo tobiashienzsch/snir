@@ -28,7 +28,7 @@ private:
 
     [[nodiscard]] auto getOrCreateLocal(std::string_view token, ValueKind kind) -> Value;
 
-    Module* _module;
+    Module* _module{nullptr};
     std::map<std::string_view, ValueId> _locals;
 };
 

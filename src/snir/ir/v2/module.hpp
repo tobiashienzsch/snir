@@ -20,9 +20,9 @@ struct Module
     [[nodiscard]] auto getValues() -> ValueRegistry&;
     [[nodiscard]] auto getValues() const -> ValueRegistry const&;
 
-    auto getFunctions() -> std::vector<ValueId>& { return _functions; }
+    [[nodiscard]] auto getFunctions() -> std::vector<ValueId>& { return _functions; }
 
-    auto getFunctions() const -> std::vector<ValueId> const& { return _functions; }
+    [[nodiscard]] auto getFunctions() const -> std::vector<ValueId> const& { return _functions; }
 
 private:
     InstRegistry _instRegistry;

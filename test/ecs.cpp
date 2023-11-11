@@ -40,7 +40,7 @@ auto test() -> void
     snir::println("{} {}", int(add.get<InstKind>()), add.get<Type>());
 }
 
-auto test_parser() -> void
+auto testParser() -> void
 {
     for (auto const& entry : std::filesystem::directory_iterator{"./test/files"}) {
         auto parser = snir::v2::Parser{};
@@ -58,6 +58,6 @@ auto test_parser() -> void
 auto main() -> int
 {
     test();
-    test_parser();
+    testParser();
     return 0;
 }

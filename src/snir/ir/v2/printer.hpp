@@ -52,7 +52,7 @@ struct Printer
     auto operator()(Module& mod, FuncBody const& body) -> void
     {
         println(_out, " {{");
-        for (auto block : body.blocks) {
+        for (auto const& block : body.blocks) {
             (*this)(mod, block);
         }
         println(_out, "}}");
