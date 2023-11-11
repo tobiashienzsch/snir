@@ -110,8 +110,10 @@ auto Parser::read(std::string_view source) -> std::optional<Module>
             auto func = _registry->create(ValueKind::Function);
             func.emplace<Type>(parseType(m.get<1>()));
             func.emplace<Name>(m.get<2>().to_string());
-            func.emplace<FuncArguments>(readArguments(m.get<3>()));
-            func.emplace<FuncBody>(readBlocks(m.get<4>()));
+            func.emplace<FunctionDefinition>(FunctionDefinition{
+                .args   = readArguments(m.get<3>()),
+                .blocks = readBlocks(m.get<4>()),
+            });
 
             module.getFunctions().push_back(func.getId());
         }

@@ -16,43 +16,39 @@ struct Printer
     auto operator()(Module& module) -> void
     {
         auto& vals = module.getRegistry().getValues();
-        auto view  = vals.view<Type, Name, FuncArguments, FuncBody>();
+        auto view  = vals.view<Type, Name, FunctionDefinition>();
 
         for (auto funcId : module.getFunctions()) {
             _nextLocalValueId = 0;
 
             auto func = Value{vals, funcId};
 
-            auto const [type, name, args, body] = view.get(func.getId());
+            auto const [type, name, funcDefintion] = view.get(func.getId());
             print(_out, "define {} @{}", type, name.text);
-            (*this)(module, args);
-            (*this)(module, body);
+            (*this)(module, funcDefintion);
             println(_out, "");
         }
     }
 
-    auto operator()(Module& module, FuncArguments const& args) -> void
+    auto operator()(Module& module, FunctionDefinition const& func) -> void
     {
-        if (args.args.empty()) {
+        if (func.args.empty()) {
             return print(_out, "()");
         }
 
-        auto func = module.getRegistry().getValues().view<Type>();
-        auto a0   = args.args.at(0);
+        auto types = module.getRegistry().getValues().view<Type>();
+        auto a0    = func.args.at(0);
 
-        print(_out, "({} %{}", func.get(a0), getLocalId(a0));
+        print(_out, "({} %{}", types.get(a0), getLocalId(a0));
         std::ranges::for_each(
-            std::ranges::next(std::ranges::begin(args.args)),
-            std::ranges::end(args.args),
-            [this, &func](auto arg) { print(_out, ", {} %{}", func.get(arg), getLocalId(arg)); }
+            std::ranges::next(std::ranges::begin(func.args)),
+            std::ranges::end(func.args),
+            [this, &types](auto arg) { print(_out, ", {} %{}", types.get(arg), getLocalId(arg)); }
         );
         print(_out, ")");
-    }
 
-    auto operator()(Module& module, FuncBody const& body) -> void
-    {
         println(_out, " {{");
-        for (auto const& block : body.blocks) {
+        for (auto const& block : func.blocks) {
             (*this)(module, block);
         }
         println(_out, "}}");
