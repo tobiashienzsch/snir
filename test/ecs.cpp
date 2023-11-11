@@ -45,12 +45,12 @@ auto testParser() -> void
     for (auto const& entry : std::filesystem::directory_iterator{"./test/files"}) {
         auto registry = snir::v2::Registry{};
         auto parser   = snir::v2::Parser{registry};
-        auto error    = parser.read(snir::readFile(entry).value());
-        assert(error.empty());
+        auto module   = parser.read(snir::readFile(entry).value());
+        assert(module.has_value());
 
         snir::println("; {}", entry.path().string());
         auto printer = snir::v2::Printer{std::cout};
-        printer(registry);
+        printer(*module);
     }
 }
 

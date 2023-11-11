@@ -97,27 +97,29 @@ enum struct IdentifierKind
 
 }  // namespace
 
-Parser::Parser(Registry& module) : _module{&module} {}
+Parser::Parser(Registry& registry) : _registry{&registry} {}
 
-auto Parser::read(std::string_view source) -> std::string
+auto Parser::read(std::string_view source) -> std::optional<Module>
 {
+    auto module = Module{*_registry};
+
     try {
         for (auto m : ctre::range<R"(define\s+(\w+)\s+@(\w+)\(([^)]*)\)\s*\{([^}]*)\})">(source)) {
             _locals.clear();
 
-            auto func = _module->create(ValueKind::Function);
+            auto func = _registry->create(ValueKind::Function);
             func.emplace<Type>(parseType(m.get<1>()));
             func.emplace<Name>(m.get<2>().to_string());
             func.emplace<FuncArguments>(readArguments(m.get<3>()));
             func.emplace<FuncBody>(readBlocks(m.get<4>()));
 
-            _module->getFunctions().push_back(func.getId());
+            module.getFunctions().push_back(func.getId());
         }
-    } catch (std::exception const& e) {
-        return e.what();
+    } catch ([[maybe_unused]] std::exception const& e) {
+        return std::nullopt;
     }
 
-    return {};
+    return module;
 }
 
 auto Parser::readArguments(std::string_view source) -> std::vector<ValueId>
@@ -158,7 +160,7 @@ auto Parser::readInst(std::string_view source) -> std::optional<Inst>
     }
 
     if (strings::contains(source, "; nop")) {
-        auto inst = _module->create(InstKind::Nop);
+        auto inst = _registry->create(InstKind::Nop);
         inst.emplace<Type>(Type::Void);
         return inst;
     }
@@ -184,7 +186,7 @@ auto Parser::readBlocks(std::string_view source) -> std::vector<BasicBlock>
 
 auto Parser::readBlock(std::string_view source) -> BasicBlock
 {
-    auto block = BasicBlock{.label = _module->create(ValueKind::Label).getId(), .instructions = {}};
+    auto block = BasicBlock{.label = _registry->create(ValueKind::Label).getId(), .instructions = {}};
     for (auto match : ctre::split<R"(\n)">(source)) {
         if (auto inst = readInst(strings::trim(match, " \t")); inst) {
             block.instructions.push_back(inst->getId());
@@ -204,7 +206,7 @@ auto Parser::readBinaryInst(std::string_view source) -> std::optional<Inst>
         auto lhs    = getOrCreateLocal(match.get<4>(), ValueKind::Register);
         auto rhs    = getOrCreateLocal(match.get<5>(), ValueKind::Register);
 
-        auto inst = _module->create(kind);
+        auto inst = _registry->create(kind);
         inst.emplace<Type>(type);
         inst.emplace<Result>(Result{result});
         inst.emplace<Operands>(StaticVector<ValueId, 2>{lhs, rhs});
@@ -221,7 +223,7 @@ auto Parser::readConstInst(std::string_view source) -> std::optional<Inst>
         auto const type    = parseType(match.get<2>());
         auto const literal = parseLiteral(match.get<3>(), type);
 
-        auto inst = _module->create(InstKind::Const);
+        auto inst = _registry->create(InstKind::Const);
         inst.emplace<Type>(type);
         inst.emplace<Result>(Result{result});
         inst.emplace<Literal>(literal);
@@ -242,7 +244,7 @@ auto Parser::readIntCmpInst(std::string_view src) -> std::optional<Inst>
         auto const lhs    = getOrCreateLocal(match.get<4>(), ValueKind::Register);
         auto const rhs    = getOrCreateLocal(match.get<5>(), ValueKind::Register);
 
-        auto inst = _module->create(InstKind::IntCmp);
+        auto inst = _registry->create(InstKind::IntCmp);
         inst.emplace<Type>(type);
         inst.emplace<Result>(result.getId());
         inst.emplace<CompareKind>(cmp);
@@ -261,7 +263,7 @@ auto Parser::readTruncInst(std::string_view src) -> std::optional<Inst>
         auto const value  = getOrCreateLocal(match.get<2>(), ValueKind::Register);
         auto const type   = parseType(match.get<3>());
 
-        auto inst = _module->create(InstKind::Trunc);
+        auto inst = _registry->create(InstKind::Trunc);
         inst.emplace<Type>(type);
         inst.emplace<Result>(result);
         inst.emplace<Operands>(StaticVector<ValueId, 2>{value});
@@ -278,7 +280,7 @@ auto Parser::readReturnInst(std::string_view src) -> std::optional<Inst>
         auto const [opKind, opSrc] = parseIdentifier(match.get<2>());
         auto const operand         = getOrCreateLocal(opSrc, ValueKind::Register);
 
-        auto ret = _module->create(InstKind::Return);
+        auto ret = _registry->create(InstKind::Return);
         ret.emplace<Type>(type);
         ret.emplace<Operands>(StaticVector<ValueId, 2>{operand.getId()});
         return ret;
@@ -286,7 +288,7 @@ auto Parser::readReturnInst(std::string_view src) -> std::optional<Inst>
 
     if (auto match = ctre::match<R"(ret\s+(\w+))">(src); match) {
         if (match.get<1>() == "void") {
-            auto ret = _module->create(InstKind::Return);
+            auto ret = _registry->create(InstKind::Return);
             ret.emplace<Type>(Type::Void);
             ret.emplace<Operands>();
             return ret;
@@ -301,7 +303,7 @@ auto Parser::readBranchInst(std::string_view src) -> std::optional<Inst>
     if (auto match = ctre::match<R"(br\s+label\s+(\S+))">(src); match) {
         auto const iftrue = getOrCreateLocal(match.get<1>().view().substr(1), ValueKind::Label);
 
-        auto br = _module->create(InstKind::Branch);
+        auto br = _registry->create(InstKind::Branch);
         br.emplace<Type>(Type::Bool);
         br.emplace<Result>(ValueId{-1});
         br.emplace<Operands>();
@@ -315,7 +317,7 @@ auto Parser::readBranchInst(std::string_view src) -> std::optional<Inst>
         auto const iftrue    = getOrCreateLocal(match.get<2>(), ValueKind::Label);
         auto const iffalse   = getOrCreateLocal(match.get<3>(), ValueKind::Label);
 
-        auto br = _module->create(InstKind::Branch);
+        auto br = _registry->create(InstKind::Branch);
         br.emplace<Type>(Type::Bool);
         br.emplace<Result>(ValueId{-1});
         br.emplace<Operands>();
@@ -333,10 +335,10 @@ auto Parser::getOrCreateLocal(std::string_view token, ValueKind kind) -> Value
     }
 
     if (auto found = _locals.find(token); found != _locals.end()) {
-        return Value{_module->getValues(), found->second};
+        return Value{_registry->getValues(), found->second};
     }
 
-    auto const value = _module->create(kind);
+    auto const value = _registry->create(kind);
     _locals.emplace(token, value.getId());
     return value;
 }

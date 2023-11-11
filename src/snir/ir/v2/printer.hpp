@@ -1,6 +1,6 @@
 #pragma once
 
-#include "snir/ir/v2/registry.hpp"
+#include "snir/ir/v2/module.hpp"
 #include "snir/ir/v2/value.hpp"
 
 #include <algorithm>
@@ -13,31 +13,31 @@ struct Printer
 {
     explicit Printer(std::ostream& out) : _out{out} {}
 
-    auto operator()(Registry& registry) -> void
+    auto operator()(Module& module) -> void
     {
-        auto& vals = registry.getValues();
+        auto& vals = module.getRegistry().getValues();
         auto view  = vals.view<Type, Name, FuncArguments, FuncBody>();
 
-        for (auto funcId : registry.getFunctions()) {
+        for (auto funcId : module.getFunctions()) {
             _nextLocalValueId = 0;
 
             auto func = Value{vals, funcId};
 
             auto const [type, name, args, body] = view.get(func.getId());
             print(_out, "define {} @{}", type, name.text);
-            (*this)(registry, args);
-            (*this)(registry, body);
+            (*this)(module, args);
+            (*this)(module, body);
             println(_out, "");
         }
     }
 
-    auto operator()(Registry& registry, FuncArguments const& args) -> void
+    auto operator()(Module& module, FuncArguments const& args) -> void
     {
         if (args.args.empty()) {
             return print(_out, "()");
         }
 
-        auto func = registry.getValues().view<Type>();
+        auto func = module.getRegistry().getValues().view<Type>();
         auto a0   = args.args.at(0);
 
         print(_out, "({} %{}", func.get(a0), getLocalId(a0));
@@ -49,18 +49,18 @@ struct Printer
         print(_out, ")");
     }
 
-    auto operator()(Registry& registry, FuncBody const& body) -> void
+    auto operator()(Module& module, FuncBody const& body) -> void
     {
         println(_out, " {{");
         for (auto const& block : body.blocks) {
-            (*this)(registry, block);
+            (*this)(module, block);
         }
         println(_out, "}}");
     }
 
-    auto operator()(Registry& registry, BasicBlock const& block) -> void
+    auto operator()(Module& module, BasicBlock const& block) -> void
     {
-        auto& insts   = registry.getInsts();
+        auto& insts   = module.getRegistry().getInsts();
         auto common   = insts.view<InstKind, Type>();
         auto result   = insts.view<Result>();
         auto operands = insts.view<Operands>();
@@ -68,7 +68,7 @@ struct Printer
         auto literal  = insts.view<Literal>();
         auto branch   = insts.view<Branch>();
 
-        auto& values   = registry.getValues();
+        auto& values   = module.getRegistry().getValues();
         auto valueKind = values.view<ValueKind>();
 
         auto formatValue = [&](auto val) {

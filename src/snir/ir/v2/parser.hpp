@@ -1,5 +1,6 @@
 #pragma once
 
+#include "snir/ir/v2/module.hpp"
 #include "snir/ir/v2/registry.hpp"
 #include "snir/ir/v2/type.hpp"
 
@@ -10,9 +11,9 @@ namespace snir::v2 {
 
 struct Parser
 {
-    explicit Parser(Registry& module);
+    explicit Parser(Registry& registry);
 
-    [[nodiscard]] auto read(std::string_view src) -> std::string;
+    [[nodiscard]] auto read(std::string_view src) -> std::optional<Module>;
 
 private:
     [[nodiscard]] auto readArguments(std::string_view src) -> std::vector<ValueId>;
@@ -28,7 +29,7 @@ private:
 
     [[nodiscard]] auto getOrCreateLocal(std::string_view token, ValueKind kind) -> Value;
 
-    Registry* _module{nullptr};
+    Registry* _registry{nullptr};
     std::map<std::string_view, ValueId> _locals;
 };
 
