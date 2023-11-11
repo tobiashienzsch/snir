@@ -11,6 +11,7 @@ target_sources(snir
         snir/ir/pass_manager.cpp
         snir/ir/pretty_printer.cpp
         snir/ir/v2/parser.cpp
+        snir/ir/v2/printer.cpp
         snir/ir/v2/registry.cpp
         snir/vm/interpreter.cpp
         snir/vm/virtual_machine.cpp
