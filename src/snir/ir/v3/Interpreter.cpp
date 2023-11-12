@@ -1,5 +1,6 @@
 #include "Interpreter.hpp"
 
+#include "snir/ir/v3/Branch.hpp"
 #include "snir/ir/v3/CompareKind.hpp"
 #include "snir/ir/v3/InstKind.hpp"
 #include "snir/ir/v3/Operands.hpp"
@@ -21,11 +22,14 @@ auto Interpreter::execute(FunctionDefinition const& func, std::span<ValueId cons
         return std::nullopt;
     }
 
+    auto currentBlock = func.blocks.at(0).label;
+
     auto instructions = _registry->view<InstKind, Type>();
     auto operands     = _registry->view<Operands>();
     auto result       = _registry->view<Result>();
     auto literal      = _registry->view<Literal>();
     auto compare      = _registry->view<CompareKind>();
+    auto branch       = _registry->view<Branch>();
 
     auto shiftLeft = []<typename T>(T lhs, T rhs) {
         return static_cast<T>(std::uint64_t(lhs) << std::uint64_t(rhs));
@@ -122,8 +126,18 @@ auto Interpreter::execute(FunctionDefinition const& func, std::span<ValueId cons
         return _registers.at(std::get<0>(operands.get(inst)).list[0]);
     };
 
-    for (auto const& block : func.blocks) {
-        for (auto const inst : block.instructions) {
+    auto executeBranch = [&](ValueId inst) {
+        auto [dest]  = branch.get(inst);
+        currentBlock = dest.iftrue;
+    };
+
+    while (true) {
+        auto const block = std::ranges::find(func.blocks, currentBlock, &BasicBlock::label);
+        if (block == std::ranges::end(func.blocks)) {
+            raisef<std::runtime_error>("unknown block");
+        }
+
+        for (auto const inst : block->instructions) {
             auto const [kind, type] = instructions.get(inst);
             switch (kind) {
                 case InstKind::Nop: break;
@@ -145,10 +159,16 @@ auto Interpreter::execute(FunctionDefinition const& func, std::span<ValueId cons
                 case InstKind::FloatDiv: executeBinaryFloatOp(inst, type, std::divides{}); break;
                 case InstKind::IntCmp: executeIntCmp(inst); break;
                 case InstKind::Return: return executeReturn(inst, type);
-                case InstKind::Branch:
+                case InstKind::Branch: executeBranch(inst); break;
                 case InstKind::Phi:
                 default: raisef<std::runtime_error>("unimplemented: {}<{}>", kind, type);
             }
+        }
+
+        if (auto const next = std::ranges::next(block); next != std::ranges::end(func.blocks)) {
+            currentBlock = next->label;
+        } else {
+            raisef<std::runtime_error>("reached on of function without return");
         }
     }
 
