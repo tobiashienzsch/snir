@@ -1,0 +1,8 @@
+// This macro should be defined before including this header:
+// - SNIR_TYPE(Id, Name)
+
+SNIR_TYPE(Void, void)
+SNIR_TYPE(Bool, i1)
+SNIR_TYPE(Int64, i64)
+SNIR_TYPE(Float, float)
+SNIR_TYPE(Double, double)

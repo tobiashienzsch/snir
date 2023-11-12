@@ -20,7 +20,12 @@ FetchContent_Declare(
     GIT_REPOSITORY "https://github.com/hanickadot/compile-time-regular-expressions"
     GIT_TAG v3.8.1
 )
-FetchContent_MakeAvailable(ctre)
+FetchContent_Declare(
+    entt
+    GIT_REPOSITORY "https://github.com/skypjack/entt"
+    GIT_TAG v3.12.2
+)
+FetchContent_MakeAvailable(ctre entt)
 
 enable_testing()
 include(cmake/snir_compiler_warnings.cmake)

@@ -13,12 +13,12 @@ else ()
             -Wpedantic
 
             -Wcast-align
-            -Wconversion
+            # -Wconversion
             -Woverloaded-virtual
             -Wreorder
             -Wshadow
             -Wsign-compare
-            -Wsign-conversion
+            # -Wsign-conversion
             -Wstrict-aliasing
             -Wswitch-enum
             -Wuninitialized
