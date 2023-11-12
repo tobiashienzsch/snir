@@ -4,6 +4,7 @@
 ; args: 0
 ; blocks: 1
 ; instructions: 2
+; return: 42
 ; END_TEST
 define i64 @func() {
 0:

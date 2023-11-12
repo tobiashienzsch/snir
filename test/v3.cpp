@@ -2,6 +2,7 @@
 #include "snir/ir/v3/Identifier.hpp"
 #include "snir/ir/v3/InstKind.hpp"
 #include "snir/ir/v3/Interpreter.hpp"
+#include "snir/ir/v3/Literal.hpp"
 #include "snir/ir/v3/Parser.hpp"
 #include "snir/ir/v3/Printer.hpp"
 #include "snir/ir/v3/Registry.hpp"
@@ -26,6 +27,7 @@ struct FunctionTestSpec
     std::size_t args{std::numeric_limits<std::size_t>::max()};
     std::size_t blocks{std::numeric_limits<std::size_t>::max()};
     std::size_t instructions{std::numeric_limits<std::size_t>::max()};
+    ir::Literal result;
 };
 
 [[nodiscard]] auto getBetween(std::string_view s, std::string_view start, std::string_view stop)
@@ -85,6 +87,32 @@ auto forEachLine(std::string_view str, auto callback) -> void
             test.instructions = static_cast<std::size_t>(match.get<1>().to_number());
             return;
         }
+        if (auto match = ctre::match<R"(;\s+return:\s+(\S+))">(line); match) {
+            auto const literal = snir::strings::trim(match.get<1>());
+            if (test.type == "void") {
+                assert(literal == "void");
+                snir::println("parse void");
+                test.result = ir::Literal{std::nan("")};
+                return;
+            }
+            if (test.type == "i1") {
+                test.result = ir::Literal{literal == "true"};
+                return;
+            }
+            if (test.type == "i64") {
+                test.result = ir::Literal{snir::strings::parse<std::int64_t>(literal)};
+                return;
+            }
+            if (test.type == "float") {
+                test.result = ir::Literal{snir::strings::parse<float>(literal)};
+                return;
+            }
+            if (test.type == "double") {
+                test.result = ir::Literal{snir::strings::parse<double>(literal)};
+                return;
+            }
+            snir::raisef<std::invalid_argument>("unknown literal '{}'", literal);
+        }
 
         snir::raisef<std::invalid_argument>("could not parse test spec '{}'", line);
     });
@@ -95,6 +123,8 @@ auto forEachLine(std::string_view str, auto callback) -> void
 auto main() -> int
 {
     for (auto const& entry : std::filesystem::directory_iterator{"./test/v3"}) {
+        snir::println("; {}", entry.path().string());
+
         auto registry = ir::Registry{};
         auto parser   = ir::Parser{registry};
         auto source   = snir::readFile(entry).value();
@@ -119,31 +149,19 @@ auto main() -> int
         }
         assert(instCount == test.instructions);
 
-        auto result = std::optional<ir::Literal>{};
         if (func.args.empty()) {
-            auto vm = ir::Interpreter{registry};
-            result  = vm.execute(func, {});
+            auto vm     = ir::Interpreter{registry};
+            auto result = vm.execute(func, {});
             assert(result.has_value());
 
+            snir::println("; return: {} as {}", *result, type);
             if (type == ir::Type::Void) {
                 assert(std::isnan(std::get<double>(result->value)));
-            } else if (type == ir::Type::Bool) {
-                assert(std::holds_alternative<bool>(result->value));
-            } else if (type == ir::Type::Int64) {
-                assert(std::holds_alternative<std::int64_t>(result->value));
-            } else if (type == ir::Type::Float) {
-                assert(std::holds_alternative<float>(result->value));
-            } else if (type == ir::Type::Double) {
-                assert(std::holds_alternative<double>(result->value));
             } else {
-                snir::raisef<std::runtime_error>("unimplemented return type '{}'", type);
+                assert(result->value == test.result.value);
             }
         }
 
-        snir::println("; {}", entry.path().string());
-        if (result) {
-            snir::println("; return: {} as {}", *result, type);
-        }
         auto printer = ir::Printer{std::cout};
         printer(*module);
     }

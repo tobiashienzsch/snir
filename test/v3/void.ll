@@ -4,6 +4,7 @@
 ; args: 0
 ; blocks: 1
 ; instructions: 1
+; return: void
 ; END_TEST
 define void @func() {
 0:

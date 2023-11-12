@@ -4,6 +4,7 @@
 ; args: 0
 ; blocks: 1
 ; instructions: 4
+; return: true
 ; END_TEST
 define i1 @func() {
 0:

@@ -4,6 +4,7 @@
 ; args: 0
 ; blocks: 1
 ; instructions: 4
+; return: 185
 ; END_TEST
 define float @func() {
 0:

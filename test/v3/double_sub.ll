@@ -4,6 +4,7 @@
 ; args: 0
 ; blocks: 1
 ; instructions: 4
+; return: -101
 ; END_TEST
 define double @func() {
 0:
