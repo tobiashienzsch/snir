@@ -26,7 +26,7 @@ auto PassManager::operator()(Function& func) -> void
         if (_log) {
             println(
                 _out,
-                "function pass on {}: {} ({})",
+                "; function pass on {}: {} ({})",
                 func.getIdentifier(),
                 pass->getName(),
                 delta

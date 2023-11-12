@@ -25,19 +25,18 @@ auto Printer::operator()(Module& module) -> void
     auto& reg = module.getRegistry();
 
     for (auto funcId : module.getFunctions()) {
-        _nextLocalValueId = 0;
-
-        auto funcVal = Value{reg, funcId};
-        auto func    = Function{funcVal};
+        auto func = Function(Value{reg, funcId});
         (*this)(func);
     }
 }
 
 auto Printer::operator()(Function& function) -> void
 {
-    auto& reg         = *function.getValue().registry();
-    auto view         = reg.view<Type, Identifier, FunctionDefinition>();
     _nextLocalValueId = 0;
+    _localValueIds.clear();
+
+    auto& reg = *function.getValue().registry();
+    auto view = reg.view<Type, Identifier, FunctionDefinition>();
 
     auto const [type, identifier, def] = view.get(function.getValue());
     print(_out, "define {} @{}", type, identifier.text);

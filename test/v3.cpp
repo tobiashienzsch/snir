@@ -5,6 +5,8 @@
 #include "snir/ir/v3/Interpreter.hpp"
 #include "snir/ir/v3/Literal.hpp"
 #include "snir/ir/v3/Parser.hpp"
+#include "snir/ir/v3/pass/RemoveEmptyBlock.hpp"
+#include "snir/ir/v3/pass/RemoveNop.hpp"
 #include "snir/ir/v3/PassManager.hpp"
 #include "snir/ir/v3/Printer.hpp"
 #include "snir/ir/v3/Registry.hpp"
@@ -165,8 +167,15 @@ auto main() -> int
             }
         }
 
+        auto opt = ir::PassManager{true};
+        opt.add(ir::RemoveNop{});
+        opt.add(ir::RemoveEmptyBlock{});
+
         auto pm      = ir::PassManager{true};
         auto printer = ir::Printer{std::cout};
+        pm.add(std::ref(printer));
+        pm.add(std::ref(opt));
+        pm.add(std::ref(opt));
         pm.add(std::ref(printer));
         pm(*module);
     }
