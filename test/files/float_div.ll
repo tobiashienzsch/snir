@@ -1,3 +1,11 @@
+; BEGIN_TEST
+; name: func
+; type: float
+; args: 0
+; blocks: 1
+; instructions: 4
+; return: 21
+; END_TEST
 define float @func() {
 0:
     %0 = float 42.0

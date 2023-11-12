@@ -1,3 +1,11 @@
+; BEGIN_TEST
+; name: func
+; type: i64
+; args: 0
+; blocks: 2
+; instructions: 3
+; return: 9
+; END_TEST
 define i64 @func() {
 0:
     br label %1

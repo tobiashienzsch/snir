@@ -1,3 +1,11 @@
+; BEGIN_TEST
+; name: func
+; type: i64
+; args: 0
+; blocks: 1
+; instructions: 4
+; return: 165
+; END_TEST
 define i64 @func() {
 0:
     %0 = i64 42

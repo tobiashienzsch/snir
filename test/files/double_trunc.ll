@@ -1,3 +1,11 @@
+; BEGIN_TEST
+; name: func
+; type: double
+; args: 0
+; blocks: 1
+; instructions: 5
+; return: -101
+; END_TEST
 define double @func() {
 0:
     %0 = double 42.0

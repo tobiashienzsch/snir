@@ -1,16 +1,24 @@
+; BEGIN_TEST
+; name: func
+; type: i64
+; args: 0
+; blocks: 4
+; instructions: 10
+; return: 9
+; END_TEST
 define i64 @func() {
 0:
   ; nop
   ; nop
 1:
-  %0 = i64 1
-  %1 = i64 2
-  %2 = add i64 %0, %1
-2:
-  %3 = i64 4
-  %4 = i64 1
-  %5 = sub i64 %3, %4
-2:
-  %6 = mul i64 %2, %5
-  ret i64 %6
+  %2 = i64 1
+  %3 = i64 2
+  %4 = add i64 %2, %3
+5:
+  %6 = i64 4
+  %7 = i64 1
+  %8 = sub i64 %6, %7
+9:
+  %10 = mul i64 %4, %8
+  ret i64 %10
 }
