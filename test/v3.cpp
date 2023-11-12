@@ -5,6 +5,7 @@
 #include "snir/ir/v3/Interpreter.hpp"
 #include "snir/ir/v3/Literal.hpp"
 #include "snir/ir/v3/Parser.hpp"
+#include "snir/ir/v3/pass/DeadStoreElimination.hpp"
 #include "snir/ir/v3/pass/RemoveEmptyBlock.hpp"
 #include "snir/ir/v3/pass/RemoveNop.hpp"
 #include "snir/ir/v3/PassManager.hpp"
@@ -95,7 +96,6 @@ auto forEachLine(std::string_view str, auto callback) -> void
             auto const literal = snir::strings::trim(match.get<1>());
             if (test.type == ir::Type::Void) {
                 assert(literal == "void");
-                snir::println("parse void");
                 test.result = ir::Literal{std::nan("")};
                 return;
             }
@@ -168,6 +168,7 @@ auto main() -> int
         }
 
         auto opt = ir::PassManager{true};
+        opt.add(ir::DeadStoreElimination{});
         opt.add(ir::RemoveNop{});
         opt.add(ir::RemoveEmptyBlock{});
 
