@@ -1,12 +1,21 @@
+#include "snir/ir/v3/CompareKind.hpp"
+#include "snir/ir/v3/Function.hpp"
+#include "snir/ir/v3/Identifier.hpp"
+#include "snir/ir/v3/InstKind.hpp"
+#include "snir/ir/v3/Interpreter.hpp"
+#include "snir/ir/v3/Literal.hpp"
+#include "snir/ir/v3/Parser.hpp"
+#include "snir/ir/v3/pass/DeadStoreElimination.hpp"
+#include "snir/ir/v3/pass/RemoveEmptyBlock.hpp"
+#include "snir/ir/v3/pass/RemoveNop.hpp"
+#include "snir/ir/v3/PassManager.hpp"
+#include "snir/ir/v3/Printer.hpp"
+#include "snir/ir/v3/Registry.hpp"
+#include "snir/ir/v3/Type.hpp"
+
 #include "snir/core/file.hpp"
+#include "snir/core/print.hpp"
 #include "snir/core/strings.hpp"
-#include "snir/ir/parser.hpp"
-#include "snir/ir/pass/dead_store_elimination.hpp"
-#include "snir/ir/pass/remove_empty_block.hpp"
-#include "snir/ir/pass/remove_nop.hpp"
-#include "snir/ir/pass_manager.hpp"
-#include "snir/ir/pretty_printer.hpp"
-#include "snir/vm/interpreter.hpp"
 
 #include <chrono>
 #include <fstream>
@@ -44,6 +53,8 @@ struct Arguments
 
 }  // namespace
 
+namespace ir = snir::v3;
+
 auto main(int argc, char const* const* argv) -> int
 {
     // Parse arguments
@@ -53,25 +64,21 @@ auto main(int argc, char const* const* argv) -> int
         return EXIT_FAILURE;
     }
 
-    // Parse source
-    auto src    = snir::readFile(args->input).value();
-    auto module = snir::Module{};
-    {
-        auto const start = std::chrono::steady_clock::now();
-        module           = snir::Parser::readModule(src).value();
-        if (args->verbose) {
-            auto const stop  = std::chrono::steady_clock::now();
-            auto const delta = std::chrono::duration_cast<std::chrono::microseconds>(stop - start);
-            snir::println("parse: {}", delta);
-        }
-    }
+    auto registry = ir::Registry{};
+    auto parser   = ir::Parser{registry};
+    auto source   = snir::readFile(args->input).value();
+
+    auto module  = parser.read(source);
+    auto funcId  = module->getFunctions().at(0);
+    auto funcVal = ir::Value{registry, funcId};
+    auto func    = ir::Function{funcVal};
 
     // Add passes
-    auto pm  = snir::PassManager{args->verbose, std::cout};
-    auto opt = snir::PassManager{args->verbose, std::cout};
-    opt.add(snir::DeadStoreElimination{});
-    opt.add(snir::RemoveNop{});
-    opt.add(snir::RemoveEmptyBasicBlock{});
+    auto pm  = ir::PassManager{args->verbose, std::cout};
+    auto opt = ir::PassManager{args->verbose, std::cout};
+    opt.add(ir::DeadStoreElimination{});
+    opt.add(ir::RemoveNop{});
+    opt.add(ir::RemoveEmptyBlock{});
     if (args->opt > 0) {
         pm.add(std::ref(opt));
     }
@@ -81,22 +88,14 @@ auto main(int argc, char const* const* argv) -> int
 
     // Print optimized source
     auto out = std::fstream(args->output, std::ios::out);
-    pm.add(snir::PrettyPrinter{out});
+    pm.add(ir::Printer{out});
 
     // Run passes
-    pm(module);
+    pm(*module);
 
-    // Execute
-    {
-        auto const start  = std::chrono::steady_clock::now();
-        auto const result = snir::Interpreter::execute(module.functions.at(0), {});
-        if (args->verbose) {
-            auto const stop  = std::chrono::steady_clock::now();
-            auto const delta = std::chrono::duration_cast<std::chrono::microseconds>(stop - start);
-            snir::println("execute: {}", delta);
-        }
-        snir::println("Return: {}", result.value());
-    }
+    auto vm     = ir::Interpreter{};
+    auto result = vm.execute(func, {});
+    snir::println("; return: {} as {}", *result, func.getType());
 
     return 0;
 }

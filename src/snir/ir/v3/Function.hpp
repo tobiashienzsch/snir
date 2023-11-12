@@ -3,6 +3,7 @@
 #include "snir/ir/v3/BasicBlock.hpp"
 #include "snir/ir/v3/FunctionDefinition.hpp"
 #include "snir/ir/v3/Identifier.hpp"
+#include "snir/ir/v3/Type.hpp"
 #include "snir/ir/v3/Value.hpp"
 
 namespace snir::v3 {
@@ -12,6 +13,8 @@ struct Function
     explicit Function(Value value) noexcept : _value{value} {}
 
     [[nodiscard]] auto getValue() const -> Value { return _value; }
+
+    [[nodiscard]] auto getType() const -> Type { return _value.get<Type>(); }
 
     [[nodiscard]] auto getIdentifier() const -> std::string_view
     {
