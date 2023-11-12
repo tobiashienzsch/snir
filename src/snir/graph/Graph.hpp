@@ -1,3 +1,7 @@
+#pragma once
+
+#include "snir/core/exception.hpp"
+
 #include <algorithm>
 #include <cassert>
 #include <cstddef>
@@ -9,29 +13,31 @@
 
 namespace snir {
 
+template<typename NodeType>
 struct Graph
 {
-    using Node = std::uint32_t;
+    using Node = NodeType;
 
     struct Edge
     {
-        std::uint32_t source;
-        std::uint32_t sink;
+        NodeType source;
+        NodeType sink;
     };
 
     Graph(std::initializer_list<Node> ilist) : _nodes(ilist) {}
 
-    auto add(std::uint32_t id) -> bool
+    auto add(NodeType id) -> void
     {
         if (idExists(id)) {
-            return false;
+            raisef<std::runtime_error>("node '{}' already exists in graph", id);
         }
+
         _nodes.emplace_back(id);
         sortNodes();
-        return true;
+        return;
     }
 
-    auto connect(std::uint32_t source, std::uint32_t sink) -> void
+    auto connect(NodeType source, NodeType sink) -> void
     {
         _edges.emplace_back(Edge{source, sink});
         sortEdges();
@@ -39,27 +45,21 @@ struct Graph
 
     [[nodiscard]] auto size() const noexcept -> std::size_t { return _nodes.size(); }
 
-    [[nodiscard]] auto inEdges(std::uint32_t nodeID) const -> std::vector<Edge>
+    [[nodiscard]] auto getInEdges(NodeType id) const -> std::vector<Edge>
     {
         auto result = std::vector<Edge>{};
-        std::copy_if(
-            begin(_edges),
-            end(_edges),
-            std::back_inserter(result),
-            [nodeID](auto const& edge) { return edge.sink == nodeID; }
-        );
+        std::ranges::copy_if(_edges, std::back_inserter(result), [id](Edge edge) {
+            return edge.sink == id;
+        });
         return result;
     }
 
-    [[nodiscard]] auto outEdges(std::uint32_t nodeID) const -> std::vector<Edge>
+    [[nodiscard]] auto getOutEdges(NodeType id) const -> std::vector<Edge>
     {
         auto result = std::vector<Edge>{};
-        std::copy_if(
-            begin(_edges),
-            end(_edges),
-            std::back_inserter(result),
-            [nodeID](auto const& edge) { return edge.source == nodeID; }
-        );
+        std::ranges::copy_if(_edges, std::back_inserter(result), [id](Edge edge) {
+            return edge.source == id;
+        });
         return result;
     }
 
@@ -72,19 +72,14 @@ struct Graph
     }
 
 private:
-    [[nodiscard]] auto idExists(std::uint32_t id) const noexcept -> bool
+    [[nodiscard]] auto idExists(NodeType id) const noexcept -> bool
     {
-        return std::find(begin(_nodes), end(_nodes), id) != end(_nodes);
+        return std::ranges::find(_nodes, id) != _nodes.end();
     }
 
-    auto sortNodes() -> void { std::sort(begin(_nodes), end(_nodes)); }
+    auto sortNodes() -> void { std::ranges::sort(_nodes); }
 
-    auto sortEdges() -> void
-    {
-        std::sort(begin(_edges), end(_edges), [](auto const& lhs, auto const& rhs) {
-            return lhs.source < rhs.source;
-        });
-    }
+    auto sortEdges() -> void { std::ranges::sort(_edges, {}, &Edge::source); }
 
     std::vector<Node> _nodes;
     std::vector<Edge> _edges;
@@ -95,18 +90,19 @@ private:
  * ordering we want. Instead of maintaining a stack of the nodes we see we
  * simply place them inside the ordering vector in reverse order for simplicity.
  */
-inline auto depthFirstSearch(
-    std::uint32_t orderIndex,
-    std::uint32_t currentNodeID,
+template<typename NodeType>
+[[nodiscard]] auto depthFirstSearch(
+    NodeType orderIndex,
+    NodeType currentNodeID,
     std::vector<bool>& visited,
-    std::vector<std::uint32_t>& ordering,
-    Graph const& graph
-) -> std::uint32_t
+    std::vector<NodeType>& ordering,
+    Graph<NodeType> const& graph
+) -> NodeType
 {
 
     visited[currentNodeID] = true;
 
-    if (auto const& edges = graph.outEdges(currentNodeID); !edges.empty()) {
+    if (auto const& edges = graph.getOutEdges(currentNodeID); !edges.empty()) {
         for (auto const& edge : edges) {
             if (!visited[edge.sink]) {
                 orderIndex = depthFirstSearch(orderIndex, edge.sink, visited, ordering, graph);
@@ -122,53 +118,55 @@ inline auto depthFirstSearch(
  * @brief Finds a topological ordering of the nodes in a Directed Acyclic Graph
  * (DAG). The input to this function is an adjacency list for a graph.
  */
-inline auto topologicalSort(Graph const& graph) -> std::vector<std::uint32_t>
+template<typename NodeType>
+[[nodiscard]] auto topologicalSort(Graph<NodeType> const& graph) -> std::vector<NodeType>
 {
     auto const size = graph.size();
-    auto ordering   = std::vector<std::uint32_t>(size);
+    auto ordering   = std::vector<NodeType>(size);
     auto visited    = std::vector<bool>(size);
 
     auto i = size - 1;
-    for (std::uint32_t at = 0; at < size; at++) {
+    for (NodeType at = 0; at < size; at++) {
         if (!visited[at]) {
-            i = depthFirstSearch(static_cast<std::uint32_t>(i), at, visited, ordering, graph);
+            i = depthFirstSearch(static_cast<NodeType>(i), at, visited, ordering, graph);
         }
     }
 
     return ordering;
 }
 
+template<typename NodeType>
 struct FindComponents
 {
-    explicit FindComponents(Graph const& graph)
+    explicit FindComponents(Graph<NodeType> const& graph)
         : _graph(graph)
-        , _size(static_cast<std::uint32_t>(_graph.size()))
+        , _size(static_cast<NodeType>(_graph.size()))
         , _components(_size)
         , _visited(_size)
     {
         assert(_components.size() == _size);
         assert(_visited.size() == _size);
 
-        for (std::uint32_t i = 0; i < _size; ++i) {
+        for (NodeType i = 0; i < _size; ++i) {
             if (!_visited[i]) {
-                ++count_;
+                ++_count;
                 dfs(i);
             }
         }
     }
 
-    [[nodiscard]] auto get() const -> std::pair<std::uint32_t, std::vector<std::uint32_t>>
+    [[nodiscard]] auto get() const -> std::pair<NodeType, std::vector<NodeType>>
     {
-        return std::make_pair(count_, _components);
+        return std::make_pair(_count, _components);
     }
 
 private:
-    auto dfs(std::uint32_t currentNode) -> void
+    auto dfs(NodeType currentNode) -> void
     {
         _visited[currentNode]    = true;
-        _components[currentNode] = count_;
+        _components[currentNode] = _count;
 
-        if (auto const& edges = _graph.outEdges(currentNode); !edges.empty()) {
+        if (auto const& edges = _graph.getOutEdges(currentNode); !edges.empty()) {
             for (auto const& edge : edges) {
                 if (!_visited[edge.sink]) {
                     dfs(edge.sink);
@@ -177,10 +175,10 @@ private:
         }
     }
 
-    Graph const& _graph;
-    std::uint32_t _size;
-    std::uint32_t count_{0};
-    std::vector<std::uint32_t> _components;
+    Graph<NodeType> const& _graph;
+    NodeType _size;
+    NodeType _count{0};
+    std::vector<NodeType> _components;
     std::vector<bool> _visited;
 };
 
