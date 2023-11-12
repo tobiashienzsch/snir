@@ -1,6 +1,7 @@
 #include "snir/ir/v3/CompareKind.hpp"
 #include "snir/ir/v3/Identifier.hpp"
 #include "snir/ir/v3/InstKind.hpp"
+#include "snir/ir/v3/Interpreter.hpp"
 #include "snir/ir/v3/Parser.hpp"
 #include "snir/ir/v3/Printer.hpp"
 #include "snir/ir/v3/Registry.hpp"
@@ -100,11 +101,6 @@ auto main() -> int
         auto test     = parseFunctionTestSpec(source);
         auto module   = parser.read(source);
         assert(module.has_value());
-
-        snir::println("; {}", entry.path().string());
-        auto printer = ir::Printer{std::cout};
-        printer(*module);
-
         assert(module->getFunctions().size() == 1);
 
         auto const funcId   = module->getFunctions().at(0);
@@ -121,8 +117,33 @@ auto main() -> int
                 ++instCount;
             }
         }
-
         assert(instCount == test.instructions);
+
+        auto result = std::optional<ir::Literal>{};
+        if (func.args.empty()) {
+            auto vm = ir::Interpreter{registry};
+            result  = vm.execute(func, {});
+            assert(result.has_value());
+
+            if (type == ir::Type::Void) {
+                assert(std::isnan(std::get<double>(result->value)));
+            } else if (type == ir::Type::Int64) {
+                assert(std::holds_alternative<std::int64_t>(result->value));
+            } else if (type == ir::Type::Float) {
+                assert(std::holds_alternative<float>(result->value));
+            } else if (type == ir::Type::Double) {
+                assert(std::holds_alternative<double>(result->value));
+            } else {
+                snir::raisef<std::runtime_error>("unimplemented return type '{}'", type);
+            }
+        }
+
+        snir::println("; {}", entry.path().string());
+        if (result) {
+            snir::println("; return: {} as {}", *result, type);
+        }
+        auto printer = ir::Printer{std::cout};
+        printer(*module);
     }
 
     return 0;

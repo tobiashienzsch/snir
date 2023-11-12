@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cstdint>
+#include <format>
 
 namespace snir::v3 {
 
