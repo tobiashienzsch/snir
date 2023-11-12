@@ -127,6 +127,8 @@ auto main() -> int
 
             if (type == ir::Type::Void) {
                 assert(std::isnan(std::get<double>(result->value)));
+            } else if (type == ir::Type::Bool) {
+                assert(std::holds_alternative<bool>(result->value));
             } else if (type == ir::Type::Int64) {
                 assert(std::holds_alternative<std::int64_t>(result->value));
             } else if (type == ir::Type::Float) {

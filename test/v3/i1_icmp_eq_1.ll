@@ -1,14 +1,14 @@
 ; BEGIN_TEST
 ; name: func
-; type: i64
+; type: i1
 ; args: 0
 ; blocks: 1
 ; instructions: 4
 ; END_TEST
-define i64 @func() {
+define i1 @func() {
 0:
     %0 = i64 42
-    %1 = i64 42
-    %2 = icmp ne i64 %0, %1
-    ret i64 %2
+    %1 = i64 143
+    %2 = icmp eq i64 %0, %1
+    ret i1 %2
 }
