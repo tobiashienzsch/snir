@@ -4,6 +4,7 @@
 #include "snir/ir/v3/Module.hpp"
 #include "snir/ir/v3/Registry.hpp"
 #include "snir/ir/v3/Type.hpp"
+#include "snir/ir/v3/Value.hpp"
 #include "snir/ir/v3/ValueKind.hpp"
 
 #include <map>

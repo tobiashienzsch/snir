@@ -8,6 +8,7 @@
 #include "snir/ir/v3/Operands.hpp"
 #include "snir/ir/v3/Result.hpp"
 #include "snir/ir/v3/Type.hpp"
+#include "snir/ir/v3/Value.hpp"
 #include "snir/ir/v3/ValueKind.hpp"
 
 #include "snir/core/print.hpp"
@@ -29,9 +30,9 @@ auto Printer::operator()(Module& module) -> void
 
         auto func = Value{reg, funcId};
 
-        auto const [type, name, funcDefintion] = view.get(func);
+        auto const [type, name, def] = view.get(func);
         print(_out, "define {} @{}", type, name.text);
-        printFunction(module, funcDefintion);
+        printFunction(module, def);
         println(_out, "");
     }
 }

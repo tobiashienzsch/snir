@@ -1,4 +1,5 @@
 #include "snir/ir/v3/CompareKind.hpp"
+#include "snir/ir/v3/Function.hpp"
 #include "snir/ir/v3/Identifier.hpp"
 #include "snir/ir/v3/InstKind.hpp"
 #include "snir/ir/v3/Interpreter.hpp"
