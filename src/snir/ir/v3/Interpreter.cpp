@@ -13,23 +13,25 @@
 
 namespace snir::v3 {
 
-Interpreter::Interpreter(Registry& registry) : _registry{&registry} {}
-
-auto Interpreter::execute(FunctionDefinition const& func, std::span<ValueId const> args)
+auto Interpreter::execute(Function const& func, std::span<ValueId const> args)
     -> std::optional<Literal>
 {
-    if (func.args.size() != args.size()) {
+    _registers.clear();
+
+    if (func.getArguments().size() != args.size()) {
         return std::nullopt;
     }
 
-    auto currentBlock = func.blocks.at(0).label;
+    auto const* registry = func.getValue().registry();
 
-    auto instructions = _registry->view<InstKind, Type>();
-    auto operands     = _registry->view<Operands>();
-    auto result       = _registry->view<Result>();
-    auto literal      = _registry->view<Literal>();
-    auto compare      = _registry->view<CompareKind>();
-    auto branch       = _registry->view<Branch>();
+    auto currentBlock = func.getBasicBlocks().at(0).label;
+
+    auto instructions = registry->view<InstKind, Type>();
+    auto operands     = registry->view<Operands>();
+    auto result       = registry->view<Result>();
+    auto literal      = registry->view<Literal>();
+    auto compare      = registry->view<CompareKind>();
+    auto branch       = registry->view<Branch>();
 
     auto shiftLeft = []<typename T>(T lhs, T rhs) {
         return static_cast<T>(std::uint64_t(lhs) << std::uint64_t(rhs));
@@ -132,8 +134,9 @@ auto Interpreter::execute(FunctionDefinition const& func, std::span<ValueId cons
     };
 
     while (true) {
-        auto const block = std::ranges::find(func.blocks, currentBlock, &BasicBlock::label);
-        if (block == std::ranges::end(func.blocks)) {
+        auto const& blocks = func.getBasicBlocks();
+        auto const block   = std::ranges::find(blocks, currentBlock, &BasicBlock::label);
+        if (block == std::ranges::end(blocks)) {
             raisef<std::runtime_error>("unknown block");
         }
 
@@ -165,7 +168,7 @@ auto Interpreter::execute(FunctionDefinition const& func, std::span<ValueId cons
             }
         }
 
-        if (auto const next = std::ranges::next(block); next != std::ranges::end(func.blocks)) {
+        if (auto const next = std::ranges::next(block); next != std::ranges::end(blocks)) {
             currentBlock = next->label;
         } else {
             raisef<std::runtime_error>("reached on of function without return");

@@ -135,6 +135,7 @@ auto main() -> int
         assert(module->getFunctions().size() == 1);
 
         auto const funcId   = module->getFunctions().at(0);
+        auto const funcVal  = ir::Value{registry, funcId};
         auto const funcView = registry.view<ir::Type, ir::Identifier, ir::FunctionDefinition>();
         auto const [type, name, func] = funcView.get(funcId);
         assert(type == test.type);
@@ -151,8 +152,8 @@ auto main() -> int
         assert(instCount == test.instructions);
 
         if (func.args.empty()) {
-            auto vm     = ir::Interpreter{registry};
-            auto result = vm.execute(func, {});
+            auto vm     = ir::Interpreter{};
+            auto result = vm.execute(ir::Function{funcVal}, {});
             assert(result.has_value());
 
             snir::println("; return: {} as {}", *result, type);
