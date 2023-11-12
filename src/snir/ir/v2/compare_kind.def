@@ -1,5 +1,0 @@
-// This macro should be defined before including this header:
-// - SNIR_COMPARE(Id, Name)
-
-SNIR_COMPARE(Equal, eq)
-SNIR_COMPARE(NotEqual, ne)
