@@ -1,0 +1,34 @@
+#pragma once
+
+#include <cstdint>
+#include <format>
+
+namespace snir::v3 {
+
+enum struct CompareKind
+{
+#define SNIR_COMPARE(Id, Name) Id,
+#include "snir/ir/CompareKind.def"
+#undef SNIR_COMPARE
+};
+
+[[nodiscard]] auto parseCompareKind(std::string_view src) -> CompareKind;
+
+}  // namespace snir::v3
+
+template<>
+struct std::formatter<snir::v3::CompareKind, char> : std::formatter<std::string_view, char>
+{
+    template<typename FormatContext>
+    auto format(snir::v3::CompareKind type, FormatContext& fc) const
+    {
+        static constexpr auto names = std::array{
+#define SNIR_COMPARE(Id, Name) std::string_view{#Name},
+#include "snir/ir/CompareKind.def"
+#undef SNIR_COMPARE
+        };
+
+        auto str = names.at(static_cast<std::size_t>(type));
+        return std::formatter<std::string_view, char>::format(str, fc);
+    }
+};

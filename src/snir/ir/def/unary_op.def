@@ -1,5 +1,0 @@
-// This macro should be defined before including this header:
-// - SNIR_INST_UNARY_OP(Id, Name)
-
-SNIR_INST_UNARY_OP(Const, const)
-SNIR_INST_UNARY_OP(Trunc, trunc)

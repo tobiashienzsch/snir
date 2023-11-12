@@ -7,18 +7,13 @@ target_include_directories(snir PUBLIC ${PROJECT_SOURCE_DIR})
 target_link_libraries(snir PUBLIC ctre::ctre EnTT::EnTT snir::compiler_warnings)
 target_sources(snir
     PRIVATE
-        snir/ir/parser.cpp
-        snir/ir/pass_manager.cpp
-        snir/ir/pretty_printer.cpp
-        snir/ir/v3/CompareKind.cpp
-        snir/ir/v3/Identifier.cpp
-        snir/ir/v3/InstKind.cpp
-        snir/ir/v3/Interpreter.cpp
-        snir/ir/v3/Literal.cpp
-        snir/ir/v3/Parser.cpp
-        snir/ir/v3/PassManager.cpp
-        snir/ir/v3/Printer.cpp
-        snir/ir/v3/Type.cpp
-        snir/vm/interpreter.cpp
-        snir/vm/virtual_machine.cpp
+        snir/ir/CompareKind.cpp
+        snir/ir/Identifier.cpp
+        snir/ir/InstKind.cpp
+        snir/ir/Interpreter.cpp
+        snir/ir/Literal.cpp
+        snir/ir/Parser.cpp
+        snir/ir/PassManager.cpp
+        snir/ir/Printer.cpp
+        snir/ir/Type.cpp
 )
