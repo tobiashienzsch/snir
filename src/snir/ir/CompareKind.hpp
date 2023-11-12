@@ -3,7 +3,7 @@
 #include <cstdint>
 #include <format>
 
-namespace snir::v3 {
+namespace snir {
 
 enum struct CompareKind
 {
@@ -14,13 +14,13 @@ enum struct CompareKind
 
 [[nodiscard]] auto parseCompareKind(std::string_view src) -> CompareKind;
 
-}  // namespace snir::v3
+}  // namespace snir
 
 template<>
-struct std::formatter<snir::v3::CompareKind, char> : std::formatter<std::string_view, char>
+struct std::formatter<snir::CompareKind, char> : std::formatter<std::string_view, char>
 {
     template<typename FormatContext>
-    auto format(snir::v3::CompareKind type, FormatContext& fc) const
+    auto format(snir::CompareKind type, FormatContext& fc) const
     {
         static constexpr auto names = std::array{
 #define SNIR_COMPARE(Id, Name) std::string_view{#Name},

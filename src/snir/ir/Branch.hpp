@@ -4,7 +4,7 @@
 
 #include <optional>
 
-namespace snir::v3 {
+namespace snir {
 
 struct Branch
 {
@@ -13,4 +13,4 @@ struct Branch
     std::optional<ValueId> condition{};
 };
 
-}  // namespace snir::v3
+}  // namespace snir

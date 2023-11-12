@@ -6,7 +6,7 @@
 #include <format>
 #include <variant>
 
-namespace snir::v3 {
+namespace snir {
 
 struct Literal
 {
@@ -15,13 +15,13 @@ struct Literal
 
 [[nodiscard]] auto parseLiteral(std::string_view src, Type type) -> Literal;
 
-}  // namespace snir::v3
+}  // namespace snir
 
 template<>
-struct std::formatter<snir::v3::Literal, char> : std::formatter<std::string_view, char>
+struct std::formatter<snir::Literal, char> : std::formatter<std::string_view, char>
 {
     template<typename FormatContext>
-    auto format(snir::v3::Literal literal, FormatContext& fc) const
+    auto format(snir::Literal literal, FormatContext& fc) const
     {
         auto str = std::visit([](auto val) { return std::format("{}", val); }, literal.value);
         return std::formatter<std::string_view, char>::format(str, fc);

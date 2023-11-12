@@ -3,7 +3,7 @@
 #include "snir/ir/Function.hpp"
 #include "snir/ir/InstKind.hpp"
 
-namespace snir::v3 {
+namespace snir {
 
 struct RemoveNop
 {
@@ -23,4 +23,4 @@ struct RemoveNop
     }
 };
 
-}  // namespace snir::v3
+}  // namespace snir

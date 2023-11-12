@@ -3,7 +3,7 @@
 #include <cstdint>
 #include <format>
 
-namespace snir::v3 {
+namespace snir {
 
 enum struct InstKind : std::uint8_t
 {
@@ -14,13 +14,13 @@ enum struct InstKind : std::uint8_t
 
 [[nodiscard]] auto parseInstKind(std::string_view source) -> InstKind;
 
-}  // namespace snir::v3
+}  // namespace snir
 
 template<>
-struct std::formatter<snir::v3::InstKind, char> : std::formatter<std::string_view, char>
+struct std::formatter<snir::InstKind, char> : std::formatter<std::string_view, char>
 {
     template<typename FormatContext>
-    auto format(snir::v3::InstKind kind, FormatContext& fc) const
+    auto format(snir::InstKind kind, FormatContext& fc) const
     {
         static constexpr auto names = std::array{
 #define SNIR_INSTRUCTION(Id, Name) std::string_view{#Name},

@@ -23,16 +23,14 @@
 #include <cassert>
 #include <filesystem>
 
-namespace ir = snir::v3;
-
 struct FunctionTestSpec
 {
     std::string name{};
-    ir::Type type{};
+    snir::Type type{};
     std::size_t args{std::numeric_limits<std::size_t>::max()};
     std::size_t blocks{std::numeric_limits<std::size_t>::max()};
     std::size_t instructions{std::numeric_limits<std::size_t>::max()};
-    ir::Literal result;
+    snir::Literal result;
 };
 
 [[nodiscard]] auto getBetween(std::string_view s, std::string_view start, std::string_view stop)
@@ -77,7 +75,7 @@ auto forEachLine(std::string_view str, auto callback) -> void
             return;
         }
         if (auto match = ctre::match<R"(;\s+type:\s+(\w+))">(line); match) {
-            test.type = ir::parseType(match.get<1>());
+            test.type = snir::parseType(match.get<1>());
             return;
         }
         if (auto match = ctre::match<R"(;\s+args:\s+(\d+))">(line); match) {
@@ -94,25 +92,25 @@ auto forEachLine(std::string_view str, auto callback) -> void
         }
         if (auto match = ctre::match<R"(;\s+return:\s+(\S+))">(line); match) {
             auto const literal = snir::strings::trim(match.get<1>());
-            if (test.type == ir::Type::Void) {
+            if (test.type == snir::Type::Void) {
                 assert(literal == "void");
-                test.result = ir::Literal{std::nan("")};
+                test.result = snir::Literal{std::nan("")};
                 return;
             }
-            if (test.type == ir::Type::Bool) {
-                test.result = ir::Literal{literal == "true"};
+            if (test.type == snir::Type::Bool) {
+                test.result = snir::Literal{literal == "true"};
                 return;
             }
-            if (test.type == ir::Type::Int64) {
-                test.result = ir::Literal{snir::strings::parse<std::int64_t>(literal)};
+            if (test.type == snir::Type::Int64) {
+                test.result = snir::Literal{snir::strings::parse<std::int64_t>(literal)};
                 return;
             }
-            if (test.type == ir::Type::Float) {
-                test.result = ir::Literal{snir::strings::parse<float>(literal)};
+            if (test.type == snir::Type::Float) {
+                test.result = snir::Literal{snir::strings::parse<float>(literal)};
                 return;
             }
-            if (test.type == ir::Type::Double) {
-                test.result = ir::Literal{snir::strings::parse<double>(literal)};
+            if (test.type == snir::Type::Double) {
+                test.result = snir::Literal{snir::strings::parse<double>(literal)};
                 return;
             }
             snir::raisef<std::invalid_argument>("unknown literal '{}'", literal);
@@ -129,8 +127,8 @@ auto main() -> int
     for (auto const& entry : std::filesystem::directory_iterator{"./test/v3"}) {
         snir::println("; {}", entry.path().string());
 
-        auto registry = ir::Registry{};
-        auto parser   = ir::Parser{registry};
+        auto registry = snir::Registry{};
+        auto parser   = snir::Parser{registry};
         auto source   = snir::readFile(entry).value();
         auto test     = parseFunctionTestSpec(source);
         auto module   = parser.read(source);
@@ -138,8 +136,8 @@ auto main() -> int
         assert(module->getFunctions().size() == 1);
 
         auto const funcId   = module->getFunctions().at(0);
-        auto const funcVal  = ir::Value{registry, funcId};
-        auto const funcView = registry.view<ir::Type, ir::Identifier, ir::FunctionDefinition>();
+        auto const funcVal  = snir::Value{registry, funcId};
+        auto const funcView = registry.view<snir::Type, snir::Identifier, snir::FunctionDefinition>();
         auto const [type, name, func] = funcView.get(funcId);
         assert(type == test.type);
         assert(name.text == test.name);
@@ -155,25 +153,25 @@ auto main() -> int
         assert(instCount == test.instructions);
 
         if (func.args.empty()) {
-            auto vm     = ir::Interpreter{};
-            auto result = vm.execute(ir::Function{funcVal}, {});
+            auto vm     = snir::Interpreter{};
+            auto result = vm.execute(snir::Function{funcVal}, {});
             assert(result.has_value());
 
             snir::println("; return: {} as {}", *result, type);
-            if (type == ir::Type::Void) {
+            if (type == snir::Type::Void) {
                 assert(std::isnan(std::get<double>(result->value)));
             } else {
                 assert(result->value == test.result.value);
             }
         }
 
-        auto opt = ir::PassManager{true};
-        opt.add(ir::DeadStoreElimination{});
-        opt.add(ir::RemoveNop{});
-        opt.add(ir::RemoveEmptyBlock{});
+        auto opt = snir::PassManager{true};
+        opt.add(snir::DeadStoreElimination{});
+        opt.add(snir::RemoveNop{});
+        opt.add(snir::RemoveEmptyBlock{});
 
-        auto pm      = ir::PassManager{true};
-        auto printer = ir::Printer{std::cout};
+        auto pm      = snir::PassManager{true};
+        auto printer = snir::Printer{std::cout};
         pm.add(std::ref(printer));
         pm.add(std::ref(opt));
         pm.add(std::ref(opt));

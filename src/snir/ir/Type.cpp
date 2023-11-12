@@ -2,7 +2,7 @@
 
 #include "snir/core/exception.hpp"
 
-namespace snir::v3 {
+namespace snir {
 
 auto parseType(std::string_view source) -> Type
 {
@@ -16,4 +16,4 @@ auto parseType(std::string_view source) -> Type
     raisef<std::invalid_argument>("failed to parse '{}' as Type", source);
 }
 
-}  // namespace snir::v3
+}  // namespace snir

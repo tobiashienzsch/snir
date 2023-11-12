@@ -4,7 +4,7 @@
 
 #include <vector>
 
-namespace snir::v3 {
+namespace snir {
 
 struct FunctionDefinition
 {
@@ -12,4 +12,4 @@ struct FunctionDefinition
     std::vector<BasicBlock> blocks;
 };
 
-}  // namespace snir::v3
+}  // namespace snir

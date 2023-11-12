@@ -5,8 +5,8 @@
 #include <entt/entity/handle.hpp>
 #include <entt/entity/registry.hpp>
 
-namespace snir::v3 {
+namespace snir {
 
 using Value = entt::handle;
 
-}  // namespace snir::v3
+}  // namespace snir

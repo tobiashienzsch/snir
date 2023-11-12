@@ -2,11 +2,11 @@
 
 #include "snir/ir/ValueId.hpp"
 
-namespace snir::v3 {
+namespace snir {
 
 struct Result
 {
     ValueId id;
 };
 
-}  // namespace snir::v3
+}  // namespace snir

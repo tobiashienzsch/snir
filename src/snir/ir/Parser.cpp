@@ -17,7 +17,7 @@
 #include <algorithm>
 #include <array>
 
-namespace snir::v3 {
+namespace snir {
 
 Parser::Parser(Registry& registry) : _registry{&registry} {}
 
@@ -285,4 +285,4 @@ auto Parser::getOrCreateLocal(std::string_view token, ValueKind kind) -> Value
     return val;
 }
 
-}  // namespace snir::v3
+}  // namespace snir

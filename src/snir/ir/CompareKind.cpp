@@ -2,7 +2,7 @@
 
 #include "snir/core/exception.hpp"
 
-namespace snir::v3 {
+namespace snir {
 
 auto parseCompareKind(std::string_view src) -> CompareKind
 {
@@ -16,4 +16,4 @@ auto parseCompareKind(std::string_view src) -> CompareKind
     raisef<std::invalid_argument>("failed to parse '{}' as CompareKind", src);
 }
 
-}  // namespace snir::v3
+}  // namespace snir

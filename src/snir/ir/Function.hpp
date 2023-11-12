@@ -6,7 +6,7 @@
 #include "snir/ir/Type.hpp"
 #include "snir/ir/Value.hpp"
 
-namespace snir::v3 {
+namespace snir {
 
 struct Function
 {
@@ -45,4 +45,4 @@ private:
     Value _value;
 };
 
-}  // namespace snir::v3
+}  // namespace snir

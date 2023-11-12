@@ -4,7 +4,7 @@
 
 #include <ctre.hpp>
 
-namespace snir::v3 {
+namespace snir {
 
 auto parseIdentifier(std::string_view src) -> std::pair<IdentifierKind, std::string_view>
 {
@@ -19,4 +19,4 @@ auto parseIdentifier(std::string_view src) -> std::pair<IdentifierKind, std::str
     raisef<std::invalid_argument>("failed to parse '{}' as Operand", src);
 }
 
-}  // namespace snir::v3
+}  // namespace snir

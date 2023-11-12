@@ -16,7 +16,7 @@
 #include <algorithm>
 #include <iterator>
 
-namespace snir::v3 {
+namespace snir {
 
 Printer::Printer(std::ostream& out) : _out{out} {}
 
@@ -185,4 +185,4 @@ auto Printer::getLocalId(ValueId value) -> int
     return id;
 }
 
-}  // namespace snir::v3
+}  // namespace snir

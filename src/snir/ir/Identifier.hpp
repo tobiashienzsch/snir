@@ -4,7 +4,7 @@
 #include <string_view>
 #include <utility>
 
-namespace snir::v3 {
+namespace snir {
 
 struct Identifier
 {
@@ -20,4 +20,4 @@ enum struct IdentifierKind
 [[nodiscard]] auto parseIdentifier(std::string_view src)
     -> std::pair<IdentifierKind, std::string_view>;
 
-}  // namespace snir::v3
+}  // namespace snir

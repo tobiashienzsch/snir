@@ -4,8 +4,8 @@
 
 #include <entt/entity/registry.hpp>
 
-namespace snir::v3 {
+namespace snir {
 
 using Registry = entt::registry;
 
-}  // namespace snir::v3
+}  // namespace snir

@@ -11,7 +11,7 @@
 #include <optional>
 #include <string_view>
 
-namespace snir::v3 {
+namespace snir {
 
 struct Parser
 {
@@ -37,4 +37,4 @@ private:
     std::map<std::string_view, ValueId> _locals;
 };
 
-}  // namespace snir::v3
+}  // namespace snir

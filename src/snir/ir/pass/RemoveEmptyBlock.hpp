@@ -3,7 +3,7 @@
 #include "snir/ir/Function.hpp"
 #include "snir/ir/InstKind.hpp"
 
-namespace snir::v3 {
+namespace snir {
 
 struct RemoveEmptyBlock
 {
@@ -19,4 +19,4 @@ struct RemoveEmptyBlock
     }
 };
 
-}  // namespace snir::v3
+}  // namespace snir

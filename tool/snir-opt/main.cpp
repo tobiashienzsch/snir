@@ -53,8 +53,6 @@ struct Arguments
 
 }  // namespace
 
-namespace ir = snir::v3;
-
 auto main(int argc, char const* const* argv) -> int
 {
     // Parse arguments
@@ -64,21 +62,21 @@ auto main(int argc, char const* const* argv) -> int
         return EXIT_FAILURE;
     }
 
-    auto registry = ir::Registry{};
-    auto parser   = ir::Parser{registry};
+    auto registry = snir::Registry{};
+    auto parser   = snir::Parser{registry};
     auto source   = snir::readFile(args->input).value();
 
     auto module  = parser.read(source);
     auto funcId  = module->getFunctions().at(0);
-    auto funcVal = ir::Value{registry, funcId};
-    auto func    = ir::Function{funcVal};
+    auto funcVal = snir::Value{registry, funcId};
+    auto func    = snir::Function{funcVal};
 
     // Add passes
-    auto pm  = ir::PassManager{args->verbose, std::cout};
-    auto opt = ir::PassManager{args->verbose, std::cout};
-    opt.add(ir::DeadStoreElimination{});
-    opt.add(ir::RemoveNop{});
-    opt.add(ir::RemoveEmptyBlock{});
+    auto pm  = snir::PassManager{args->verbose, std::cout};
+    auto opt = snir::PassManager{args->verbose, std::cout};
+    opt.add(snir::DeadStoreElimination{});
+    opt.add(snir::RemoveNop{});
+    opt.add(snir::RemoveEmptyBlock{});
     if (args->opt > 0) {
         pm.add(std::ref(opt));
     }
@@ -88,12 +86,12 @@ auto main(int argc, char const* const* argv) -> int
 
     // Print optimized source
     auto out = std::fstream(args->output, std::ios::out);
-    pm.add(ir::Printer{out});
+    pm.add(snir::Printer{out});
 
     // Run passes
     pm(*module);
 
-    auto vm     = ir::Interpreter{};
+    auto vm     = snir::Interpreter{};
     auto result = vm.execute(func, {});
     snir::println("; return: {} as {}", *result, func.getType());
 

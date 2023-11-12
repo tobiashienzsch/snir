@@ -4,7 +4,7 @@
 
 #include <chrono>
 
-namespace snir::v3 {
+namespace snir {
 
 PassManager::PassManager(bool log, std::ostream& out) : _out{out}, _log{log} {}
 
@@ -35,4 +35,4 @@ auto PassManager::operator()(Function& func) -> void
     }
 }
 
-}  // namespace snir::v3
+}  // namespace snir

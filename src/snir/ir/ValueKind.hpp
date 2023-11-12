@@ -2,7 +2,7 @@
 
 #include <cstdint>
 
-namespace snir::v3 {
+namespace snir {
 
 enum struct ValueKind : std::uint8_t
 {
@@ -11,13 +11,13 @@ enum struct ValueKind : std::uint8_t
 #undef SNIR_VALUE
 };
 
-}  // namespace snir::v3
+}  // namespace snir
 
 template<>
-struct std::formatter<snir::v3::ValueKind, char> : std::formatter<std::string_view, char>
+struct std::formatter<snir::ValueKind, char> : std::formatter<std::string_view, char>
 {
     template<typename FormatContext>
-    auto format(snir::v3::ValueKind kind, FormatContext& fc) const
+    auto format(snir::ValueKind kind, FormatContext& fc) const
     {
         static constexpr auto names = std::array{
 #define SNIR_VALUE(Id, Name) std::string_view{#Name},

@@ -9,7 +9,7 @@
 
 #include <set>
 
-namespace snir::v3 {
+namespace snir {
 
 struct DeadStoreElimination
 {
@@ -58,4 +58,4 @@ private:
     std::set<ValueId> _used;
 };
 
-}  // namespace snir::v3
+}  // namespace snir

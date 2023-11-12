@@ -5,7 +5,7 @@
 
 #include <ctre.hpp>
 
-namespace snir::v3 {
+namespace snir {
 
 auto parseLiteral(std::string_view src, Type type) -> Literal
 {
@@ -24,4 +24,4 @@ auto parseLiteral(std::string_view src, Type type) -> Literal
     raisef<std::invalid_argument>("failed to parse '{}' as Literal", src);
 }
 
-}  // namespace snir::v3
+}  // namespace snir

@@ -7,7 +7,7 @@
 #include <map>
 #include <ostream>
 
-namespace snir::v3 {
+namespace snir {
 
 struct Printer
 {
@@ -28,4 +28,4 @@ private:
     std::map<ValueId, int> _localValueIds{};
 };
 
-}  // namespace snir::v3
+}  // namespace snir

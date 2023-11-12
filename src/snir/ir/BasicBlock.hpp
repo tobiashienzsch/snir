@@ -4,7 +4,7 @@
 
 #include <vector>
 
-namespace snir::v3 {
+namespace snir {
 
 struct BasicBlock
 {
@@ -12,4 +12,4 @@ struct BasicBlock
     std::vector<ValueId> instructions;
 };
 
-}  // namespace snir::v3
+}  // namespace snir

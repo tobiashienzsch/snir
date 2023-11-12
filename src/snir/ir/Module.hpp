@@ -5,7 +5,7 @@
 
 #include <vector>
 
-namespace snir::v3 {
+namespace snir {
 
 struct Module
 {
@@ -24,4 +24,4 @@ private:
     std::vector<ValueId> _functions;
 };
 
-}  // namespace snir::v3
+}  // namespace snir

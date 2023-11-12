@@ -11,7 +11,7 @@
 #include "snir/core/print.hpp"
 #include "snir/core/unreachable.hpp"
 
-namespace snir::v3 {
+namespace snir {
 
 auto Interpreter::execute(Function const& func, std::span<ValueId const> args)
     -> std::optional<Literal>
@@ -178,4 +178,4 @@ auto Interpreter::execute(Function const& func, std::span<ValueId const> args)
     return std::nullopt;
 }
 
-}  // namespace snir::v3
+}  // namespace snir

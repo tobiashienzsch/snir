@@ -2,8 +2,8 @@
 
 #include <entt/entity/registry.hpp>
 
-namespace snir::v3 {
+namespace snir {
 
 using ValueId = entt::entity;
 
-}  // namespace snir::v3
+}  // namespace snir

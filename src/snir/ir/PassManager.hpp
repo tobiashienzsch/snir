@@ -7,7 +7,7 @@
 #include <iostream>
 #include <memory>
 
-namespace snir::v3 {
+namespace snir {
 
 struct PassManager
 {
@@ -65,4 +65,4 @@ private:
     bool _log;
 };
 
-}  // namespace snir::v3
+}  // namespace snir

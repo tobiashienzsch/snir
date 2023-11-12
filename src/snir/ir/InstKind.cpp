@@ -5,7 +5,7 @@
 
 #include <algorithm>
 
-namespace snir::v3 {
+namespace snir {
 
 auto parseInstKind(std::string_view source) -> InstKind
 {
@@ -29,4 +29,4 @@ auto parseInstKind(std::string_view source) -> InstKind
     return found->kind;
 }
 
-}  // namespace snir::v3
+}  // namespace snir

@@ -8,7 +8,7 @@
 #include <optional>
 #include <span>
 
-namespace snir::v3 {
+namespace snir {
 
 struct Interpreter
 {
@@ -21,4 +21,4 @@ private:
     std::map<ValueId, Literal> _registers;
 };
 
-}  // namespace snir::v3
+}  // namespace snir
