@@ -315,7 +315,7 @@ auto Parser::readBranchInst(std::string_view src) -> std::optional<ValueId>
         br.emplace<InstKind>(InstKind::Branch);
         br.emplace<Type>(Type::Bool);
         br.emplace<Operands>();
-        br.emplace<Branch>(Branch{iftrue, std::nullopt, std::nullopt});
+        br.emplace<Branch>(iftrue, std::nullopt, std::nullopt);
         return br;
     }
 
@@ -329,7 +329,7 @@ auto Parser::readBranchInst(std::string_view src) -> std::optional<ValueId>
         br.emplace<InstKind>(InstKind::Branch);
         br.emplace<Type>(Type::Bool);
         br.emplace<Operands>();
-        br.emplace<Branch>(Branch{iftrue, iffalse, condition});
+        br.emplace<Branch>(iftrue, iffalse, condition);
         return br;
     }
 
@@ -367,6 +367,7 @@ auto Parser::getOrCreateLocal(std::string_view token, ValueKind kind) -> Value
 
     auto val = Value{*_registry, _registry->create()};
     val.emplace<ValueKind>(kind);
+    _locals.emplace(token, val);
     return val;
 }
 
