@@ -9,29 +9,24 @@
 
 namespace snir {
 
-struct Edge
-{
-    std::uint32_t source;
-    std::uint32_t sink;
-};
-
-struct Node
-{
-    std::function<double(double)> Handler = nullptr;
-};
-
 struct Graph
 {
-    using value_type = std::pair<std::uint32_t, Node>;
+    using Node = std::uint32_t;
 
-    Graph(std::initializer_list<value_type> ilist) : _nodes(ilist) {}
+    struct Edge
+    {
+        std::uint32_t source;
+        std::uint32_t sink;
+    };
 
-    auto add(std::uint32_t id, Node node) -> bool
+    Graph(std::initializer_list<Node> ilist) : _nodes(ilist) {}
+
+    auto add(std::uint32_t id) -> bool
     {
         if (idExists(id)) {
             return false;
         }
-        _nodes.emplace_back(id, std::move(node));
+        _nodes.emplace_back(id);
         sortNodes();
         return true;
     }
@@ -40,18 +35,6 @@ struct Graph
     {
         _edges.emplace_back(Edge{source, sink});
         sortEdges();
-    }
-
-    [[nodiscard]] auto node(std::uint32_t id) -> Node&
-    {
-        auto sameID = [id](auto const& n) { return n.first == id; };
-        return std::find_if(begin(_nodes), end(_nodes), sameID)->second;
-    }
-
-    [[nodiscard]] auto node(std::uint32_t id) const -> Node const&
-    {
-        auto sameID = [id](auto const& n) { return n.first == id; };
-        return std::find_if(begin(_nodes), end(_nodes), sameID)->second;
     }
 
     [[nodiscard]] auto size() const noexcept -> std::size_t { return _nodes.size(); }
@@ -91,16 +74,10 @@ struct Graph
 private:
     [[nodiscard]] auto idExists(std::uint32_t id) const noexcept -> bool
     {
-        auto equal = [id](auto const& node) { return node.first == id; };
-        return std::find_if(begin(_nodes), end(_nodes), equal) != end(_nodes);
+        return std::find(begin(_nodes), end(_nodes), id) != end(_nodes);
     }
 
-    auto sortNodes() -> void
-    {
-        std::sort(begin(_nodes), end(_nodes), [](auto const& lhs, auto const& rhs) {
-            return lhs.first < rhs.first;
-        });
-    }
+    auto sortNodes() -> void { std::sort(begin(_nodes), end(_nodes)); }
 
     auto sortEdges() -> void
     {
@@ -109,7 +86,7 @@ private:
         });
     }
 
-    std::vector<value_type> _nodes;
+    std::vector<Node> _nodes;
     std::vector<Edge> _edges;
 };
 
