@@ -5,6 +5,7 @@
 #include "snir/ir/Interpreter.hpp"
 #include "snir/ir/Literal.hpp"
 #include "snir/ir/Parser.hpp"
+#include "snir/ir/pass/ControlFlowGraph.hpp"
 #include "snir/ir/pass/DeadStoreElimination.hpp"
 #include "snir/ir/pass/RemoveEmptyBlock.hpp"
 #include "snir/ir/pass/RemoveNop.hpp"
@@ -74,6 +75,7 @@ auto main(int argc, char const* const* argv) -> int
     // Add passes
     auto pm  = snir::PassManager{args->verbose, std::cout};
     auto opt = snir::PassManager{args->verbose, std::cout};
+    opt.add(snir::ControlFlowGraph{});
     opt.add(snir::DeadStoreElimination{});
     opt.add(snir::RemoveNop{});
     opt.add(snir::RemoveEmptyBlock{});
