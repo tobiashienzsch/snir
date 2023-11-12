@@ -16,6 +16,7 @@ target_sources(snir
         snir/ir/v3/Interpreter.cpp
         snir/ir/v3/Literal.cpp
         snir/ir/v3/Parser.cpp
+        snir/ir/v3/PassManager.cpp
         snir/ir/v3/Printer.cpp
         snir/ir/v3/Type.cpp
         snir/vm/interpreter.cpp

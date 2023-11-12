@@ -23,27 +23,35 @@ Printer::Printer(std::ostream& out) : _out{out} {}
 auto Printer::operator()(Module& module) -> void
 {
     auto& reg = module.getRegistry();
-    auto view = reg.view<Type, Identifier, FunctionDefinition>();
 
     for (auto funcId : module.getFunctions()) {
         _nextLocalValueId = 0;
 
-        auto func = Value{reg, funcId};
-
-        auto const [type, name, def] = view.get(func);
-        print(_out, "define {} @{}", type, name.text);
-        printFunction(module, def);
-        println(_out, "");
+        auto funcVal = Value{reg, funcId};
+        auto func    = Function{funcVal};
+        (*this)(func);
     }
 }
 
-auto Printer::printFunction(Module& module, FunctionDefinition const& func) -> void
+auto Printer::operator()(Function& function) -> void
 {
-    if (func.args.empty()) {
+    auto& reg         = *function.getValue().registry();
+    auto view         = reg.view<Type, Identifier, FunctionDefinition>();
+    _nextLocalValueId = 0;
+
+    auto const [type, identifier, def] = view.get(function.getValue());
+    print(_out, "define {} @{}", type, identifier.text);
+    printFunction(function);
+    println(_out, "");
+}
+
+auto Printer::printFunction(Function& func) -> void
+{
+    if (func.getArguments().empty()) {
         print(_out, "()");
     } else {
-        auto types = module.getRegistry().view<Type>();
-        auto a0    = func.args.at(0);
+        auto types = func.getValue().registry()->view<Type>();
+        auto a0    = func.getArguments().at(0);
 
         auto printArg = [this, &types](ValueId arg) {
             print(_out, ", {} %{}", std::get<0>(types.get(arg)), getLocalId(arg));
@@ -51,23 +59,23 @@ auto Printer::printFunction(Module& module, FunctionDefinition const& func) -> v
 
         print(_out, "({} %{}", std::get<0>(types.get(a0)), getLocalId(a0));
         std::ranges::for_each(
-            std::ranges::next(std::ranges::begin(func.args)),
-            std::ranges::end(func.args),
+            std::ranges::next(std::ranges::begin(func.getArguments())),
+            std::ranges::end(func.getArguments()),
             printArg
         );
         print(_out, ")");
     }
 
     println(_out, " {{");
-    for (auto const& block : func.blocks) {
-        printBasicBlock(module, block);
+    for (auto const& block : func.getBasicBlocks()) {
+        printBasicBlock(func, block);
     }
     println(_out, "}}");
 }
 
-auto Printer::printBasicBlock(Module& module, BasicBlock const& block) -> void
+auto Printer::printBasicBlock(Function& func, BasicBlock const& block) -> void
 {
-    auto& reg      = module.getRegistry();
+    auto& reg      = *func.getValue().registry();
     auto common    = reg.view<InstKind, Type>();
     auto result    = reg.view<Result>();
     auto operands  = reg.view<Operands>();

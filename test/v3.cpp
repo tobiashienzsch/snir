@@ -5,6 +5,7 @@
 #include "snir/ir/v3/Interpreter.hpp"
 #include "snir/ir/v3/Literal.hpp"
 #include "snir/ir/v3/Parser.hpp"
+#include "snir/ir/v3/PassManager.hpp"
 #include "snir/ir/v3/Printer.hpp"
 #include "snir/ir/v3/Registry.hpp"
 #include "snir/ir/v3/Type.hpp"
@@ -164,8 +165,10 @@ auto main() -> int
             }
         }
 
+        auto pm      = ir::PassManager{true};
         auto printer = ir::Printer{std::cout};
-        printer(*module);
+        pm.add(std::ref(printer));
+        pm(*module);
     }
 
     return 0;
