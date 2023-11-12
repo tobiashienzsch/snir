@@ -1,5 +1,7 @@
 #pragma once
 
+#include "snir/ir/v3/Type.hpp"
+
 #include <cstdint>
 #include <format>
 #include <variant>
@@ -10,6 +12,8 @@ struct Literal
 {
     std::variant<bool, std::int64_t, float, double> value;
 };
+
+[[nodiscard]] auto parseLiteral(std::string_view src, Type type) -> Literal;
 
 }  // namespace snir::v3
 

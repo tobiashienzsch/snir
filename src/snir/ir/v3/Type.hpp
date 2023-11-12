@@ -12,6 +12,8 @@ enum struct Type : std::uint8_t
 #undef SNIR_TYPE
 };
 
+[[nodiscard]] auto parseType(std::string_view source) -> Type;
+
 }  // namespace snir::v3
 
 template<>

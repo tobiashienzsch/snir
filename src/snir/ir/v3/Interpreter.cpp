@@ -145,6 +145,8 @@ auto Interpreter::execute(FunctionDefinition const& func, std::span<ValueId cons
                 case InstKind::FloatDiv: executeBinaryFloatOp(inst, type, std::divides{}); break;
                 case InstKind::IntCmp: executeIntCmp(inst); break;
                 case InstKind::Return: return executeReturn(inst, type);
+                case InstKind::Branch:
+                case InstKind::Phi:
                 default: raisef<std::runtime_error>("unimplemented: {}<{}>", kind, type);
             }
         }

@@ -12,6 +12,8 @@ enum struct CompareKind
 #undef SNIR_COMPARE
 };
 
+[[nodiscard]] auto parseCompareKind(std::string_view src) -> CompareKind;
+
 }  // namespace snir::v3
 
 template<>

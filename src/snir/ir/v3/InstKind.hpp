@@ -12,6 +12,8 @@ enum struct InstKind : std::uint8_t
 #undef SNIR_INSTRUCTION
 };
 
+[[nodiscard]] auto parseInstKind(std::string_view source) -> InstKind;
+
 }  // namespace snir::v3
 
 template<>

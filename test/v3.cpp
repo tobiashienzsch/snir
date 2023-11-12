@@ -23,7 +23,7 @@ namespace ir = snir::v3;
 struct FunctionTestSpec
 {
     std::string name{};
-    std::string type{};
+    ir::Type type{};
     std::size_t args{std::numeric_limits<std::size_t>::max()};
     std::size_t blocks{std::numeric_limits<std::size_t>::max()};
     std::size_t instructions{std::numeric_limits<std::size_t>::max()};
@@ -72,7 +72,7 @@ auto forEachLine(std::string_view str, auto callback) -> void
             return;
         }
         if (auto match = ctre::match<R"(;\s+type:\s+(\w+))">(line); match) {
-            test.type = match.get<1>();
+            test.type = ir::parseType(match.get<1>());
             return;
         }
         if (auto match = ctre::match<R"(;\s+args:\s+(\d+))">(line); match) {
@@ -89,25 +89,25 @@ auto forEachLine(std::string_view str, auto callback) -> void
         }
         if (auto match = ctre::match<R"(;\s+return:\s+(\S+))">(line); match) {
             auto const literal = snir::strings::trim(match.get<1>());
-            if (test.type == "void") {
+            if (test.type == ir::Type::Void) {
                 assert(literal == "void");
                 snir::println("parse void");
                 test.result = ir::Literal{std::nan("")};
                 return;
             }
-            if (test.type == "i1") {
+            if (test.type == ir::Type::Bool) {
                 test.result = ir::Literal{literal == "true"};
                 return;
             }
-            if (test.type == "i64") {
+            if (test.type == ir::Type::Int64) {
                 test.result = ir::Literal{snir::strings::parse<std::int64_t>(literal)};
                 return;
             }
-            if (test.type == "float") {
+            if (test.type == ir::Type::Float) {
                 test.result = ir::Literal{snir::strings::parse<float>(literal)};
                 return;
             }
-            if (test.type == "double") {
+            if (test.type == ir::Type::Double) {
                 test.result = ir::Literal{snir::strings::parse<double>(literal)};
                 return;
             }
@@ -136,7 +136,7 @@ auto main() -> int
         auto const funcId   = module->getFunctions().at(0);
         auto const funcView = registry.view<ir::Type, ir::Identifier, ir::FunctionDefinition>();
         auto const [type, name, func] = funcView.get(funcId);
-        assert(std::format("{}", type) == test.type);
+        assert(type == test.type);
         assert(name.text == test.name);
         assert(func.args.size() == test.args);
         assert(func.blocks.size() == test.blocks);
