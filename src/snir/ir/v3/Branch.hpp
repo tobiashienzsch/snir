@@ -8,9 +8,9 @@ namespace snir::v3 {
 
 struct Branch
 {
-    ValueId iftrue;
-    std::optional<ValueId> iffalse;
-    std::optional<ValueId> condition;
+    ValueId iftrue{};
+    std::optional<ValueId> iffalse{};
+    std::optional<ValueId> condition{};
 };
 
 }  // namespace snir::v3

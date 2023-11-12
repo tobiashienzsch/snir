@@ -146,10 +146,10 @@ auto Parser::readBinaryInst(std::string_view source) -> std::optional<ValueId>
     return std::nullopt;
 }
 
-auto Parser::readIntCmpInst(std::string_view src) -> std::optional<ValueId>
+auto Parser::readIntCmpInst(std::string_view source) -> std::optional<ValueId>
 {
     // <result> = icmp eq i32 4, 5
-    auto match = ctre::match<R"(%(\d+)\s+=\s+icmp\s+(\w+)\s+(\w+)\s+%(\d+),\s+%(\d+))">(src);
+    auto match = ctre::match<R"(%(\d+)\s+=\s+icmp\s+(\w+)\s+(\w+)\s+%(\d+),\s+%(\d+))">(source);
     if (match) {
         auto const result = getOrCreateLocal(match.get<1>(), ValueKind::Register);
         auto const cmp    = parseCompareKind(match.get<2>());
@@ -170,10 +170,10 @@ auto Parser::readIntCmpInst(std::string_view src) -> std::optional<ValueId>
     return std::nullopt;
 }
 
-auto Parser::readTruncInst(std::string_view src) -> std::optional<ValueId>
+auto Parser::readTruncInst(std::string_view source) -> std::optional<ValueId>
 {
     // %2 = trunc %1 to float
-    if (auto match = ctre::match<R"(%(\d+)\s+=\s+trunc\s+%(\d+)\s+to\s+(\w+))">(src); match) {
+    if (auto match = ctre::match<R"(%(\d+)\s+=\s+trunc\s+%(\d+)\s+to\s+(\w+))">(source); match) {
         auto const result = getOrCreateLocal(match.get<1>(), ValueKind::Register);
         auto const value  = getOrCreateLocal(match.get<2>(), ValueKind::Register);
         auto const type   = parseType(match.get<3>());
@@ -190,9 +190,9 @@ auto Parser::readTruncInst(std::string_view src) -> std::optional<ValueId>
     return std::nullopt;
 }
 
-auto Parser::readReturnInst(std::string_view src) -> std::optional<ValueId>
+auto Parser::readReturnInst(std::string_view source) -> std::optional<ValueId>
 {
-    if (auto match = ctre::match<R"(ret\s+(\w+)\s+(\S+))">(src); match) {
+    if (auto match = ctre::match<R"(ret\s+(\w+)\s+(\S+))">(source); match) {
         auto const type            = parseType(match.get<1>());
         auto const [opKind, opSrc] = parseIdentifier(match.get<2>());
         auto const operand         = getOrCreateLocal(opSrc, ValueKind::Register);
@@ -205,7 +205,7 @@ auto Parser::readReturnInst(std::string_view src) -> std::optional<ValueId>
         return ret;
     }
 
-    if (auto match = ctre::match<R"(ret\s+(\w+))">(src); match) {
+    if (auto match = ctre::match<R"(ret\s+(\w+))">(source); match) {
         if (match.get<1>() == "void") {
             auto ret = Value{*_registry, _registry->create()};
             ret.emplace<ValueKind>(ValueKind::Instruction);
@@ -219,9 +219,9 @@ auto Parser::readReturnInst(std::string_view src) -> std::optional<ValueId>
     return std::nullopt;
 }
 
-auto Parser::readBranchInst(std::string_view src) -> std::optional<ValueId>
+auto Parser::readBranchInst(std::string_view source) -> std::optional<ValueId>
 {
-    if (auto m = ctre::match<R"(br\s+label\s+(\S+))">(src); m) {
+    if (auto m = ctre::match<R"(br\s+label\s+(\S+))">(source); m) {
         auto const iftrue = getOrCreateLocal(m.get<1>().view().substr(1), ValueKind::Label);
 
         auto br = Value{*_registry, _registry->create()};
@@ -233,7 +233,7 @@ auto Parser::readBranchInst(std::string_view src) -> std::optional<ValueId>
         return br;
     }
 
-    if (auto m = ctre::match<R"(br\s+i1\s+%(\d+),\s+label\s+%(\d+),\s+label\s+%(\d+))">(src); m) {
+    if (auto m = ctre::match<R"(br\s+i1\s+%(\d+),\s+label\s+%(\d+),\s+label\s+%(\d+))">(source); m) {
         auto const condition = getOrCreateLocal(m.get<1>(), ValueKind::Register);
         auto const iftrue    = getOrCreateLocal(m.get<2>(), ValueKind::Label);
         auto const iffalse   = getOrCreateLocal(m.get<3>(), ValueKind::Label);

@@ -21,7 +21,7 @@ auto parseInstKind(std::string_view source) -> InstKind
 #undef SNIR_INSTRUCTION
     };
 
-    auto found = std::ranges::find(names, strings::trim(source), &InstName::name);
+    auto const* found = std::ranges::find(names, strings::trim(source), &InstName::name);
     if (found == std::ranges::end(names)) {
         raisef<std::invalid_argument>("failed to parse '{}' as InstKind", source);
     }
