@@ -12,9 +12,20 @@ struct Function
 {
     explicit Function(Value value) noexcept : _value{value} {}
 
-    [[nodiscard]] auto getValue() const -> Value { return _value; }
+    [[nodiscard]] static auto create(Registry& reg, Type type) -> Function
+    {
+        auto func = Value{reg, reg.create()};
+        func.emplace<ValueKind>(ValueKind::Function);
+        func.emplace<Type>(type);
+        return Function{func};
+    }
 
     [[nodiscard]] auto getType() const -> Type { return _value.get<Type>(); }
+
+    auto setIdentifier(std::string_view text) const -> void
+    {
+        _value.emplace_or_replace<Identifier>(std::string{text});
+    }
 
     [[nodiscard]] auto getIdentifier() const -> std::string_view
     {
@@ -40,6 +51,12 @@ struct Function
     {
         return _value.get<FunctionDefinition>().blocks;
     }
+
+    [[nodiscard]] auto getValue() const noexcept -> Value { return _value; }
+
+    [[nodiscard]] operator Value() const noexcept { return _value; }
+
+    [[nodiscard]] operator ValueId() const noexcept { return _value; }
 
 private:
     Value _value;

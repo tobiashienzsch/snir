@@ -2,6 +2,7 @@
 
 #include "snir/ir/Branch.hpp"
 #include "snir/ir/CompareKind.hpp"
+#include "snir/ir/Function.hpp"
 #include "snir/ir/FunctionDefinition.hpp"
 #include "snir/ir/Identifier.hpp"
 #include "snir/ir/InstKind.hpp"
@@ -30,11 +31,12 @@ auto Parser::read(std::string_view source) -> std::optional<Module>
         for (auto m : ctre::range<R"(define\s+(\w+)\s+@(\w+)\(([^)]*)\)\s*\{([^}]*)\})">(source)) {
             _locals.clear();
 
-            auto func = Value{*_registry, _registry->create()};
-            func.emplace<ValueKind>(ValueKind::Function);
-            func.emplace<Type>(parseType(m.get<1>()));
-            func.emplace<Identifier>(m.get<2>().to_string());
-            func.emplace<FunctionDefinition>(readArguments(m.get<3>()), readBlocks(m.get<4>()));
+            auto func = Function::create(*_registry, parseType(m.get<1>()));
+            func.setIdentifier(m.get<2>());
+            func.getValue().emplace<FunctionDefinition>(
+                readArguments(m.get<3>()),
+                readBlocks(m.get<4>())
+            );
 
             module.getFunctions().push_back(func);
         }
@@ -257,8 +259,7 @@ auto Parser::getOrCreateLocal(std::string_view token, ValueKind kind) -> Value
         return Value{*_registry, found->second};
     }
 
-    auto val = Value{*_registry, _registry->create()};
-    val.emplace<ValueKind>(kind);
+    auto val = createValue(*_registry, kind);
     _locals.emplace(token, val);
     return val;
 }
