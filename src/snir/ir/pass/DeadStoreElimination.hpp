@@ -1,5 +1,6 @@
 #pragma once
 
+#include "snir/ir/AnalysisManager.hpp"
 #include "snir/ir/Function.hpp"
 #include "snir/ir/Instruction.hpp"
 #include "snir/ir/Operands.hpp"
@@ -18,7 +19,7 @@ struct DeadStoreElimination
 
     DeadStoreElimination() = default;
 
-    auto operator()(Function& f) -> void
+    auto operator()(Function& f, AnalysisManager<Function>& /*analysis*/) -> void
     {
         _used.clear();
         auto* reg    = f.getValue().registry();

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "snir/graph/Graph.hpp"
+#include "snir/ir/AnalysisManager.hpp"
 #include "snir/ir/Function.hpp"
 #include "snir/ir/Registry.hpp"
 
@@ -13,9 +14,15 @@ struct ControlFlowGraph
 {
     static constexpr auto name = std::string_view{"ControlFlowGraph"};
 
+    struct Result
+    {
+        std::map<ValueId, std::uint32_t> nodeIds;
+        Graph<std::uint32_t> graph;
+    };
+
     ControlFlowGraph() = default;
 
-    auto operator()(Function const& func) -> void;
+    auto operator()(Function const& func, AnalysisManager<Function>& analysis) -> void;
 
 private:
     auto addBlockToGraph(BasicBlock const& block) -> void;

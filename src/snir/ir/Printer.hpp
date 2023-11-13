@@ -1,5 +1,6 @@
 #pragma once
 
+#include "snir/ir/AnalysisManager.hpp"
 #include "snir/ir/BasicBlock.hpp"
 #include "snir/ir/Function.hpp"
 #include "snir/ir/Module.hpp"
@@ -16,7 +17,7 @@ struct Printer
     explicit Printer(std::ostream& out);
 
     auto operator()(Module& module) -> void;
-    auto operator()(Function& func) -> void;
+    auto operator()(Function& func, AnalysisManager<Function>& analysis) -> void;
 
 private:
     auto printFunction(Function& func) -> void;

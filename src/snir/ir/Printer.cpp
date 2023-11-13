@@ -22,15 +22,16 @@ Printer::Printer(std::ostream& out) : _out{out} {}
 
 auto Printer::operator()(Module& module) -> void
 {
-    auto& reg = module.getRegistry();
+    auto& reg  = module.getRegistry();
+    auto dummy = AnalysisManager<Function>{};
 
     for (auto funcId : module.getFunctions()) {
         auto func = Function(Value{reg, funcId});
-        (*this)(func);
+        (*this)(func, dummy);
     }
 }
 
-auto Printer::operator()(Function& function) -> void
+auto Printer::operator()(Function& function, AnalysisManager<Function>& /*analysis*/) -> void
 {
     _nextLocalValueId = 0;
     _localValueIds.clear();

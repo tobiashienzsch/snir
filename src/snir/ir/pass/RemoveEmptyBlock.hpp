@@ -1,5 +1,6 @@
 #pragma once
 
+#include "snir/ir/AnalysisManager.hpp"
 #include "snir/ir/Function.hpp"
 #include "snir/ir/InstKind.hpp"
 
@@ -11,7 +12,7 @@ struct RemoveEmptyBlock
 
     RemoveEmptyBlock() = default;
 
-    auto operator()(Function& func) -> void
+    auto operator()(Function& func, AnalysisManager<Function>& /*analysis*/) -> void
     {
         std::erase_if(func.getBasicBlocks(), [](BasicBlock const& block) {
             return block.instructions.empty();

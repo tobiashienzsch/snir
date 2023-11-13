@@ -1,5 +1,6 @@
 #pragma once
 
+#include "snir/ir/AnalysisManager.hpp"
 #include "snir/ir/Function.hpp"
 #include "snir/ir/InstKind.hpp"
 
@@ -11,7 +12,7 @@ struct RemoveNop
 
     RemoveNop() = default;
 
-    auto operator()(Function& func) -> void
+    auto operator()(Function& func, AnalysisManager<Function>& /*analysis*/) -> void
     {
         auto instKind = func.getValue().registry()->view<InstKind>();
         for (auto& block : func.getBasicBlocks()) {

@@ -9,7 +9,8 @@
 
 namespace snir {
 
-auto ControlFlowGraph::operator()(Function const& func) -> void
+auto ControlFlowGraph::operator()(Function const& func, AnalysisManager<Function>& /*analysis*/)
+    -> void
 {
     _graph.clear();
     _nodeIds.clear();
