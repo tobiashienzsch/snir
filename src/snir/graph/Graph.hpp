@@ -24,6 +24,8 @@ struct Graph
         NodeType sink;
     };
 
+    Graph() = default;
+
     Graph(std::initializer_list<Node> ilist) : _nodes(ilist) {}
 
     auto add(NodeType id) -> void
@@ -35,6 +37,13 @@ struct Graph
         _nodes.emplace_back(id);
         sortNodes();
         return;
+    }
+
+    auto addIfNotContains(NodeType id) -> void
+    {
+        if (not idExists(id)) {
+            add(id);
+        }
     }
 
     auto connect(NodeType source, NodeType sink) -> void
@@ -69,6 +78,12 @@ struct Graph
         for (auto const& node : _nodes) {
             func(node);
         }
+    }
+
+    auto clear() -> void
+    {
+        _nodes.clear();
+        _edges.clear();
     }
 
 private:

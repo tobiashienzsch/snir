@@ -1,6 +1,7 @@
 #pragma once
 
 #include "snir/ir/Function.hpp"
+#include "snir/ir/Instruction.hpp"
 #include "snir/ir/Operands.hpp"
 #include "snir/ir/Result.hpp"
 #include "snir/ir/Value.hpp"
@@ -23,10 +24,7 @@ struct DeadStoreElimination
         auto* reg    = f.getValue().registry();
         auto& blocks = f.getBasicBlocks();
 
-        auto nop = reg->create();
-        reg->emplace<ValueKind>(nop, ValueKind::Instruction);
-        reg->emplace<InstKind>(nop, InstKind::Nop);
-        reg->emplace<Type>(nop, Type::Void);
+        auto nop = Instruction::create(*reg, InstKind::Nop, Type::Void);
 
         for (auto block = std::rbegin(blocks); block != std::rend(blocks); ++block) {
             auto rb = std::rbegin(block->instructions);

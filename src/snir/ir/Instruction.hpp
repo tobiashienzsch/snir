@@ -4,22 +4,25 @@
 #include "snir/ir/Registry.hpp"
 #include "snir/ir/Type.hpp"
 #include "snir/ir/Value.hpp"
+#include "snir/ir/ValueKind.hpp"
 
 namespace snir {
 
 struct Instruction
 {
-    explicit Instruction(Value value) noexcept : _value{value} {}
+    explicit Instruction(Value value) noexcept;
+    Instruction(Registry& registry, ValueId id) noexcept;
 
-    explicit Instruction(Registry& registry, ValueId id) noexcept : _value{registry, id} {}
+    [[nodiscard]] static auto create(Registry& reg, InstKind kind, Type type) -> Instruction;
 
-    [[nodiscard]] auto getValue() const -> Value { return _value; }
+    [[nodiscard]] auto getKind() const -> InstKind;
+    [[nodiscard]] auto getType() const -> Type;
 
-    [[nodiscard]] auto getKind() const -> InstKind { return _value.get<InstKind>(); }
+    [[nodiscard]] auto isTerminator() const -> bool;
 
-    [[nodiscard]] auto getType() const -> Type { return _value.get<Type>(); }
-
-    [[nodiscard]] explicit(false) operator ValueId() const noexcept { return _value; }
+    [[nodiscard]] auto getValue() const -> Value;
+    [[nodiscard]] explicit(false) operator Value() const noexcept;
+    [[nodiscard]] explicit(false) operator ValueId() const noexcept;
 
 private:
     Value _value;
