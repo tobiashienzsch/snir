@@ -16,6 +16,13 @@ namespace snir::strings {
     return str.find(sub) != std::string_view::npos;
 }
 
+[[nodiscard]] inline auto removeSuffix(std::string_view str, std::string_view::size_type n)
+    -> std::string_view
+{
+    str.remove_suffix(n);
+    return str;
+}
+
 [[nodiscard]] inline auto trim(std::string_view str, std::string_view whitespace = " \t")
     -> std::string_view
 {
@@ -27,6 +34,25 @@ namespace snir::strings {
     auto const last  = str.find_last_not_of(whitespace);
     auto const range = last - first + 1;
     return str.substr(first, range);
+}
+
+auto forEachLine(std::string_view str, auto callback) -> void
+{
+    if (str.empty()) {
+        return;
+    }
+
+    auto first = 0;
+    while (true) {
+        auto const last = str.find_first_of('\n', first);
+        if (last == std::string_view::npos) {
+            return;
+        }
+
+        auto const line = str.substr(first, last - first);
+        callback(line);
+        first = last + 1;
+    }
 }
 
 template<typename NumberType>

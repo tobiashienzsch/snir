@@ -22,7 +22,6 @@ struct Parser
 private:
     [[nodiscard]] auto readArguments(std::string_view source) -> std::vector<ValueId>;
     [[nodiscard]] auto readBlocks(std::string_view source) -> std::vector<BasicBlock>;
-    [[nodiscard]] auto readBlock(std::string_view source) -> BasicBlock;
     [[nodiscard]] auto readInst(std::string_view source) -> std::optional<ValueId>;
     [[nodiscard]] auto readBinaryInst(std::string_view source) -> std::optional<ValueId>;
     [[nodiscard]] auto readIntCmpInst(std::string_view source) -> std::optional<ValueId>;

@@ -95,32 +95,37 @@ auto Parser::readInst(std::string_view source) -> std::optional<ValueId>
 
 auto Parser::readBlocks(std::string_view source) -> std::vector<BasicBlock>
 {
-    auto blocks = std::vector<BasicBlock>{};
+    auto blocks  = std::vector<BasicBlock>{};
+    auto current = std::optional<BasicBlock>{};
 
-    for (auto match : ctre::split<R"(\d+:)">(source)) {
-        auto const str = strings::trim(match, " \t\n");
+    strings::forEachLine(source, [&, this](std::string_view line) {
+        auto const str = strings::trim(line);
         if (str.empty()) {
-            continue;
+            return;
         }
 
-        blocks.push_back(readBlock(str));
+        if (auto match = ctre::match<R"((\d+):)">(str); match) {
+            auto token  = match.view();
+            auto number = strings::removeSuffix(token, 1);
+            if (current) {
+                blocks.push_back(std::move(*current));
+                current = std::nullopt;
+            }
+
+            current = BasicBlock{getOrCreateLocal(number, ValueKind::Label), {}};
+            return;
+        }
+
+        if (auto const inst = readInst(strings::trim(line, " \t")); inst) {
+            current->instructions.push_back(*inst);
+        }
+    });
+
+    if (current) {
+        blocks.push_back(std::move(*current));
     }
 
     return blocks;
-}
-
-auto Parser::readBlock(std::string_view source) -> BasicBlock
-{
-    auto label = _registry->create();
-    _registry->emplace<ValueKind>(label, ValueKind::Label);
-
-    auto block = BasicBlock{.label = label, .instructions = {}};
-    for (auto match : ctre::split<R"(\n)">(source)) {
-        if (auto const inst = readInst(strings::trim(match, " \t")); inst) {
-            block.instructions.push_back(*inst);
-        }
-    }
-    return block;
 }
 
 // NOLINTNEXTLINE(readability-function-cognitive-complexity)

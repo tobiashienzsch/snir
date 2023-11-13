@@ -42,30 +42,11 @@ struct FunctionTestSpec
     return s.substr(endOfStart, stopPos - endOfStart);
 }
 
-auto forEachLine(std::string_view str, auto callback) -> void
-{
-    if (str.empty()) {
-        return;
-    }
-
-    auto first = 0;
-    while (true) {
-        auto const last = str.find_first_of('\n', first);
-        if (last == std::string_view::npos) {
-            return;
-        }
-
-        auto const line = str.substr(first, last - first);
-        callback(line);
-        first = last + 1;
-    }
-}
-
 [[nodiscard]] auto parseFunctionTestSpec(std::string_view source) -> FunctionTestSpec
 {
     auto spec = getBetween(source, "; BEGIN_TEST", "; END_TEST");
     auto test = FunctionTestSpec{};
-    forEachLine(spec, [&](std::string_view line) {
+    snir::strings::forEachLine(spec, [&](std::string_view line) {
         auto trimmed = snir::strings::trim(line);
         if (trimmed.empty()) {
             return;
