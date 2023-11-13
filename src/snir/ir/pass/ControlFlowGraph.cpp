@@ -10,7 +10,7 @@
 namespace snir {
 
 auto ControlFlowGraph::operator()(Function const& func, AnalysisManager<Function>& /*analysis*/)
-    -> void
+    -> Result
 {
     _graph.clear();
     _nodeIds.clear();
@@ -19,19 +19,21 @@ auto ControlFlowGraph::operator()(Function const& func, AnalysisManager<Function
 
     auto const& blocks = func.getBasicBlocks();
     if (blocks.empty()) {
-        return;
+        return {};
     }
 
+    println("; CFG for '{}': ", func.getIdentifier());
     for (auto const& block : blocks) {
         addBlockToGraph(block);
     }
 
+    print("; ");
     auto const order = topologicalSort(_graph);
-    println("CFG for '{}': ", func.getIdentifier());
     for (auto node : order) {
         print("{} -> ", int(getValueForId(node)));
     }
     println("return");
+    return {_nodeIds, _graph};
 }
 
 auto ControlFlowGraph::addBlockToGraph(BasicBlock const& block) -> void
@@ -49,12 +51,12 @@ auto ControlFlowGraph::addBlockToGraph(BasicBlock const& block) -> void
     auto terminal = Instruction{*_registry, block.instructions.back()};
     auto kind     = terminal.getKind();
     if (kind == InstKind::Return) {
-        println("return in block {}", int(getValueForId(node)));
+        println("; return in block {}", int(getValueForId(node)));
     }
     if (kind == InstKind::Branch) {
         auto const [branch] = branchView.get(terminal);
         auto const dest     = getOrCreateNodeId(branch.iftrue);
-        println("branch in block {} to {}", int(getValueForId(node)), int(getValueForId(dest)));
+        println("; branch in block {} to {}", int(getValueForId(node)), int(getValueForId(dest)));
         _graph.addIfNotContains(dest);
         _graph.connect(node, dest);
     }

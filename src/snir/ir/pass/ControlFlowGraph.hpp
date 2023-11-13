@@ -22,7 +22,7 @@ struct ControlFlowGraph
 
     ControlFlowGraph() = default;
 
-    auto operator()(Function const& func, AnalysisManager<Function>& analysis) -> void;
+    auto operator()(Function const& func, AnalysisManager<Function>& analysis) -> Result;
 
 private:
     auto addBlockToGraph(BasicBlock const& block) -> void;

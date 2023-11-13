@@ -133,19 +133,6 @@ auto main() -> int
         }
         assert(instCount == test.instructions);
 
-        if (func.args.empty()) {
-            auto vm     = snir::Interpreter{};
-            auto result = vm.execute(snir::Function{funcVal}, {});
-            assert(result.has_value());
-
-            snir::println("; return: {} as {}", *result, type);
-            if (type == snir::Type::Void) {
-                assert(std::isnan(std::get<double>(result->value)));
-            } else {
-                assert(result->value == test.result.value);
-            }
-        }
-
         auto opt = snir::PassManager{true};
         opt.add(snir::DeadStoreElimination{});
         opt.add(snir::RemoveNop{});
@@ -158,6 +145,19 @@ auto main() -> int
         pm.add(std::ref(opt));
         pm.add(std::ref(printer));
         pm(*module);
+
+        if (func.args.empty()) {
+            auto vm     = snir::Interpreter{};
+            auto result = vm.execute(snir::Function{funcVal}, {});
+            assert(result.has_value());
+
+            snir::println("; return: {} as {}", *result, type);
+            if (type == snir::Type::Void) {
+                assert(std::isnan(std::get<double>(result->value)));
+            } else {
+                assert(result->value == test.result.value);
+            }
+        }
     }
 
     return 0;

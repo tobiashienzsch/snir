@@ -6,6 +6,7 @@
 #include "snir/ir/InstKind.hpp"
 #include "snir/ir/Literal.hpp"
 #include "snir/ir/Operands.hpp"
+#include "snir/ir/pass/ControlFlowGraph.hpp"
 #include "snir/ir/Result.hpp"
 #include "snir/ir/Type.hpp"
 #include "snir/ir/Value.hpp"
@@ -31,13 +32,15 @@ auto Printer::operator()(Module& module) -> void
     }
 }
 
-auto Printer::operator()(Function& function, AnalysisManager<Function>& /*analysis*/) -> void
+auto Printer::operator()(Function& function, AnalysisManager<Function>& analysis) -> void
 {
     _nextLocalValueId = 0;
     _localValueIds.clear();
 
-    auto& reg = *function.getValue().registry();
-    auto view = reg.view<Type, Identifier, FunctionDefinition>();
+    auto& reg       = *function.getValue().registry();
+    auto view       = reg.view<Type, Identifier, FunctionDefinition>();
+    auto const& cfg = analysis.getResult<ControlFlowGraph>(function);
+    (void)(cfg);
 
     auto const [type, identifier, def] = view.get(function.getValue());
     print(_out, "define {} @{}", type, identifier.text);
