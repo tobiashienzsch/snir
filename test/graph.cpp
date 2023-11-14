@@ -1,4 +1,5 @@
 #include "snir/graph/Graph.hpp"
+#include "snir/graph/AdjacencyList.hpp"
 
 #include "snir/core/print.hpp"
 #include "snir/ir/ValueId.hpp"
@@ -7,6 +8,25 @@
 #include <array>
 #include <cassert>
 #include <map>
+
+auto testAdjacencyList() -> void
+{
+    auto const graph = snir::AdjacencyList<char>{
+        {'A', {'B', 'C'}},
+        {'B', {'D', 'E'}},
+        {'C', {'F'}     },
+        {'D', {}        },
+        {'E', {'F'}     },
+        {'F', {}        },
+    };
+    auto result = std::vector<char>{};
+    snir::dfs(graph, 'A', [&](auto node) {
+        std::printf("node: %c\n", node);
+        result.push_back(node);
+    });
+
+    assert(std::ranges::equal(result, std::array{'A', 'B', 'D', 'E', 'F', 'C'}));
+}
 
 auto testTopologicalSort() -> void
 {
@@ -66,6 +86,7 @@ auto testGraph() -> void
 
 auto main() -> int
 {
+    testAdjacencyList();
     testTopologicalSort();
     testGraph();
     return EXIT_SUCCESS;
