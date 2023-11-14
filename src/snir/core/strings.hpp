@@ -55,6 +55,15 @@ auto forEachLine(std::string_view str, auto callback) -> void
     }
 }
 
+[[nodiscard]] inline auto
+getBetween(std::string_view s, std::string_view start, std::string_view stop) -> std::string_view
+{
+    auto const startPos   = s.find(start);
+    auto const endOfStart = startPos + start.length();
+    auto const stopPos    = s.find(stop);
+    return s.substr(endOfStart, stopPos - endOfStart);
+}
+
 template<typename NumberType>
 [[nodiscard]] auto tryParse(std::string_view str) -> std::optional<NumberType>
 {

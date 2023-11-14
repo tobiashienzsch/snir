@@ -10,10 +10,20 @@
 #include "snir/core/print.hpp"
 #include "snir/core/strings.hpp"
 
+#include <ctre.hpp>
+
 #undef NDEBUG
 #include <cassert>
 
 using namespace snir;
+
+#define CHECK_CONTAINS(str, sub)                                                                     \
+    do {                                                                                             \
+        if (not ::snir::strings::contains((str), (sub))) {                                           \
+            ::snir::println("'{}' does not contain '{}'", (str), (sub));                             \
+            assert(false);                                                                           \
+        }                                                                                            \
+    } while (false)
 
 #define CHECK_THROW_CONTAINS(stmt, msg)                                                              \
     do {                                                                                             \
@@ -22,12 +32,25 @@ using namespace snir;
             (void)((stmt));                                                                          \
             didRun = true;                                                                           \
         } catch ([[maybe_unused]] ::std::exception const& e) {                                       \
-            assert(::snir::strings::contains(e.what(), msg));                                        \
+            CHECK_CONTAINS(e.what(), (msg));                                                         \
         }                                                                                            \
         assert(not didRun);                                                                          \
     } while (false)
 
 namespace {
+
+[[nodiscard]] auto parseErrorMessage(std::string_view source) -> std::string_view
+{
+    auto spec = snir::strings::getBetween(source, "; BEGIN_TEST", "; END_TEST");
+
+    auto const tag       = std::string_view{"error: "};
+    auto const tagPos    = spec.find(tag);
+    auto const msgPos    = tagPos + tag.size();
+    auto const endOfLine = spec.find('\n', tagPos);
+    auto const error     = spec.substr(msgPos, endOfLine - msgPos);
+    return error;
+}
+
 auto testTypeParser() -> void
 {
     assert(parseType("void") == Type::Void);
@@ -108,15 +131,11 @@ auto testParser() -> void
         assert(br.iftrue == blocks.at(1).label);
     }
 
-    try {
-        auto const module = parser.read(std::string_view{R"(
-define i64 @func() {
-0:
-  foo label %1
-}
-)"});
-    } catch (std::exception const& e) {
-        assert(snir::strings::contains(e.what(), "failed to parse 'foo label %1' as an instruction"));
+    for (auto const& entry : std::filesystem::directory_iterator{"./test/files/error"}) {
+        snir::println("; {}", entry.path().string());
+        auto const source = readFile(entry).value();
+        auto const error  = parseErrorMessage(source);
+        CHECK_THROW_CONTAINS(parser.read(source), error);
     }
 }
 

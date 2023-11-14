@@ -33,18 +33,9 @@ struct FunctionTestSpec
     snir::Literal result;
 };
 
-[[nodiscard]] auto getBetween(std::string_view s, std::string_view start, std::string_view stop)
-    -> std::string_view
-{
-    auto const startPos   = s.find(start);
-    auto const endOfStart = startPos + start.length();
-    auto const stopPos    = s.find(stop);
-    return s.substr(endOfStart, stopPos - endOfStart);
-}
-
 [[nodiscard]] auto parseFunctionTestSpec(std::string_view source) -> FunctionTestSpec
 {
-    auto spec = getBetween(source, "; BEGIN_TEST", "; END_TEST");
+    auto spec = snir::strings::getBetween(source, "; BEGIN_TEST", "; END_TEST");
     auto test = FunctionTestSpec{};
     snir::strings::forEachLine(spec, [&](std::string_view line) {
         auto trimmed = snir::strings::trim(line);
@@ -106,6 +97,9 @@ struct FunctionTestSpec
 auto main() -> int
 {
     for (auto const& entry : std::filesystem::directory_iterator{"./test/files"}) {
+        if (not entry.is_regular_file()) {
+            continue;
+        }
         snir::println("; {}", entry.path().string());
 
         auto registry = snir::Registry{};
