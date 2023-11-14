@@ -85,15 +85,19 @@ auto main(int argc, char const* const* argv) -> int
     }
 
     // Print optimized source
-    auto out = std::fstream(args->output, std::ios::out);
-    pm.add(snir::Printer{out});
+    if (not args->output.empty()) {
+        auto out = std::fstream(args->output, std::ios::out);
+        pm.add(snir::Printer{out});
+    }
 
     // Run passes
     pm(*module);
 
-    auto vm     = snir::Interpreter{};
-    auto result = vm.execute(func, {});
-    snir::println("; return: {} as {}", *result, func.getType());
+    if (func.getArguments().empty()) {
+        auto vm     = snir::Interpreter{};
+        auto result = vm.execute(func, {});
+        snir::println("; return: {} as {}", result.value(), func.getType());
+    }
 
     return 0;
 }
