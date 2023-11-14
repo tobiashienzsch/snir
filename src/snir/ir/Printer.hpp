@@ -27,7 +27,7 @@ private:
     [[nodiscard]] auto getLocalId(ValueId value) -> int;
 
     std::reference_wrapper<std::ostream> _out;
-    ControlFlowGraph::Result const* _cfg;
+    ControlFlowGraph::Result const* _cfg{nullptr};
     int _nextLocalValueId{0};
     std::map<ValueId, int> _localValueIds{};
 };

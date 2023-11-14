@@ -36,7 +36,6 @@ struct Graph
 
         _nodes.emplace_back(id);
         sortNodes();
-        return;
     }
 
     auto addIfNotContains(NodeType id) -> void

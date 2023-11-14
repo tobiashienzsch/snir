@@ -32,7 +32,7 @@ private:
     std::uint32_t _nextNodeId{0};
     std::map<ValueId, std::uint32_t> _nodeIds;
     Graph<std::uint32_t> _graph;
-    Registry* _registry;
+    Registry* _registry{nullptr};
 };
 
 }  // namespace snir

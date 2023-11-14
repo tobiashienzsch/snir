@@ -21,7 +21,9 @@ struct Instruction
     [[nodiscard]] auto isTerminator() const -> bool;
 
     [[nodiscard]] auto getValue() const -> Value;
+    // NOLINTNEXTLINE(hicpp-explicit-conversions)
     [[nodiscard]] explicit(false) operator Value() const noexcept;
+    // NOLINTNEXTLINE(hicpp-explicit-conversions)
     [[nodiscard]] explicit(false) operator ValueId() const noexcept;
 
 private:

@@ -66,9 +66,11 @@ struct Function
 
     [[nodiscard]] auto getValue() const noexcept -> Value { return _value; }
 
-    [[nodiscard]] operator Value() const noexcept { return _value; }
+    // NOLINTNEXTLINE(hicpp-explicit-conversions)
+    [[nodiscard]] explicit(false) operator Value() const noexcept { return _value; }
 
-    [[nodiscard]] operator ValueId() const noexcept { return _value; }
+    // NOLINTNEXTLINE(hicpp-explicit-conversions)
+    [[nodiscard]] explicit(false) operator ValueId() const noexcept { return _value; }
 
 private:
     Value _value;
