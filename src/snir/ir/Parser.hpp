@@ -17,7 +17,7 @@ struct Parser
 {
     explicit Parser(Registry& registry);
 
-    [[nodiscard]] auto read(std::string_view source) -> std::optional<Module>;
+    [[nodiscard]] auto read(std::string_view source) -> Module;
 
 private:
     [[nodiscard]] auto readArguments(std::string_view source) -> std::vector<ValueId>;

@@ -67,7 +67,7 @@ auto main(int argc, char const* const* argv) -> int
     auto source   = snir::readFile(args->input).value();
 
     auto module  = parser.read(source);
-    auto funcId  = module->getFunctions().at(0);
+    auto funcId  = module.getFunctions().at(0);
     auto funcVal = snir::Value{registry, funcId};
     auto func    = snir::Function{funcVal};
 
@@ -91,7 +91,7 @@ auto main(int argc, char const* const* argv) -> int
     }
 
     // Run passes
-    pm(*module);
+    pm(module);
 
     if (func.getArguments().empty()) {
         auto vm     = snir::Interpreter{};

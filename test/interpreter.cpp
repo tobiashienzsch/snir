@@ -5,6 +5,11 @@
 #include "snir/ir/InstKind.hpp"
 #include "snir/ir/Literal.hpp"
 #include "snir/ir/Parser.hpp"
+#include "snir/ir/pass/DeadStoreElimination.hpp"
+#include "snir/ir/pass/RemoveEmptyBlock.hpp"
+#include "snir/ir/pass/RemoveNop.hpp"
+#include "snir/ir/PassManager.hpp"
+#include "snir/ir/Printer.hpp"
 #include "snir/ir/Registry.hpp"
 #include "snir/ir/Type.hpp"
 
@@ -108,15 +113,40 @@ auto main() -> int
         auto source   = snir::readFile(entry).value();
         auto test     = parseFunctionTestSpec(source);
         auto module   = parser.read(source);
-        assert(module.has_value());
-        assert(module->getFunctions().size() == 1);
+        assert(module.getFunctions().size() == 1);
 
-        auto const func = snir::Function{registry, module->getFunctions().at(0)};
+        auto const func = snir::Function{registry, module.getFunctions().at(0)};
         assert(func.getType() == test.type);
         assert(func.getIdentifier() == test.name);
         assert(func.getArguments().size() == test.args);
         assert(func.getBasicBlocks().size() == test.blocks);
         assert(func.getInstructionCount() == test.instructions);
+
+        if (func.getArguments().empty()) {
+            auto vm     = snir::Interpreter{};
+            auto result = vm.execute(func, {});
+            assert(result.has_value());
+
+            snir::println("; return: {} as {}", *result, func.getType());
+            if (func.getType() == snir::Type::Void) {
+                assert(std::isnan(std::get<double>(result->value)));
+            } else {
+                assert(result->value == test.result.value);
+            }
+        }
+
+        auto opt = snir::PassManager{true};
+        opt.add(snir::DeadStoreElimination{});
+        opt.add(snir::RemoveNop{});
+        opt.add(snir::RemoveEmptyBlock{});
+
+        auto pm      = snir::PassManager{true};
+        auto printer = snir::Printer{std::cout};
+        pm.add(std::ref(printer));
+        pm.add(std::ref(opt));
+        pm.add(std::ref(opt));
+        pm.add(std::ref(printer));
+        pm(module);
 
         if (func.getArguments().empty()) {
             auto vm     = snir::Interpreter{};

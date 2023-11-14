@@ -23,26 +23,21 @@ namespace snir {
 
 Parser::Parser(Registry& registry) : _registry{&registry} {}
 
-auto Parser::read(std::string_view source) -> std::optional<Module>
+auto Parser::read(std::string_view source) -> Module
 {
     auto module = Module{*_registry};
 
-    try {
-        for (auto m : ctre::range<R"(define\s+(\w+)\s+@(\w+)\(([^)]*)\)\s*\{([^}]*)\})">(source)) {
-            _locals.clear();
+    for (auto match : ctre::range<R"(define\s+(\w+)\s+@(\w+)\(([^)]*)\)\s*\{([^}]*)\})">(source)) {
+        _locals.clear();
 
-            auto func = Function::create(*_registry, parseType(m.get<1>()));
-            func.setIdentifier(m.get<2>());
-            func.getValue().emplace<FunctionDefinition>(
-                readArguments(m.get<3>()),
-                readBlocks(m.get<4>())
-            );
+        auto func = Function::create(*_registry, parseType(match.get<1>()));
+        func.setIdentifier(match.get<2>());
+        func.getValue().emplace<FunctionDefinition>(
+            readArguments(match.get<3>()),
+            readBlocks(match.get<4>())
+        );
 
-            module.getFunctions().push_back(func);
-        }
-    } catch ([[maybe_unused]] std::exception const& e) {
-        println("error parsing: {}", e.what());
-        return std::nullopt;
+        module.getFunctions().push_back(func);
     }
 
     return module;

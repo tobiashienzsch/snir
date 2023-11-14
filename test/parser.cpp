@@ -85,26 +85,39 @@ auto testParser() -> void
 {
     auto registry = Registry{};
     auto parser   = Parser{registry};
-    auto branch   = registry.view<Branch>();
 
-    auto const* file = "./test/files/i64_blocks.ll";
+    {
+        auto branch = registry.view<snir::Branch>();
 
-    auto const source = readFile(file).value();
-    auto const module = parser.read(source);
-    assert(module.has_value());
+        auto const* file = "./test/files/i64_blocks.ll";
 
-    auto const func    = Function{Value(registry, module->getFunctions().at(0))};
-    auto const& blocks = func.getBasicBlocks();
-    assert(blocks.size() == 4);
+        auto const source = readFile(file).value();
+        auto const module = parser.read(source);
 
-    auto const terminatorVal = Value{registry, blocks.at(0).instructions.back()};
-    auto const terminator    = Instruction{terminatorVal};
-    assert(terminator.isTerminator());
-    assert(terminator.getKind() == InstKind::Branch);
-    assert(terminator.getType() == Type::Bool);
+        auto const func    = Function{Value(registry, module.getFunctions().at(0))};
+        auto const& blocks = func.getBasicBlocks();
+        assert(blocks.size() == 4);
 
-    auto const [br] = branch.get(terminator);
-    assert(br.iftrue == blocks.at(1).label);
+        auto const terminatorVal = Value{registry, blocks.at(0).instructions.back()};
+        auto const terminator    = Instruction{terminatorVal};
+        assert(terminator.isTerminator());
+        assert(terminator.getKind() == InstKind::Branch);
+        assert(terminator.getType() == Type::Bool);
+
+        auto const [br] = branch.get(terminator);
+        assert(br.iftrue == blocks.at(1).label);
+    }
+
+    try {
+        auto const module = parser.read(std::string_view{R"(
+define i64 @func() {
+0:
+  foo label %1
+}
+)"});
+    } catch (std::exception const& e) {
+        assert(snir::strings::contains(e.what(), "failed to parse 'foo label %1' as an instruction"));
+    }
 }
 
 }  // namespace
