@@ -35,6 +35,28 @@ struct FunctionTestSpec
     snir::Literal result;
 };
 
+[[nodiscard]] auto parseTestResult(std::string_view str, snir::Type type) -> snir::Literal
+{
+    if (type == snir::Type::Void) {
+        assert(str == "void");
+        return snir::Literal{std::nan("")};
+    }
+    if (type == snir::Type::Bool) {
+        return snir::Literal{str == "true"};
+    }
+    if (type == snir::Type::Int64) {
+        return snir::Literal{snir::strings::parse<std::int64_t>(str)};
+    }
+    if (type == snir::Type::Float) {
+        return snir::Literal{snir::strings::parse<float>(str)};
+    }
+    if (type == snir::Type::Double) {
+        return snir::Literal{snir::strings::parse<double>(str)};
+    }
+
+    snir::raisef<std::invalid_argument>("unknown literal '{}'", str);
+}
+
 [[nodiscard]] auto parseFunctionTestSpec(std::string_view source) -> FunctionTestSpec
 {
     auto spec = snir::strings::getBetween(source, "; BEGIN_TEST", "; END_TEST");
@@ -66,28 +88,8 @@ struct FunctionTestSpec
         }
         if (auto match = ctre::match<R"(;\s+return:\s+(\S+))">(line); match) {
             auto const literal = snir::strings::trim(match.get<1>());
-            if (test.type == snir::Type::Void) {
-                assert(literal == "void");
-                test.result = snir::Literal{std::nan("")};
-                return;
-            }
-            if (test.type == snir::Type::Bool) {
-                test.result = snir::Literal{literal == "true"};
-                return;
-            }
-            if (test.type == snir::Type::Int64) {
-                test.result = snir::Literal{snir::strings::parse<std::int64_t>(literal)};
-                return;
-            }
-            if (test.type == snir::Type::Float) {
-                test.result = snir::Literal{snir::strings::parse<float>(literal)};
-                return;
-            }
-            if (test.type == snir::Type::Double) {
-                test.result = snir::Literal{snir::strings::parse<double>(literal)};
-                return;
-            }
-            snir::raisef<std::invalid_argument>("unknown literal '{}'", literal);
+            test.result        = parseTestResult(literal, test.type);
+            return;
         }
 
         snir::raisef<std::invalid_argument>("could not parse test spec '{}'", line);

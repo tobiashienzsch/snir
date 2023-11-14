@@ -153,8 +153,8 @@ template<typename NodeType>
 struct FindComponents
 {
     explicit FindComponents(Graph<NodeType> const& graph)
-        : _graph(graph)
-        , _size(static_cast<NodeType>(_graph.size()))
+        : _graph(&graph)
+        , _size(static_cast<NodeType>(_graph->size()))
         , _components(_size)
         , _visited(_size)
     {
@@ -180,7 +180,7 @@ private:
         _visited[currentNode]    = true;
         _components[currentNode] = _count;
 
-        if (auto const& edges = _graph.getOutEdges(currentNode); !edges.empty()) {
+        if (auto const& edges = _graph->getOutEdges(currentNode); !edges.empty()) {
             for (auto const& edge : edges) {
                 if (!_visited[edge.sink]) {
                     dfs(edge.sink);
@@ -189,7 +189,7 @@ private:
         }
     }
 
-    Graph<NodeType> const& _graph;
+    Graph<NodeType> const* _graph{nullptr};
     NodeType _size;
     NodeType _count{0};
     std::vector<NodeType> _components;

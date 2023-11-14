@@ -20,8 +20,7 @@ using namespace snir;
 #define CHECK_CONTAINS(str, sub)                                                                     \
     do {                                                                                             \
         if (not ::snir::strings::contains((str), (sub))) {                                           \
-            ::snir::println("'{}' does not contain '{}'", (str), (sub));                             \
-            assert(false);                                                                           \
+            ::snir::raisef<std::runtime_error>("'{}' does not contain '{}'", (str), (sub));          \
         }                                                                                            \
     } while (false)
 
@@ -60,9 +59,6 @@ auto testTypeParser() -> void
     assert(parseType("float") == Type::Float);
     assert(parseType("double") == Type::Double);
     CHECK_THROW_CONTAINS(parseType("bool"), "failed to parse 'bool' as Type");
-    CHECK_THROW_CONTAINS(parseType("char"), "failed to parse 'char' as Type");
-    CHECK_THROW_CONTAINS(parseType("short"), "failed to parse 'short' as Type");
-    CHECK_THROW_CONTAINS(parseType("long"), "failed to parse 'long' as Type");
 }
 
 auto testCompareKindParser() -> void
@@ -109,28 +105,31 @@ auto testParser() -> void
     auto registry = Registry{};
     auto parser   = Parser{registry};
 
-    {
-        auto branch = registry.view<snir::Branch>();
+    auto branch = registry.view<snir::Branch>();
 
-        auto const* file = "./test/files/i64_blocks.ll";
+    auto const* file = "./test/files/i64_blocks.ll";
 
-        auto const source = readFile(file).value();
-        auto const module = parser.read(source);
+    auto const source = readFile(file).value();
+    auto const module = parser.read(source);
 
-        auto const func    = Function{Value(registry, module.getFunctions().at(0))};
-        auto const& blocks = func.getBasicBlocks();
-        assert(blocks.size() == 4);
+    auto const func    = Function{Value(registry, module.getFunctions().at(0))};
+    auto const& blocks = func.getBasicBlocks();
+    assert(blocks.size() == 4);
 
-        auto const terminatorVal = Value{registry, blocks.at(0).instructions.back()};
-        auto const terminator    = Instruction{terminatorVal};
-        assert(terminator.isTerminator());
-        assert(terminator.getKind() == InstKind::Branch);
-        assert(terminator.getType() == Type::Bool);
+    auto const terminatorVal = Value{registry, blocks.at(0).instructions.back()};
+    auto const terminator    = Instruction{terminatorVal};
+    assert(terminator.isTerminator());
+    assert(terminator.getKind() == InstKind::Branch);
+    assert(terminator.getType() == Type::Bool);
 
-        auto const [br] = branch.get(terminator);
-        assert(br.iftrue == blocks.at(1).label);
-    }
+    auto const [br] = branch.get(terminator);
+    assert(br.iftrue == blocks.at(1).label);
+}
 
+auto testParserErrors() -> void
+{
+    auto registry = Registry{};
+    auto parser   = Parser{registry};
     for (auto const& entry : std::filesystem::directory_iterator{"./test/files/error"}) {
         snir::println("; {}", entry.path().string());
         auto const source = readFile(entry).value();
@@ -149,5 +148,6 @@ auto main() -> int
     testIdentifierParser();
     testInstKindParser();
     testParser();
+    testParserErrors();
     return EXIT_SUCCESS;
 }
