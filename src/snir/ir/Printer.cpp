@@ -6,7 +6,6 @@
 #include "snir/ir/InstKind.hpp"
 #include "snir/ir/Literal.hpp"
 #include "snir/ir/Operands.hpp"
-#include "snir/ir/pass/ControlFlowGraph.hpp"
 #include "snir/ir/Result.hpp"
 #include "snir/ir/Type.hpp"
 #include "snir/ir/Value.hpp"
@@ -18,6 +17,29 @@
 #include <iterator>
 
 namespace snir {
+
+[[nodiscard]] auto getPredsForBlock(ControlFlowGraph::Result const& result, ValueId block)
+    -> std::vector<ValueId>
+{
+    auto nodeToId = [&](auto node) -> std::optional<ValueId> {
+        for (auto const [val, id] : result.nodeIds) {
+            if (id == node) {
+                return val;
+            }
+        }
+        return std::nullopt;
+    };
+
+    auto const node  = result.nodeIds.at(block);
+    auto const edges = result.graph.getInEdges(node);
+
+    auto preds = std::vector<ValueId>{};
+    preds.reserve(edges.size());
+    for (auto const edge : edges) {
+        preds.push_back(nodeToId(edge.source).value());
+    }
+    return preds;
+};
 
 Printer::Printer(std::ostream& out) : _out{out} {}
 
@@ -34,46 +56,50 @@ auto Printer::operator()(Module& module) -> void
 
 auto Printer::operator()(Function& function, AnalysisManager<Function>& analysis) -> void
 {
-    _nextLocalValueId = 0;
+    _cfg = &analysis.getResult<ControlFlowGraph>(function);
     _localValueIds.clear();
-
-    auto& reg       = *function.getValue().registry();
-    auto view       = reg.view<Type, Identifier, FunctionDefinition>();
-    auto const& cfg = analysis.getResult<ControlFlowGraph>(function);
-    (void)(cfg);
-
-    auto const [type, identifier, def] = view.get(function.getValue());
-    print(_out, "define {} @{}", type, identifier.text);
+    _nextLocalValueId = 0;
     printFunction(function);
-    println(_out, "");
 }
 
 auto Printer::printFunction(Function& func) -> void
 {
-    if (func.getArguments().empty()) {
-        print(_out, "()");
-    } else {
-        auto types = func.getValue().registry()->view<Type>();
-        auto a0    = func.getArguments().at(0);
+    auto& reg = *func.getValue().registry();
+    auto view = reg.view<Type, Identifier, FunctionDefinition>();
 
-        auto printArg = [this, &types](ValueId arg) {
-            print(_out, ", {} %{}", std::get<0>(types.get(arg)), getLocalId(arg));
-        };
+    auto const [type, identifier, def] = view.get(func.getValue());
 
-        print(_out, "({} %{}", std::get<0>(types.get(a0)), getLocalId(a0));
-        std::ranges::for_each(
-            std::ranges::next(std::ranges::begin(func.getArguments())),
-            std::ranges::end(func.getArguments()),
-            printArg
-        );
-        print(_out, ")");
-    }
+    print(_out, "define {} @{}", type, identifier.text);
+    printFunctionArgs(func);
 
     println(_out, " {{");
-    for (auto const& block : func.getBasicBlocks()) {
-        printBasicBlock(func, block);
+    auto const& blocks = func.getBasicBlocks();
+    for (auto i{0U}; i < blocks.size(); ++i) {
+        printBasicBlock(func, blocks.at(i));
+        if (auto const isLast = i == blocks.size() - 1U; not isLast) {
+            println(_out, "");
+        }
     }
-    println(_out, "}}");
+    println(_out, "}}\n");
+}
+
+auto Printer::printFunctionArgs(Function& func) -> void
+{
+    auto const& args = func.getArguments();
+    auto types       = func.getValue().registry()->view<Type>();
+
+    if (args.empty()) {
+        print(_out, "()");
+        return;
+    }
+
+    auto const a0 = std::ranges::begin(args);
+    auto const l  = std::ranges::end(args);
+    print(_out, "({} %{}", std::get<0>(types.get(*a0)), getLocalId(*a0));
+    std::ranges::for_each(std::ranges::next(a0), l, [this, &types](ValueId arg) {
+        print(_out, ", {} %{}", std::get<0>(types.get(arg)), getLocalId(arg));
+    });
+    print(_out, ")");
 }
 
 auto Printer::printBasicBlock(Function& func, BasicBlock const& block) -> void
@@ -95,7 +121,20 @@ auto Printer::printBasicBlock(Function& func, BasicBlock const& block) -> void
         return std::format("{}", int(val));
     };
 
-    println(_out, "{}:", getLocalId(block.label));
+    print(_out, "{}:", getLocalId(block.label));
+    if (_cfg != nullptr) {
+        auto const preds = getPredsForBlock(*_cfg, block.label);
+        if (not preds.empty()) {
+            auto first = std::ranges::begin(preds);
+            print(_out, "\t\t\t\t\t\t; preds = %{}", getLocalId(*first));
+            std::ranges::for_each(
+                std::ranges::next(first),
+                std::ranges::end(preds),
+                [this](auto pred) { print(_out, ", %{}", getLocalId(pred)); }
+            );
+        }
+    }
+    println(_out, "");
 
     for (auto const inst : block.instructions) {
         auto const [kind, type] = common.get(inst);
@@ -124,7 +163,7 @@ auto Printer::printBasicBlock(Function& func, BasicBlock const& block) -> void
             case InstKind::Branch: {
                 auto [br] = branch.get(inst);
                 if (not br.condition) {
-                    println(_out, "  {} label {}", kind, getLocalId(br.iftrue));
+                    println(_out, "  {} label %{}", kind, getLocalId(br.iftrue));
                 } else {
                 }
                 break;
