@@ -6,11 +6,15 @@
 #include "snir/ir/Type.hpp"
 #include "snir/ir/Value.hpp"
 
+#include <numeric>
+
 namespace snir {
 
 struct Function
 {
     explicit Function(Value value) noexcept : _value{value} {}
+
+    Function(Registry& reg, ValueId id) noexcept : _value{reg, id} {}
 
     [[nodiscard]] static auto create(Registry& reg, Type type) -> Function
     {
@@ -50,6 +54,14 @@ struct Function
     [[nodiscard]] auto getBasicBlocks() -> std::vector<BasicBlock>&
     {
         return _value.get<FunctionDefinition>().blocks;
+    }
+
+    [[nodiscard]] auto getInstructionCount() const -> std::size_t
+    {
+        auto const& blocks = getBasicBlocks();
+        return std::accumulate(blocks.begin(), blocks.end(), 0U, [](auto sum, auto const& block) {
+            return sum + block.instructions.size();
+        });
     }
 
     [[nodiscard]] auto getValue() const noexcept -> Value { return _value; }

@@ -5,11 +5,6 @@
 #include "snir/ir/InstKind.hpp"
 #include "snir/ir/Literal.hpp"
 #include "snir/ir/Parser.hpp"
-#include "snir/ir/pass/DeadStoreElimination.hpp"
-#include "snir/ir/pass/RemoveEmptyBlock.hpp"
-#include "snir/ir/pass/RemoveNop.hpp"
-#include "snir/ir/PassManager.hpp"
-#include "snir/ir/Printer.hpp"
 #include "snir/ir/Registry.hpp"
 #include "snir/ir/Type.hpp"
 
@@ -116,43 +111,20 @@ auto main() -> int
         assert(module.has_value());
         assert(module->getFunctions().size() == 1);
 
-        auto const funcId   = module->getFunctions().at(0);
-        auto const funcVal  = snir::Value{registry, funcId};
-        auto const funcView = registry.view<snir::Type, snir::Identifier, snir::FunctionDefinition>();
-        auto const [type, name, func] = funcView.get(funcId);
-        assert(type == test.type);
-        assert(name.text == test.name);
-        assert(func.args.size() == test.args);
-        assert(func.blocks.size() == test.blocks);
+        auto const func = snir::Function{registry, module->getFunctions().at(0)};
+        assert(func.getType() == test.type);
+        assert(func.getIdentifier() == test.name);
+        assert(func.getArguments().size() == test.args);
+        assert(func.getBasicBlocks().size() == test.blocks);
+        assert(func.getInstructionCount() == test.instructions);
 
-        auto instCount = 0U;
-        for (auto const& block : func.blocks) {
-            for ([[maybe_unused]] auto const inst : block.instructions) {
-                ++instCount;
-            }
-        }
-        assert(instCount == test.instructions);
-
-        auto opt = snir::PassManager{true};
-        opt.add(snir::DeadStoreElimination{});
-        opt.add(snir::RemoveNop{});
-        opt.add(snir::RemoveEmptyBlock{});
-
-        auto pm      = snir::PassManager{true};
-        auto printer = snir::Printer{std::cout};
-        pm.add(std::ref(printer));
-        pm.add(std::ref(opt));
-        pm.add(std::ref(opt));
-        pm.add(std::ref(printer));
-        pm(*module);
-
-        if (func.args.empty()) {
+        if (func.getArguments().empty()) {
             auto vm     = snir::Interpreter{};
-            auto result = vm.execute(snir::Function{funcVal}, {});
+            auto result = vm.execute(func, {});
             assert(result.has_value());
 
-            snir::println("; return: {} as {}", *result, type);
-            if (type == snir::Type::Void) {
+            snir::println("; return: {} as {}", *result, func.getType());
+            if (func.getType() == snir::Type::Void) {
                 assert(std::isnan(std::get<double>(result->value)));
             } else {
                 assert(result->value == test.result.value);
