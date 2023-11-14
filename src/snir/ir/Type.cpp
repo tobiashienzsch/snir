@@ -11,7 +11,6 @@ auto parseType(std::string_view source) -> Type
         return Type::Id;                                                                             \
     }
 #include "snir/ir/Type.def"
-#undef SNIR_TYPE
 
     raisef<std::invalid_argument>("failed to parse '{}' as Type", source);
 }

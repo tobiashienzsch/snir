@@ -1,5 +1,9 @@
 // This macro should be defined before including this header:
-// - SNIR_TYPE(Id, Name)
+// - SNIR_TYPE(Id, Token)
+
+#if not defined(SNIR_TYPE)
+    #error "Must define the x-macro to use this file."
+#endif
 
 SNIR_TYPE(Void, void)
 SNIR_TYPE(Pointer, ptr)
@@ -7,3 +11,5 @@ SNIR_TYPE(Bool, i1)
 SNIR_TYPE(Int64, i64)
 SNIR_TYPE(Float, float)
 SNIR_TYPE(Double, double)
+
+#undef SNIR_TYPE

@@ -7,9 +7,8 @@ namespace snir {
 
 enum struct CompareKind
 {
-#define SNIR_COMPARE(Id, Name) Id,
+#define SNIR_COMPARE_KIND(Id, Name) Id,
 #include "snir/ir/CompareKind.def"
-#undef SNIR_COMPARE
 };
 
 [[nodiscard]] auto parseCompareKind(std::string_view src) -> CompareKind;
@@ -23,9 +22,8 @@ struct std::formatter<snir::CompareKind, char> : std::formatter<std::string_view
     auto format(snir::CompareKind type, FormatContext& fc) const
     {
         static constexpr auto names = std::array{
-#define SNIR_COMPARE(Id, Name) std::string_view{#Name},
+#define SNIR_COMPARE_KIND(Id, Name) std::string_view{#Name},
 #include "snir/ir/CompareKind.def"
-#undef SNIR_COMPARE
         };
 
         auto str = names.at(static_cast<std::size_t>(type));

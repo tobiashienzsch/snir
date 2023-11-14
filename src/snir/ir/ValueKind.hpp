@@ -6,9 +6,8 @@ namespace snir {
 
 enum struct ValueKind : std::uint8_t
 {
-#define SNIR_VALUE(Id, Name) Id,
+#define SNIR_VALUE_KIND(Id, Name) Id,
 #include "snir/ir/ValueKind.def"
-#undef SNIR_VALUE
 };
 
 }  // namespace snir
@@ -20,9 +19,8 @@ struct std::formatter<snir::ValueKind, char> : std::formatter<std::string_view, 
     auto format(snir::ValueKind kind, FormatContext& fc) const
     {
         static constexpr auto names = std::array{
-#define SNIR_VALUE(Id, Name) std::string_view{#Name},
+#define SNIR_VALUE_KIND(Id, Name) std::string_view{#Name},
 #include "snir/ir/ValueKind.def"
-#undef SNIR_VALUE
         };
 
         auto str = names.at(static_cast<std::size_t>(kind));

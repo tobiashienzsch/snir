@@ -1,5 +1,11 @@
 // This macro should be defined before including this header:
-// - SNIR_COMPARE(Id, Name)
+// - SNIR_COMPARE_KIND(Id, Token)
 
-SNIR_COMPARE(Equal, eq)
-SNIR_COMPARE(NotEqual, ne)
+#if not defined(SNIR_COMPARE_KIND)
+    #error "Must define the x-macro to use this file."
+#endif
+
+SNIR_COMPARE_KIND(Equal, eq)
+SNIR_COMPARE_KIND(NotEqual, ne)
+
+#undef SNIR_COMPARE_KIND

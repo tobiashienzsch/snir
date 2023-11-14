@@ -16,9 +16,8 @@ auto parseInstKind(std::string_view source) -> InstKind
     };
 
     static constexpr auto names = std::array{
-#define SNIR_INSTRUCTION(Id, Name) InstName{InstKind::Id, std::string_view{#Name}},
+#define SNIR_INST_KIND(Id, Name) InstName{InstKind::Id, std::string_view{#Name}},
 #include "snir/ir/InstKind.def"
-#undef SNIR_INSTRUCTION
     };
 
     auto const* found = std::ranges::find(names, strings::trim(source), &InstName::name);

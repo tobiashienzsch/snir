@@ -1,9 +1,15 @@
 // This macro should be defined before including this header:
-// - SNIR_VALUE(Id, Name)
+// - SNIR_VALUE_KIND(Id, Token)
 
-SNIR_VALUE(Register, register)
-SNIR_VALUE(Instruction, instruction)
-SNIR_VALUE(Label, label)
-SNIR_VALUE(Literal, literal)
-SNIR_VALUE(Function, function)
-SNIR_VALUE(Global, global)
+#if not defined(SNIR_VALUE_KIND)
+    #error "Must define the x-macro to use this file."
+#endif
+
+SNIR_VALUE_KIND(Register, register)
+SNIR_VALUE_KIND(Instruction, instruction)
+SNIR_VALUE_KIND(Label, label)
+SNIR_VALUE_KIND(Literal, literal)
+SNIR_VALUE_KIND(Function, function)
+SNIR_VALUE_KIND(Global, global)
+
+#undef SNIR_VALUE_KIND

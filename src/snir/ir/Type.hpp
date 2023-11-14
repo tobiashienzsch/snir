@@ -25,7 +25,6 @@ struct std::formatter<snir::Type, char> : std::formatter<std::string_view, char>
         static constexpr auto names = std::array{
 #define SNIR_TYPE(Id, Name) std::string_view{#Name},
 #include "snir/ir/Type.def"
-#undef SNIR_TYPE
         };
 
         auto str = names.at(static_cast<std::size_t>(type));

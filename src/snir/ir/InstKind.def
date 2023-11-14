@@ -1,28 +1,34 @@
 // This macro should be defined before including this header:
-// - SNIR_INSTRUCTION(Id, Token)
+// - SNIR_INST_KIND(Id, Token)
 
-SNIR_INSTRUCTION(Nop, nop)
-SNIR_INSTRUCTION(Const, const)
+#if not defined(SNIR_INST_KIND)
+    #error "Must define the x-macro to use this file."
+#endif
 
-SNIR_INSTRUCTION(Return, ret)
-SNIR_INSTRUCTION(Branch, br)
-SNIR_INSTRUCTION(Phi, phi)
+SNIR_INST_KIND(Nop, nop)
+SNIR_INST_KIND(Const, const)
 
-SNIR_INSTRUCTION(Add, add)
-SNIR_INSTRUCTION(Sub, sub)
-SNIR_INSTRUCTION(Mul, mul)
-SNIR_INSTRUCTION(Div, div)
-SNIR_INSTRUCTION(Mod, mod)
-SNIR_INSTRUCTION(And, and)
-SNIR_INSTRUCTION(Or, or)
-SNIR_INSTRUCTION(Xor, xor)
-SNIR_INSTRUCTION(ShiftLeft, shl)
-SNIR_INSTRUCTION(ShiftRight, shr)
-SNIR_INSTRUCTION(IntCmp, icmp)
+SNIR_INST_KIND(Return, ret)
+SNIR_INST_KIND(Branch, br)
+SNIR_INST_KIND(Phi, phi)
 
-SNIR_INSTRUCTION(FloatAdd, fadd)
-SNIR_INSTRUCTION(FloatSub, fsub)
-SNIR_INSTRUCTION(FloatMul, fmul)
-SNIR_INSTRUCTION(FloatDiv, fdiv)
+SNIR_INST_KIND(Add, add)
+SNIR_INST_KIND(Sub, sub)
+SNIR_INST_KIND(Mul, mul)
+SNIR_INST_KIND(Div, div)
+SNIR_INST_KIND(Mod, mod)
+SNIR_INST_KIND(And, and)
+SNIR_INST_KIND(Or, or)
+SNIR_INST_KIND(Xor, xor)
+SNIR_INST_KIND(ShiftLeft, shl)
+SNIR_INST_KIND(ShiftRight, shr)
+SNIR_INST_KIND(IntCmp, icmp)
 
-SNIR_INSTRUCTION(Trunc, trunc)
+SNIR_INST_KIND(FloatAdd, fadd)
+SNIR_INST_KIND(FloatSub, fsub)
+SNIR_INST_KIND(FloatMul, fmul)
+SNIR_INST_KIND(FloatDiv, fdiv)
+
+SNIR_INST_KIND(Trunc, trunc)
+
+#undef SNIR_INST_KIND

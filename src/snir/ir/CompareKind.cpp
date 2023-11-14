@@ -6,12 +6,11 @@ namespace snir {
 
 auto parseCompareKind(std::string_view src) -> CompareKind
 {
-#define SNIR_COMPARE(Op, Name)                                                                       \
+#define SNIR_COMPARE_KIND(Op, Name)                                                                  \
     if (src == std::string_view{#Name}) {                                                            \
         return CompareKind::Op;                                                                      \
     }
 #include "snir/ir/CompareKind.def"
-#undef SNIR_COMPARE
 
     raisef<std::invalid_argument>("failed to parse '{}' as CompareKind", src);
 }
