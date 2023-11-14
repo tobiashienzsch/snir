@@ -16,7 +16,7 @@ auto parseIdentifier(std::string_view src) -> std::pair<IdentifierKind, std::str
         return {IdentifierKind::Global, str.substr(1)};
     }
 
-    raisef<std::invalid_argument>("failed to parse '{}' as Operand", src);
+    raisef<std::invalid_argument>("failed to parse '{}' as Identifier", src);
 }
 
 }  // namespace snir
