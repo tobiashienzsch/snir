@@ -42,7 +42,7 @@ auto forEachLine(std::string_view str, auto callback) -> void
         return;
     }
 
-    auto first = 0;
+    auto first = std::size_t(0);
     while (true) {
         auto const last = str.find_first_of('\n', first);
         if (last == std::string_view::npos) {

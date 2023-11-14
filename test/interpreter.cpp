@@ -23,6 +23,8 @@
 #include <cassert>
 #include <filesystem>
 
+namespace {
+
 struct FunctionTestSpec
 {
     std::string name{};
@@ -94,67 +96,71 @@ struct FunctionTestSpec
     return test;
 }
 
+auto execute(snir::Function const& func, snir::Literal expected) -> void
+{
+    if (func.getArguments().empty()) {
+        auto vm     = snir::Interpreter{};
+        auto result = vm.execute(func, {});
+        assert(result.has_value());
+
+        snir::println("; return: {} as {}", *result, func.getType());
+        if (func.getType() == snir::Type::Void) {
+            assert(std::isnan(std::get<double>(result->value)));
+        } else {
+            assert(result->value == expected.value);
+        }
+    }
+}
+
+auto optimize(snir::Module& module) -> void
+{
+    auto opt = snir::PassManager{true};
+    opt.add(snir::DeadStoreElimination{});
+    opt.add(snir::RemoveNop{});
+    opt.add(snir::RemoveEmptyBlock{});
+
+    auto pm      = snir::PassManager{true};
+    auto printer = snir::Printer{std::cout};
+    pm.add(std::ref(printer));
+    pm.add(std::ref(opt));
+    pm.add(std::ref(opt));
+    pm.add(std::ref(printer));
+    pm(module);
+}
+
+auto testFile(std::filesystem::path const& path) -> void
+{
+    snir::println("; {}", path.string());
+
+    auto registry = snir::Registry{};
+    auto parser   = snir::Parser{registry};
+    auto source   = snir::readFile(path).value();
+    auto test     = parseFunctionTestSpec(source);
+    auto module   = parser.read(source);
+    assert(module.getFunctions().size() == 1);
+
+    auto const func = snir::Function{registry, module.getFunctions().at(0)};
+    assert(func.getType() == test.type);
+    assert(func.getIdentifier() == test.name);
+    assert(func.getArguments().size() == test.args);
+    assert(func.getBasicBlocks().size() == test.blocks);
+    assert(func.getInstructionCount() == test.instructions);
+
+    execute(func, test.result);
+    optimize(module);
+    execute(func, test.result);
+}
+
+}  // namespace
+
 auto main() -> int
 {
     for (auto const& entry : std::filesystem::directory_iterator{"./test/files"}) {
         if (not entry.is_regular_file()) {
             continue;
         }
-        snir::println("; {}", entry.path().string());
-
-        auto registry = snir::Registry{};
-        auto parser   = snir::Parser{registry};
-        auto source   = snir::readFile(entry).value();
-        auto test     = parseFunctionTestSpec(source);
-        auto module   = parser.read(source);
-        assert(module.getFunctions().size() == 1);
-
-        auto const func = snir::Function{registry, module.getFunctions().at(0)};
-        assert(func.getType() == test.type);
-        assert(func.getIdentifier() == test.name);
-        assert(func.getArguments().size() == test.args);
-        assert(func.getBasicBlocks().size() == test.blocks);
-        assert(func.getInstructionCount() == test.instructions);
-
-        if (func.getArguments().empty()) {
-            auto vm     = snir::Interpreter{};
-            auto result = vm.execute(func, {});
-            assert(result.has_value());
-
-            snir::println("; return: {} as {}", *result, func.getType());
-            if (func.getType() == snir::Type::Void) {
-                assert(std::isnan(std::get<double>(result->value)));
-            } else {
-                assert(result->value == test.result.value);
-            }
-        }
-
-        auto opt = snir::PassManager{true};
-        opt.add(snir::DeadStoreElimination{});
-        opt.add(snir::RemoveNop{});
-        opt.add(snir::RemoveEmptyBlock{});
-
-        auto pm      = snir::PassManager{true};
-        auto printer = snir::Printer{std::cout};
-        pm.add(std::ref(printer));
-        pm.add(std::ref(opt));
-        pm.add(std::ref(opt));
-        pm.add(std::ref(printer));
-        pm(module);
-
-        if (func.getArguments().empty()) {
-            auto vm     = snir::Interpreter{};
-            auto result = vm.execute(func, {});
-            assert(result.has_value());
-
-            snir::println("; return: {} as {}", *result, func.getType());
-            if (func.getType() == snir::Type::Void) {
-                assert(std::isnan(std::get<double>(result->value)));
-            } else {
-                assert(result->value == test.result.value);
-            }
-        }
+        testFile(entry);
     }
 
-    return 0;
+    return EXIT_SUCCESS;
 }
