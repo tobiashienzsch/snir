@@ -8,7 +8,7 @@ namespace snir {
 namespace detail {
 
 template<typename E>
-inline constexpr bool isScopedEnum = requires {
+inline constexpr bool IsScopedEnum = requires {
     requires std::is_enum_v<E>;
     requires not std::is_convertible_v<E, std::underlying_type_t<E>>;
 };
@@ -16,6 +16,6 @@ inline constexpr bool isScopedEnum = requires {
 }  // namespace detail
 
 template<typename Enum>
-concept ScopedEnum = detail::isScopedEnum<Enum>;
+concept ScopedEnum = detail::IsScopedEnum<Enum>;
 
 }  // namespace snir
