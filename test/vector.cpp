@@ -1,5 +1,5 @@
-#include "snir/core/static_vector.hpp"
-#include "snir/core/strings.hpp"
+#include "snir/core/StaticVector.hpp"
+#include "snir/core/Strings.hpp"
 
 #undef NDEBUG
 #include <algorithm>

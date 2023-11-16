@@ -1,5 +1,6 @@
 #include "Interpreter.hpp"
 
+#include "snir/core/Print.hpp"
 #include "snir/ir/Branch.hpp"
 #include "snir/ir/CompareKind.hpp"
 #include "snir/ir/InstKind.hpp"
@@ -7,9 +8,6 @@
 #include "snir/ir/Result.hpp"
 #include "snir/ir/Type.hpp"
 #include "snir/ir/ValueKind.hpp"
-
-#include "snir/core/print.hpp"
-#include "snir/core/unreachable.hpp"
 
 namespace snir {
 

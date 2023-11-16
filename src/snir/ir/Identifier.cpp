@@ -1,6 +1,6 @@
 #include "Identifier.hpp"
 
-#include "snir/core/exception.hpp"
+#include "snir/core/Exception.hpp"
 
 #include <ctre.hpp>
 

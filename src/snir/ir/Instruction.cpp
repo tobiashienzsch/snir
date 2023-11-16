@@ -1,6 +1,6 @@
 #include "Instruction.hpp"
 
-#include "snir/core/ranges.hpp"
+#include "snir/core/Ranges.hpp"
 
 namespace snir {
 

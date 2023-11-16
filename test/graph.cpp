@@ -1,7 +1,7 @@
 #include "snir/graph/Graph.hpp"
-#include "snir/graph/AdjacencyList.hpp"
 
-#include "snir/core/print.hpp"
+#include "snir/core/Print.hpp"
+#include "snir/graph/AdjacencyList.hpp"
 #include "snir/ir/ValueId.hpp"
 
 #undef NDEBUG

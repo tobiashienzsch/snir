@@ -1,13 +1,12 @@
 #pragma once
 
+#include "snir/core/Print.hpp"
 #include "snir/ir/AnalysisManager.hpp"
 #include "snir/ir/Function.hpp"
 #include "snir/ir/Instruction.hpp"
 #include "snir/ir/Operands.hpp"
 #include "snir/ir/Result.hpp"
 #include "snir/ir/Value.hpp"
-
-#include "snir/core/print.hpp"
 
 #include <set>
 

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "snir/core/exception.hpp"
+#include "snir/core/Exception.hpp"
 
 #include <algorithm>
 #include <charconv>

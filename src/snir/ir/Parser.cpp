@@ -1,5 +1,7 @@
 #include "Parser.hpp"
 
+#include "snir/core/Print.hpp"
+#include "snir/core/Strings.hpp"
 #include "snir/ir/Branch.hpp"
 #include "snir/ir/CompareKind.hpp"
 #include "snir/ir/Function.hpp"
@@ -10,9 +12,6 @@
 #include "snir/ir/Literal.hpp"
 #include "snir/ir/Operands.hpp"
 #include "snir/ir/Result.hpp"
-
-#include "snir/core/print.hpp"
-#include "snir/core/strings.hpp"
 
 #include <ctre.hpp>
 

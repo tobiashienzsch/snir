@@ -1,7 +1,7 @@
 #include "ControlFlowGraph.hpp"
 
-#include "snir/core/exception.hpp"
-#include "snir/core/print.hpp"
+#include "snir/core/Exception.hpp"
+#include "snir/core/Print.hpp"
 #include "snir/ir/Branch.hpp"
 #include "snir/ir/InstKind.hpp"
 #include "snir/ir/Instruction.hpp"

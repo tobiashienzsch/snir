@@ -1,8 +1,7 @@
 #pragma once
 
+#include "snir/core/StaticVector.hpp"
 #include "snir/ir/ValueId.hpp"
-
-#include "snir/core/static_vector.hpp"
 
 namespace snir {
 

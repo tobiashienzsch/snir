@@ -1,14 +1,13 @@
 #include "snir/ir/Parser.hpp"
+#include "snir/core/File.hpp"
+#include "snir/core/Print.hpp"
+#include "snir/core/Strings.hpp"
 #include "snir/ir/Branch.hpp"
 #include "snir/ir/CompareKind.hpp"
 #include "snir/ir/Function.hpp"
 #include "snir/ir/InstKind.hpp"
 #include "snir/ir/Instruction.hpp"
 #include "snir/ir/Literal.hpp"
-
-#include "snir/core/file.hpp"
-#include "snir/core/print.hpp"
-#include "snir/core/strings.hpp"
 
 #include <ctre.hpp>
 

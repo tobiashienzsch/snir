@@ -1,6 +1,6 @@
 #include "CompareKind.hpp"
 
-#include "snir/core/exception.hpp"
+#include "snir/core/Exception.hpp"
 
 namespace snir {
 

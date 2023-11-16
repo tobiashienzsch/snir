@@ -1,5 +1,6 @@
 #include "Printer.hpp"
 
+#include "snir/core/Print.hpp"
 #include "snir/ir/Branch.hpp"
 #include "snir/ir/CompareKind.hpp"
 #include "snir/ir/Identifier.hpp"
@@ -10,8 +11,6 @@
 #include "snir/ir/Type.hpp"
 #include "snir/ir/Value.hpp"
 #include "snir/ir/ValueKind.hpp"
-
-#include "snir/core/print.hpp"
 
 #include <algorithm>
 #include <iterator>

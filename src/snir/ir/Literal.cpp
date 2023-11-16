@@ -1,7 +1,7 @@
 #include "Literal.hpp"
 
-#include "snir/core/exception.hpp"
-#include "snir/core/strings.hpp"
+#include "snir/core/Exception.hpp"
+#include "snir/core/Strings.hpp"
 
 #include <ctre.hpp>
 

@@ -1,4 +1,7 @@
 #include "snir/ir/Interpreter.hpp"
+#include "snir/core/File.hpp"
+#include "snir/core/Print.hpp"
+#include "snir/core/Strings.hpp"
 #include "snir/ir/CompareKind.hpp"
 #include "snir/ir/Function.hpp"
 #include "snir/ir/Identifier.hpp"
@@ -12,10 +15,6 @@
 #include "snir/ir/Printer.hpp"
 #include "snir/ir/Registry.hpp"
 #include "snir/ir/Type.hpp"
-
-#include "snir/core/file.hpp"
-#include "snir/core/print.hpp"
-#include "snir/core/strings.hpp"
 
 #include <ctre.hpp>
 

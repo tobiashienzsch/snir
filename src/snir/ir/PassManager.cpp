@@ -1,6 +1,6 @@
 #include "PassManager.hpp"
 
-#include "snir/core/print.hpp"
+#include "snir/core/Print.hpp"
 
 #include <chrono>
 
