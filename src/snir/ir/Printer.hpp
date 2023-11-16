@@ -1,5 +1,6 @@
 #pragma once
 
+#include "snir/core/LocalIdMap.hpp"
 #include "snir/ir/AnalysisManager.hpp"
 #include "snir/ir/BasicBlock.hpp"
 #include "snir/ir/Function.hpp"
@@ -24,12 +25,10 @@ private:
     auto printFunction(Function& func) -> void;
     auto printFunctionArgs(Function& func) -> void;
     auto printBasicBlock(Function& func, BasicBlock const& block) -> void;
-    [[nodiscard]] auto getLocalId(ValueId value) -> int;
 
     std::reference_wrapper<std::ostream> _out;
     ControlFlowGraph::Result const* _cfg{nullptr};
-    int _nextLocalValueId{0};
-    std::map<ValueId, int> _localValueIds{};
+    LocalIdMap<ValueId, int> _localIds{};
 };
 
 }  // namespace snir

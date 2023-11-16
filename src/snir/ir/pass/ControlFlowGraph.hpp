@@ -1,5 +1,6 @@
 #pragma once
 
+#include "snir/core/LocalIdMap.hpp"
 #include "snir/graph/Graph.hpp"
 #include "snir/ir/AnalysisManager.hpp"
 #include "snir/ir/Function.hpp"
@@ -16,7 +17,7 @@ struct ControlFlowGraph
 
     struct Result
     {
-        std::map<ValueId, std::uint32_t> nodeIds;
+        LocalIdMap<ValueId, std::uint32_t> nodeIds;
         Graph<std::uint32_t> graph;
     };
 
@@ -26,13 +27,10 @@ struct ControlFlowGraph
 
 private:
     auto addBlockToGraph(BasicBlock const& block) -> void;
-    [[nodiscard]] auto getOrCreateNodeId(ValueId value) -> std::uint32_t;
-    [[nodiscard]] auto getValueForId(std::uint32_t id) -> ValueId;
 
-    std::uint32_t _nextNodeId{0};
-    std::map<ValueId, std::uint32_t> _nodeIds;
-    Graph<std::uint32_t> _graph;
     Registry* _registry{nullptr};
+    LocalIdMap<ValueId, std::uint32_t> _nodeIds;
+    Graph<std::uint32_t> _graph;
 };
 
 }  // namespace snir

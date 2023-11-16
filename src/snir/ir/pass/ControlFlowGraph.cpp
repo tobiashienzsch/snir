@@ -14,8 +14,7 @@ auto ControlFlowGraph::operator()(Function const& func, AnalysisManager<Function
 {
     _graph.clear();
     _nodeIds.clear();
-    _nextNodeId = 0;
-    _registry   = func.getValue().registry();
+    _registry = func.getValue().registry();
 
     auto const& blocks = func.getBasicBlocks();
     if (blocks.empty()) {
@@ -30,7 +29,7 @@ auto ControlFlowGraph::operator()(Function const& func, AnalysisManager<Function
     print("; ");
     auto const order = topologicalSort(_graph);
     for (auto node : order) {
-        print("{} -> ", int(getValueForId(node)));
+        print("{} -> ", int(_nodeIds[node]));
     }
     println("return");
     return {_nodeIds, _graph};
@@ -41,7 +40,7 @@ auto ControlFlowGraph::addBlockToGraph(BasicBlock const& block) -> void
     auto branchView = _registry->view<Branch>();
 
     auto const label = block.label;
-    auto const node  = getOrCreateNodeId(label);
+    auto const node  = _nodeIds.add(label);
     _graph.addIfNotContains(node);
 
     if (block.instructions.empty()) {
@@ -51,37 +50,15 @@ auto ControlFlowGraph::addBlockToGraph(BasicBlock const& block) -> void
     auto terminal = Instruction{*_registry, block.instructions.back()};
     auto kind     = terminal.getKind();
     if (kind == InstKind::Return) {
-        println("; return in block {}", int(getValueForId(node)));
+        println("; return in block {}", int(_nodeIds[node]));
     }
     if (kind == InstKind::Branch) {
         auto const [branch] = branchView.get(terminal);
-        auto const dest     = getOrCreateNodeId(branch.iftrue);
-        println("; branch in block {} to {}", int(getValueForId(node)), int(getValueForId(dest)));
+        auto const dest     = _nodeIds.add(branch.iftrue);
+        println("; branch in block {} to {}", int(_nodeIds[node]), int(_nodeIds[dest]));
         _graph.addIfNotContains(dest);
         _graph.connect(node, dest);
     }
-}
-
-auto ControlFlowGraph::getOrCreateNodeId(ValueId value) -> std::uint32_t
-{
-    if (auto const id = _nodeIds.find(value); id != _nodeIds.end()) {
-        return id->second;
-    }
-
-    auto const id = _nextNodeId++;
-    _nodeIds.emplace(value, id);
-    return id;
-}
-
-auto ControlFlowGraph::getValueForId(std::uint32_t id) -> ValueId
-{
-    for (auto [value, node] : _nodeIds) {
-        if (node == id) {
-            return value;
-        }
-    }
-
-    raisef<std::runtime_error>("unkown node id '{}'", id);
 }
 
 }  // namespace snir

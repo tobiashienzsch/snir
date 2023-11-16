@@ -21,22 +21,13 @@ namespace snir {
 [[nodiscard]] auto getPredsForBlock(ControlFlowGraph::Result const& result, ValueId block)
     -> std::vector<ValueId>
 {
-    auto nodeToId = [&](auto node) -> std::optional<ValueId> {
-        for (auto const [val, id] : result.nodeIds) {
-            if (id == node) {
-                return val;
-            }
-        }
-        return std::nullopt;
-    };
-
-    auto const node  = result.nodeIds.at(block);
+    auto const node  = result.nodeIds[block];
     auto const edges = result.graph.getInEdges(node);
 
     auto preds = std::vector<ValueId>{};
     preds.reserve(edges.size());
     for (auto const edge : edges) {
-        preds.push_back(nodeToId(edge.source).value());
+        preds.push_back(result.nodeIds[edge.source]);
     }
     return preds;
 };
@@ -57,8 +48,7 @@ auto Printer::operator()(Module& module) -> void
 auto Printer::operator()(Function& function, AnalysisManager<Function>& analysis) -> void
 {
     _cfg = &analysis.getResult<ControlFlowGraph>(function);
-    _localValueIds.clear();
-    _nextLocalValueId = 0;
+    _localIds.clear();
     printFunction(function);
 }
 
@@ -95,9 +85,9 @@ auto Printer::printFunctionArgs(Function& func) -> void
 
     auto const a0 = std::ranges::begin(args);
     auto const l  = std::ranges::end(args);
-    print(_out, "({} %{}", std::get<0>(types.get(*a0)), getLocalId(*a0));
+    print(_out, "({} %{}", std::get<0>(types.get(*a0)), _localIds.add(*a0));
     std::ranges::for_each(std::ranges::next(a0), l, [this, &types](ValueId arg) {
-        print(_out, ", {} %{}", std::get<0>(types.get(arg)), getLocalId(arg));
+        print(_out, ", {} %{}", std::get<0>(types.get(arg)), _localIds.add(arg));
     });
     print(_out, ")");
 }
@@ -116,21 +106,21 @@ auto Printer::printBasicBlock(Function& func, BasicBlock const& block) -> void
     auto formatValue = [&](ValueId val) {
         auto [kind] = valueKind.get(val);
         if (kind == ValueKind::Register) {
-            return std::format("%{}", getLocalId(val));
+            return std::format("%{}", _localIds.add(val));
         }
         return std::format("{}", int(val));
     };
 
-    print(_out, "{}:", getLocalId(block.label));
+    print(_out, "{}:", _localIds.add(block.label));
     if (_cfg != nullptr) {
         auto const preds = getPredsForBlock(*_cfg, block.label);
         if (not preds.empty()) {
             auto first = std::ranges::begin(preds);
-            print(_out, "\t\t\t\t\t\t; preds = %{}", getLocalId(*first));
+            print(_out, "\t\t\t\t\t\t; preds = %{}", _localIds.add(*first));
             std::ranges::for_each(
                 std::ranges::next(first),
                 std::ranges::end(preds),
-                [this](auto pred) { print(_out, ", %{}", getLocalId(pred)); }
+                [this](auto pred) { print(_out, ", %{}", _localIds.add(pred)); }
             );
         }
     }
@@ -163,7 +153,7 @@ auto Printer::printBasicBlock(Function& func, BasicBlock const& block) -> void
             case InstKind::Branch: {
                 auto [br] = branch.get(inst);
                 if (not br.condition) {
-                    println(_out, "  {} label %{}", kind, getLocalId(br.iftrue));
+                    println(_out, "  {} label %{}", kind, _localIds.add(br.iftrue));
                 } else {
                 }
                 break;
@@ -215,17 +205,6 @@ auto Printer::printBasicBlock(Function& func, BasicBlock const& block) -> void
             }
         }
     }
-}
-
-auto Printer::getLocalId(ValueId value) -> int
-{
-    if (auto found = _localValueIds.find(value); found != _localValueIds.end()) {
-        return found->second;
-    }
-
-    auto id = _nextLocalValueId++;
-    _localValueIds.emplace(value, id);
-    return id;
 }
 
 }  // namespace snir
