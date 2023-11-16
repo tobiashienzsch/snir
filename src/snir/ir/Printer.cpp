@@ -21,7 +21,7 @@ namespace snir {
     -> std::vector<ValueId>
 {
     auto const node  = result.nodeIds[block];
-    auto const edges = result.graph.getInEdges(node);
+    auto const edges = result.graph.inEdges(node);
 
     auto preds = std::vector<ValueId>{};
     preds.reserve(edges.size());
@@ -35,10 +35,10 @@ Printer::Printer(std::ostream& out) : _out{out} {}
 
 auto Printer::operator()(Module& module) -> void
 {
-    auto& reg  = module.getRegistry();
+    auto& reg  = module.registry();
     auto dummy = AnalysisManager<Function>{};
 
-    for (auto funcId : module.getFunctions()) {
+    for (auto funcId : module.functions()) {
         auto func = Function(Value{reg, funcId});
         (*this)(func, dummy);
     }
@@ -53,16 +53,16 @@ auto Printer::operator()(Function& function, AnalysisManager<Function>& analysis
 
 auto Printer::printFunction(Function& func) -> void
 {
-    auto& reg = *func.getValue().registry();
+    auto& reg = *func.asValue().registry();
     auto view = reg.view<Type, Identifier, FunctionDefinition>();
 
-    auto const [type, identifier, def] = view.get(func.getValue());
+    auto const [type, identifier, def] = view.get(func.asValue());
 
     print(_out, "define {} @{}", type, identifier.text);
     printFunctionArgs(func);
 
     println(_out, " {{");
-    auto const& blocks = func.getBasicBlocks();
+    auto const& blocks = func.basicBlocks();
     for (auto i{0U}; i < blocks.size(); ++i) {
         printBasicBlock(func, blocks.at(i));
         if (auto const isLast = i == blocks.size() - 1U; not isLast) {
@@ -74,8 +74,8 @@ auto Printer::printFunction(Function& func) -> void
 
 auto Printer::printFunctionArgs(Function& func) -> void
 {
-    auto const& args = func.getArguments();
-    auto types       = func.getValue().registry()->view<Type>();
+    auto const& args = func.arguments();
+    auto types       = func.asValue().registry()->view<Type>();
 
     if (args.empty()) {
         print(_out, "()");
@@ -93,7 +93,7 @@ auto Printer::printFunctionArgs(Function& func) -> void
 
 auto Printer::printBasicBlock(Function& func, BasicBlock const& block) -> void
 {
-    auto& reg      = *func.getValue().registry();
+    auto& reg      = *func.asValue().registry();
     auto common    = reg.view<InstKind, Type>();
     auto result    = reg.view<Result>();
     auto operands  = reg.view<Operands>();

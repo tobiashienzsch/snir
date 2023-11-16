@@ -10,8 +10,8 @@ PassManager::PassManager(bool log, std::ostream& out) : _out{out}, _log{log} {}
 
 auto PassManager::operator()(Module& m) -> void
 {
-    for (auto& funcId : m.getFunctions()) {
-        auto func = Function(Value{m.getRegistry(), funcId});
+    for (auto& funcId : m.functions()) {
+        auto func = Function(Value{m.registry(), funcId});
         std::invoke(*this, func, _analysis);
     }
 }
@@ -27,7 +27,7 @@ auto PassManager::operator()(Function& func, AnalysisManager<Function>& analysis
             println(
                 _out,
                 "; function pass on {}: {} ({})",
-                func.getIdentifier(),
+                func.identifier(),
                 pass->getName(),
                 delta
             );

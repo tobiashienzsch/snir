@@ -14,7 +14,7 @@ struct RemoveEmptyBlock
 
     auto operator()(Function& func, AnalysisManager<Function>& /*analysis*/) -> void
     {
-        std::erase_if(func.getBasicBlocks(), [](BasicBlock const& block) {
+        std::erase_if(func.basicBlocks(), [](BasicBlock const& block) {
             return block.instructions.empty();
         });
     }

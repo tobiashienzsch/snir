@@ -16,13 +16,13 @@ auto Interpreter::execute(Function const& func, std::span<ValueId const> args)
 {
     _registers.clear();
 
-    if (func.getArguments().size() != args.size()) {
+    if (func.arguments().size() != args.size()) {
         return std::nullopt;
     }
 
-    auto const* registry = func.getValue().registry();
+    auto const* registry = func.asValue().registry();
 
-    auto currentBlock = func.getBasicBlocks().at(0).label;
+    auto currentBlock = func.basicBlocks().at(0).label;
 
     auto instructions = registry->view<InstKind, Type>();
     auto operands     = registry->view<Operands>();
@@ -132,7 +132,7 @@ auto Interpreter::execute(Function const& func, std::span<ValueId const> args)
     };
 
     while (true) {
-        auto const& blocks = func.getBasicBlocks();
+        auto const& blocks = func.basicBlocks();
         auto const block   = std::ranges::find(blocks, currentBlock, &BasicBlock::label);
         if (block == std::ranges::end(blocks)) {
             raisef<std::runtime_error>("unknown block");

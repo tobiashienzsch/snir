@@ -14,14 +14,14 @@ auto ControlFlowGraph::operator()(Function const& func, AnalysisManager<Function
 {
     _graph.clear();
     _nodeIds.clear();
-    _registry = func.getValue().registry();
+    _registry = func.asValue().registry();
 
-    auto const& blocks = func.getBasicBlocks();
+    auto const& blocks = func.basicBlocks();
     if (blocks.empty()) {
         return {};
     }
 
-    println("; CFG for '{}': ", func.getIdentifier());
+    println("; CFG for '{}': ", func.identifier());
     for (auto const& block : blocks) {
         addBlockToGraph(block);
     }
@@ -41,14 +41,14 @@ auto ControlFlowGraph::addBlockToGraph(BasicBlock const& block) -> void
 
     auto const label = block.label;
     auto const node  = _nodeIds.add(label);
-    _graph.addIfNotContains(node);
+    _graph.add(node);
 
     if (block.instructions.empty()) {
         return;
     }
 
     auto terminal = Instruction{*_registry, block.instructions.back()};
-    auto kind     = terminal.getKind();
+    auto kind     = terminal.kind();
     if (kind == InstKind::Return) {
         println("; return in block {}", int(_nodeIds[node]));
     }
@@ -56,7 +56,7 @@ auto ControlFlowGraph::addBlockToGraph(BasicBlock const& block) -> void
         auto const [branch] = branchView.get(terminal);
         auto const dest     = _nodeIds.add(branch.iftrue);
         println("; branch in block {} to {}", int(_nodeIds[node]), int(_nodeIds[dest]));
-        _graph.addIfNotContains(dest);
+        _graph.add(dest);
         _graph.connect(node, dest);
     }
 }

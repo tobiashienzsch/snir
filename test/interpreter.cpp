@@ -99,13 +99,13 @@ struct FunctionTestSpec
 
 auto execute(snir::Function const& func, snir::Literal expected) -> void
 {
-    if (func.getArguments().empty()) {
+    if (func.arguments().empty()) {
         auto vm     = snir::Interpreter{};
         auto result = vm.execute(func, {});
         assert(result.has_value());
 
-        snir::println("; return: {} as {}", *result, func.getType());
-        if (func.getType() == snir::Type::Void) {
+        snir::println("; return: {} as {}", *result, func.type());
+        if (func.type() == snir::Type::Void) {
             assert(std::isnan(std::get<double>(result->value)));
         } else {
             assert(result->value == expected.value);
@@ -138,14 +138,14 @@ auto testFile(std::filesystem::path const& path) -> void
     auto source   = snir::readFile(path).value();
     auto test     = parseFunctionTestSpec(source);
     auto module   = parser.read(source);
-    assert(module.getFunctions().size() == 1);
+    assert(module.functions().size() == 1);
 
-    auto const func = snir::Function{registry, module.getFunctions().at(0)};
-    assert(func.getType() == test.type);
-    assert(func.getIdentifier() == test.name);
-    assert(func.getArguments().size() == test.args);
-    assert(func.getBasicBlocks().size() == test.blocks);
-    assert(func.getInstructionCount() == test.instructions);
+    auto const func = snir::Function{registry, module.functions().at(0)};
+    assert(func.type() == test.type);
+    assert(func.identifier() == test.name);
+    assert(func.arguments().size() == test.args);
+    assert(func.basicBlocks().size() == test.blocks);
+    assert(func.numInstructions() == test.instructions);
 
     execute(func, test.result);
     optimize(module);

@@ -15,12 +15,12 @@ struct Instruction
 
     [[nodiscard]] static auto create(Registry& reg, InstKind kind, Type type) -> Instruction;
 
-    [[nodiscard]] auto getKind() const -> InstKind;
-    [[nodiscard]] auto getType() const -> Type;
+    [[nodiscard]] auto kind() const -> InstKind;
+    [[nodiscard]] auto type() const -> Type;
 
     [[nodiscard]] auto isTerminator() const -> bool;
 
-    [[nodiscard]] auto getValue() const -> Value;
+    [[nodiscard]] auto asValue() const -> Value;
     // NOLINTNEXTLINE(hicpp-explicit-conversions)
     [[nodiscard]] explicit(false) operator Value() const noexcept;
     // NOLINTNEXTLINE(hicpp-explicit-conversions)

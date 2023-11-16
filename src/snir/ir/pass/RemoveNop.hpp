@@ -14,8 +14,8 @@ struct RemoveNop
 
     auto operator()(Function& func, AnalysisManager<Function>& /*analysis*/) -> void
     {
-        auto instKind = func.getValue().registry()->view<InstKind>();
-        for (auto& block : func.getBasicBlocks()) {
+        auto instKind = func.asValue().registry()->view<InstKind>();
+        for (auto& block : func.basicBlocks()) {
             std::erase_if(block.instructions, [&](ValueId id) {
                 auto const [kind] = instKind.get(id);
                 return kind == InstKind::Nop;

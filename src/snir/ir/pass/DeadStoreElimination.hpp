@@ -21,8 +21,8 @@ struct DeadStoreElimination
     auto operator()(Function& f, AnalysisManager<Function>& /*analysis*/) -> void
     {
         _used.clear();
-        auto* reg    = f.getValue().registry();
-        auto& blocks = f.getBasicBlocks();
+        auto* reg    = f.asValue().registry();
+        auto& blocks = f.basicBlocks();
 
         auto nop = Instruction::create(*reg, InstKind::Nop, Type::Void);
 

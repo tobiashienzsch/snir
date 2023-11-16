@@ -111,15 +111,15 @@ auto testParser() -> void
     auto const source = readFile(file).value();
     auto const module = parser.read(source);
 
-    auto const func    = Function{Value(registry, module.getFunctions().at(0))};
-    auto const& blocks = func.getBasicBlocks();
+    auto const func    = Function{Value(registry, module.functions().at(0))};
+    auto const& blocks = func.basicBlocks();
     assert(blocks.size() == 4);
 
     auto const terminatorVal = Value{registry, blocks.at(0).instructions.back()};
     auto const terminator    = Instruction{terminatorVal};
     assert(terminator.isTerminator());
-    assert(terminator.getKind() == InstKind::Branch);
-    assert(terminator.getType() == Type::Bool);
+    assert(terminator.kind() == InstKind::Branch);
+    assert(terminator.type() == Type::Bool);
 
     auto const [br] = branch.get(terminator);
     assert(br.iftrue == blocks.at(1).label);

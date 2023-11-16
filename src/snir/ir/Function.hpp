@@ -24,47 +24,47 @@ struct Function
         return Function{func};
     }
 
-    [[nodiscard]] auto getType() const -> Type { return _value.get<Type>(); }
+    [[nodiscard]] auto type() const -> Type { return _value.get<Type>(); }
 
-    auto setIdentifier(std::string_view text) const -> void
+    auto identifier(std::string_view text) const -> void
     {
         _value.emplace_or_replace<Identifier>(std::string{text});
     }
 
-    [[nodiscard]] auto getIdentifier() const -> std::string_view
+    [[nodiscard]] auto identifier() const -> std::string_view
     {
         return _value.get<Identifier>().text;
     }
 
-    [[nodiscard]] auto getArguments() const -> std::vector<ValueId> const&
+    [[nodiscard]] auto arguments() const -> std::vector<ValueId> const&
     {
         return _value.get<FunctionDefinition>().args;
     }
 
-    [[nodiscard]] auto getArguments() -> std::vector<ValueId>&
+    [[nodiscard]] auto arguments() -> std::vector<ValueId>&
     {
         return _value.get<FunctionDefinition>().args;
     }
 
-    [[nodiscard]] auto getBasicBlocks() const -> std::vector<BasicBlock> const&
+    [[nodiscard]] auto basicBlocks() const -> std::vector<BasicBlock> const&
     {
         return _value.get<FunctionDefinition>().blocks;
     }
 
-    [[nodiscard]] auto getBasicBlocks() -> std::vector<BasicBlock>&
+    [[nodiscard]] auto basicBlocks() -> std::vector<BasicBlock>&
     {
         return _value.get<FunctionDefinition>().blocks;
     }
 
-    [[nodiscard]] auto getInstructionCount() const -> std::size_t
+    [[nodiscard]] auto numInstructions() const -> std::size_t
     {
-        auto const& blocks = getBasicBlocks();
+        auto const& blocks = basicBlocks();
         return std::accumulate(blocks.begin(), blocks.end(), 0U, [](auto sum, auto const& block) {
             return sum + block.instructions.size();
         });
     }
 
-    [[nodiscard]] auto getValue() const noexcept -> Value { return _value; }
+    [[nodiscard]] auto asValue() const noexcept -> Value { return _value; }
 
     // NOLINTNEXTLINE(hicpp-explicit-conversions)
     [[nodiscard]] explicit(false) operator Value() const noexcept { return _value; }

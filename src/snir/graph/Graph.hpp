@@ -28,21 +28,15 @@ struct Graph
 
     Graph(std::initializer_list<Node> ilist) : _nodes(ilist) {}
 
-    auto add(NodeType id) -> void
+    auto add(NodeType id) -> bool
     {
         if (idExists(id)) {
-            raisef<std::runtime_error>("node '{}' already exists in graph", id);
+            return false;
         }
 
         _nodes.emplace_back(id);
         sortNodes();
-    }
-
-    auto addIfNotContains(NodeType id) -> void
-    {
-        if (not idExists(id)) {
-            add(id);
-        }
+        return true;
     }
 
     auto connect(NodeType source, NodeType sink) -> void
@@ -53,7 +47,7 @@ struct Graph
 
     [[nodiscard]] auto size() const noexcept -> std::size_t { return _nodes.size(); }
 
-    [[nodiscard]] auto getInEdges(NodeType id) const -> std::vector<Edge>
+    [[nodiscard]] auto inEdges(NodeType id) const -> std::vector<Edge>
     {
         auto result = std::vector<Edge>{};
         std::ranges::copy_if(_edges, std::back_inserter(result), [id](Edge edge) {
@@ -62,7 +56,7 @@ struct Graph
         return result;
     }
 
-    [[nodiscard]] auto getOutEdges(NodeType id) const -> std::vector<Edge>
+    [[nodiscard]] auto outEdges(NodeType id) const -> std::vector<Edge>
     {
         auto result = std::vector<Edge>{};
         std::ranges::copy_if(_edges, std::back_inserter(result), [id](Edge edge) {
@@ -116,7 +110,7 @@ template<typename NodeType>
 
     visited[currentNodeID] = true;
 
-    if (auto const& edges = graph.getOutEdges(currentNodeID); !edges.empty()) {
+    if (auto const& edges = graph.outEdges(currentNodeID); !edges.empty()) {
         for (auto const& edge : edges) {
             if (!visited[edge.sink]) {
                 orderIndex = depthFirstSearch(orderIndex, edge.sink, visited, ordering, graph);
@@ -180,7 +174,7 @@ private:
         _visited[currentNode]    = true;
         _components[currentNode] = _count;
 
-        if (auto const& edges = _graph->getOutEdges(currentNode); !edges.empty()) {
+        if (auto const& edges = _graph->outEdges(currentNode); !edges.empty()) {
             for (auto const& edge : edges) {
                 if (!_visited[edge.sink]) {
                     dfs(edge.sink);

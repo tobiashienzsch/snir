@@ -64,7 +64,7 @@ auto testGraph() -> void
     snir::println("Graph: ");
     graph.forEach([&graph](auto const& node) {
         snir::print("{}: [", node);
-        for (auto edge : graph.getOutEdges(node)) {
+        for (auto edge : graph.outEdges(node)) {
             snir::print("{} ", edge.sink);
         }
         snir::println("]");

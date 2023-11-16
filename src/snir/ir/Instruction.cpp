@@ -17,16 +17,16 @@ auto Instruction::create(Registry& reg, InstKind kind, Type type) -> Instruction
     return Instruction{reg, inst};
 }
 
-auto Instruction::getKind() const -> InstKind { return _value.get<InstKind>(); }
+auto Instruction::kind() const -> InstKind { return _value.get<InstKind>(); }
 
-auto Instruction::getType() const -> Type { return _value.get<Type>(); }
+auto Instruction::type() const -> Type { return _value.get<Type>(); }
 
 auto Instruction::isTerminator() const -> bool
 {
-    return ranges::contains(std::array{InstKind::Return, InstKind::Branch}, getKind());
+    return ranges::contains(std::array{InstKind::Return, InstKind::Branch}, kind());
 }
 
-auto Instruction::getValue() const -> Value { return _value; }
+auto Instruction::asValue() const -> Value { return _value; }
 
 Instruction::operator Value() const noexcept { return _value; }
 

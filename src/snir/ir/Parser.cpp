@@ -30,13 +30,13 @@ auto Parser::read(std::string_view source) -> Module
         _locals.clear();
 
         auto func = Function::create(*_registry, parseType(match.get<1>()));
-        func.setIdentifier(match.get<2>());
-        func.getValue().emplace<FunctionDefinition>(
+        func.identifier(match.get<2>());
+        func.asValue().emplace<FunctionDefinition>(
             readArguments(match.get<3>()),
             readBlocks(match.get<4>())
         );
 
-        module.getFunctions().push_back(func);
+        module.functions().push_back(func);
     }
 
     return module;
@@ -133,8 +133,8 @@ auto Parser::readBinaryInst(std::string_view source) -> std::optional<ValueId>
         auto rhs    = getOrCreateLocal(match.get<5>(), ValueKind::Register);
 
         auto inst = Instruction::create(*_registry, kind, type);
-        inst.getValue().emplace<Result>(result);
-        inst.getValue().emplace<Operands>(StaticVector<ValueId, 2>{lhs, rhs});
+        inst.asValue().emplace<Result>(result);
+        inst.asValue().emplace<Operands>(StaticVector<ValueId, 2>{lhs, rhs});
         return inst;
     }
 
@@ -153,9 +153,9 @@ auto Parser::readIntCmpInst(std::string_view source) -> std::optional<ValueId>
         auto const rhs    = getOrCreateLocal(match.get<5>(), ValueKind::Register);
 
         auto inst = Instruction::create(*_registry, InstKind::IntCmp, type);
-        inst.getValue().emplace<Result>(result);
-        inst.getValue().emplace<CompareKind>(cmp);
-        inst.getValue().emplace<Operands>(StaticVector<ValueId, 2>{lhs, rhs});
+        inst.asValue().emplace<Result>(result);
+        inst.asValue().emplace<CompareKind>(cmp);
+        inst.asValue().emplace<Operands>(StaticVector<ValueId, 2>{lhs, rhs});
         return inst;
     }
 
@@ -171,8 +171,8 @@ auto Parser::readTruncInst(std::string_view source) -> std::optional<ValueId>
         auto const type   = parseType(match.get<3>());
 
         auto inst = Instruction::create(*_registry, InstKind::Trunc, type);
-        inst.getValue().emplace<Result>(result);
-        inst.getValue().emplace<Operands>(StaticVector<ValueId, 2>{value});
+        inst.asValue().emplace<Result>(result);
+        inst.asValue().emplace<Operands>(StaticVector<ValueId, 2>{value});
         return inst;
     }
 
@@ -187,14 +187,14 @@ auto Parser::readReturnInst(std::string_view source) -> std::optional<ValueId>
         auto const operand         = getOrCreateLocal(opSrc, ValueKind::Register);
 
         auto ret = Instruction::create(*_registry, InstKind::Return, type);
-        ret.getValue().emplace<Operands>(StaticVector<ValueId, 2>{operand});
+        ret.asValue().emplace<Operands>(StaticVector<ValueId, 2>{operand});
         return ret;
     }
 
     if (auto match = ctre::match<R"(ret\s+(\w+))">(source); match) {
         if (match.get<1>() == "void") {
             auto ret = Instruction::create(*_registry, InstKind::Return, Type::Void);
-            ret.getValue().emplace<Operands>();
+            ret.asValue().emplace<Operands>();
             return ret;
         }
     }
@@ -208,8 +208,8 @@ auto Parser::readBranchInst(std::string_view source) -> std::optional<ValueId>
         auto const iftrue = getOrCreateLocal(m.get<1>().view().substr(1), ValueKind::Label);
 
         auto br = Instruction::create(*_registry, InstKind::Branch, Type::Bool);
-        br.getValue().emplace<Operands>();
-        br.getValue().emplace<Branch>(iftrue, std::nullopt, std::nullopt);
+        br.asValue().emplace<Operands>();
+        br.asValue().emplace<Branch>(iftrue, std::nullopt, std::nullopt);
         return br;
     }
 
@@ -219,8 +219,8 @@ auto Parser::readBranchInst(std::string_view source) -> std::optional<ValueId>
         auto const iffalse   = getOrCreateLocal(m.get<3>(), ValueKind::Label);
 
         auto br = Instruction::create(*_registry, InstKind::Branch, Type::Bool);
-        br.getValue().emplace<Operands>();
-        br.getValue().emplace<Branch>(iftrue, iffalse, condition);
+        br.asValue().emplace<Operands>();
+        br.asValue().emplace<Branch>(iftrue, iffalse, condition);
         return br;
     }
 
@@ -235,8 +235,8 @@ auto Parser::readConstInst(std::string_view source) -> std::optional<ValueId>
         auto const literal = parseLiteral(match.get<3>(), type);
 
         auto inst = Instruction::create(*_registry, InstKind::Const, type);
-        inst.getValue().emplace<Result>(Result{result});
-        inst.getValue().emplace<Literal>(literal);
+        inst.asValue().emplace<Result>(Result{result});
+        inst.asValue().emplace<Literal>(literal);
         return inst;
     }
 

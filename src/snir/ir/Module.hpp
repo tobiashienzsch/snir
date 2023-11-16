@@ -11,13 +11,13 @@ struct Module
 {
     explicit Module(Registry& registry) : _registry{&registry} {}
 
-    [[nodiscard]] auto getRegistry() -> Registry& { return *_registry; }
+    [[nodiscard]] auto registry() -> Registry& { return *_registry; }
 
-    [[nodiscard]] auto getRegistry() const -> Registry const& { return *_registry; }
+    [[nodiscard]] auto registry() const -> Registry const& { return *_registry; }
 
-    [[nodiscard]] auto getFunctions() -> std::vector<ValueId>& { return _functions; }
+    [[nodiscard]] auto functions() -> std::vector<ValueId>& { return _functions; }
 
-    [[nodiscard]] auto getFunctions() const -> std::vector<ValueId> const& { return _functions; }
+    [[nodiscard]] auto functions() const -> std::vector<ValueId> const& { return _functions; }
 
 private:
     Registry* _registry;

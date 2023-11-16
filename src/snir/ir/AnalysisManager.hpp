@@ -14,7 +14,7 @@ struct AnalysisManager
     {
         using ResultT = typename PassT::Result;
 
-        auto val     = unit.getValue();
+        auto val     = unit.asValue();
         auto* result = val.template try_get<ResultT>();
         if (result != nullptr) {
             return *result;
