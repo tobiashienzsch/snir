@@ -91,10 +91,12 @@ private:
         raisef<std::out_of_range>("subscript out-of-bounds idx: {}, size: {}", index, self.size());
     }
 
+    static_assert(Capacity <= std::numeric_limits<std::uint16_t>::max());
+
     using SizeType = std::conditional_t<
         Capacity <= std::numeric_limits<std::uint8_t>::max(),
         std::uint8_t,
-        std::uint32_t>;
+        std::uint16_t>;
 
     std::array<T, Capacity> _buffer{};
     SizeType _size{0};

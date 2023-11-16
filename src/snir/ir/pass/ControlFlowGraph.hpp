@@ -17,8 +17,8 @@ struct ControlFlowGraph
 
     struct Result
     {
-        LocalIdMap<ValueId, std::uint32_t> nodeIds;
-        Graph<std::uint32_t> graph;
+        LocalIdMap<ValueId, int> nodeIds;
+        Graph<int> graph;
     };
 
     ControlFlowGraph() = default;
@@ -29,8 +29,8 @@ private:
     auto addBlockToGraph(BasicBlock const& block) -> void;
 
     Registry* _registry{nullptr};
-    LocalIdMap<ValueId, std::uint32_t> _nodeIds;
-    Graph<std::uint32_t> _graph;
+    LocalIdMap<ValueId, int> _nodeIds;
+    Graph<int> _graph;
 };
 
 }  // namespace snir

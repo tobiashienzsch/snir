@@ -9,6 +9,7 @@
 #include <functional>
 #include <initializer_list>
 #include <iterator>
+#include <utility>
 #include <vector>
 
 namespace snir {
@@ -132,9 +133,12 @@ template<typename NodeType>
     auto const size = graph.size();
     auto ordering   = std::vector<NodeType>(size);
     auto visited    = std::vector<bool>(size);
+    if (size == 0) {
+        return ordering;
+    }
 
     auto i = size - 1;
-    for (NodeType at = 0; at < size; at++) {
+    for (NodeType at = 0; std::cmp_less(at, size); ++at) {
         if (!visited[at]) {
             i = depthFirstSearch(static_cast<NodeType>(i), at, visited, ordering, graph);
         }
