@@ -26,7 +26,7 @@ auto Parser::read(std::string_view source) -> Module
 {
     auto module = Module{*_registry};
 
-    for (auto match : ctre::range<R"(define\s+(\w+)\s+@(\w+)\(([^)]*)\)\s*\{([^}]*)\})">(source)) {
+    for (auto match : ctre::search_all<R"(define\s+(\w+)\s+@(\w+)\(([^)]*)\)\s*\{([^}]*)\})">(source)) {
         _locals.clear();
 
         auto func = Function::create(*_registry, parseType(match.get<1>()));
@@ -45,7 +45,7 @@ auto Parser::read(std::string_view source) -> Module
 auto Parser::readArguments(std::string_view source) -> std::vector<ValueId>
 {
     auto args = std::vector<ValueId>{};
-    for (auto match : ctre::range<R"(\s*([a-zA-Z_]\w*)\s+%([0-9]+)(?:\s*,\s*|$))">(source)) {
+    for (auto match : ctre::search_all<R"(\s*([a-zA-Z_]\w*)\s+%([0-9]+)(?:\s*,\s*|$))">(source)) {
         auto local = getOrCreateLocal(match.get<2>(), ValueKind::Register);
         local.emplace<Type>(parseType(match.get<1>()));
         args.push_back(local);

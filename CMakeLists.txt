@@ -18,12 +18,12 @@ include(FetchContent)
 FetchContent_Declare(
     ctre
     GIT_REPOSITORY "https://github.com/hanickadot/compile-time-regular-expressions"
-    GIT_TAG v3.8.1
+    GIT_TAG v3.10.0
 )
 FetchContent_Declare(
     entt
     GIT_REPOSITORY "https://github.com/skypjack/entt"
-    GIT_TAG v3.12.2
+    GIT_TAG v3.15.0
 )
 FetchContent_MakeAvailable(ctre entt)
 
