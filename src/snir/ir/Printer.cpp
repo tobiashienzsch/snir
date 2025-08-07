@@ -77,9 +77,9 @@ auto Printer::printFunction(Function& func) -> void
 
     std::println(_out, " {{");
     auto const& blocks = func.basicBlocks();
-    for (auto i{0U}; i < blocks.size(); ++i) {
+    for (auto i = 0zu; i < blocks.size(); ++i) {
         printBasicBlock(func, blocks.at(i));
-        if (auto const isLast = i == blocks.size() - 1U; not isLast) {
+        if (auto const isLast = i == blocks.size() - 1zu; not isLast) {
             std::println(_out, "");
         }
     }

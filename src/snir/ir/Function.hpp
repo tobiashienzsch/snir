@@ -59,7 +59,7 @@ struct Function
     [[nodiscard]] auto numInstructions() const -> std::size_t
     {
         auto const& blocks = basicBlocks();
-        return std::accumulate(blocks.begin(), blocks.end(), 0U, [](auto sum, auto const& block) {
+        return std::accumulate(blocks.begin(), blocks.end(), 0zu, [](auto sum, auto const& block) {
             return sum + block.instructions.size();
         });
     }

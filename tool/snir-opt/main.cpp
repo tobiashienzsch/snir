@@ -31,7 +31,7 @@ struct Arguments
 [[nodiscard]] auto parseArguments(std::span<char const* const> arguments) -> std::optional<Arguments>
 {
     auto args = Arguments{};
-    for (auto i{1U}; i < arguments.size(); ++i) {
+    for (auto i{1zu}; i < arguments.size(); ++i) {
         if (snir::strings::trim(arguments[i]) == std::string_view{"-v"}) {
             args.verbose = true;
             continue;
