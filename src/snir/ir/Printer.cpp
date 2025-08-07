@@ -27,8 +27,10 @@
 
 namespace snir {
 
-[[nodiscard]] static auto getPredsForBlock(ControlFlowGraph::Result const& result, ValueId block)
-    -> std::vector<ValueId>
+namespace {
+
+[[nodiscard]] auto
+getPredsForBlock(ControlFlowGraph::Result const& result, ValueId block) -> std::vector<ValueId>
 {
     auto const node  = result.nodeIds[block];
     auto const edges = result.graph.inEdges(node);
@@ -40,6 +42,8 @@ namespace snir {
     }
     return preds;
 };
+
+}  // namespace
 
 Printer::Printer(std::ostream& out) : _out{out} {}
 

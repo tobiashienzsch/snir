@@ -5,7 +5,7 @@
 
 namespace snir {
 
-enum struct CompareKind
+enum struct CompareKind : std::uint8_t
 {
 #define SNIR_COMPARE_KIND(Id, Name) Id,
 #include "snir/ir/CompareKind.def"

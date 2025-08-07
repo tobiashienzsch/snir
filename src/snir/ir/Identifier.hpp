@@ -1,5 +1,6 @@
 #pragma once
 
+#include <cstdint>
 #include <string>
 #include <string_view>
 #include <utility>
@@ -11,13 +12,13 @@ struct Identifier
     std::string text;
 };
 
-enum struct IdentifierKind
+enum struct IdentifierKind : std::uint8_t
 {
     Global,
     Local,
 };
 
-[[nodiscard]] auto parseIdentifier(std::string_view src)
-    -> std::pair<IdentifierKind, std::string_view>;
+[[nodiscard]] auto parseIdentifier(std::string_view src
+) -> std::pair<IdentifierKind, std::string_view>;
 
 }  // namespace snir
