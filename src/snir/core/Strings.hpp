@@ -1,9 +1,11 @@
 #pragma once
 
+#include "snir/core/Concepts.hpp"
 #include "snir/core/Exception.hpp"
 
 #include <algorithm>
 #include <charconv>
+#include <concepts>
 #include <iterator>
 #include <optional>
 #include <string>
@@ -70,7 +72,15 @@ template<typename NumberType>
     auto value              = NumberType{};
     auto const* const first = str.data();
     auto const* const last  = std::next(str.data(), std::ranges::ssize(str));
-    auto const result       = std::from_chars(first, last, value);
+    auto const result       = [&] {
+        if constexpr (std::floating_point<NumberType>) {
+            return std::from_chars(first, last, value, std::chars_format::general);
+        } else if constexpr (std::integral<NumberType>) {
+            return std::from_chars(first, last, value, 10);
+        } else {
+            static_assert(alwaysFalse<NumberType>);
+        }
+    }();
     if (result.ec == std::errc{}) {
         return value;
     }
