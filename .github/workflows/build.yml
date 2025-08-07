@@ -13,15 +13,24 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - name: Linux
+          - name: Linux GCC
             os: ubuntu-24.04
             cmake_flags: "-D CMAKE_C_COMPILER=gcc-14 -D CMAKE_CXX_COMPILER=g++-14"
 
-          - name: macOS
-            os: macos-15
+          - name: Linux Clang
+            os: ubuntu-24.04
             cmake_flags: ""
 
-          - name: Windows
+        # Does not support from_chars for floating point types
+        #   - name: macOS
+        #     os: macos-15
+        #     cmake_flags: ""
+
+          - name: Windows Clang
+            os: windows-2025
+            cmake_flags: ''
+
+          - name: Windows MSVC
             os: windows-2025
             cmake_flags: '-D CMAKE_CXX_FLAGS="/EHsc"'
     steps:
@@ -31,8 +40,15 @@ jobs:
           lfs: true
 
       - name: Set up Visual Studio shell
-        if: matrix.name == 'Windows'
+        if: matrix.name == 'Windows MSVC'
         uses: egor-tensin/vs-shell@v2
+
+      - name: Set up Clang
+        if: (matrix.name == 'Linux Clang') || (matrix.name == 'Windows Clang')
+        uses: egor-tensin/setup-clang@v1
+        with:
+          version: latest
+          platform: x64
 
       - name: CMake configure
         run: cmake -S . -B build -G "Ninja Multi-Config" -D CMAKE_UNITY_BUILD=ON ${{ matrix.cmake_flags }}
