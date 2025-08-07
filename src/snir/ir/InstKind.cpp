@@ -24,8 +24,8 @@ auto parseInstKind(std::string_view source) -> InstKind
 #include "snir/ir/InstKind.def"
     };
 
-    auto const* found = std::ranges::find(names, strings::trim(source), &InstName::name);
-    if (found == std::ranges::end(names)) {
+    auto const found = std::ranges::find(names, strings::trim(source), &InstName::name);
+    if (found == std::ranges::cend(names)) {
         raisef<std::invalid_argument>("failed to parse '{}' as InstKind", source);
     }
 
