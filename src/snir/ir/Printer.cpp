@@ -1,6 +1,5 @@
 #include "Printer.hpp"
 
-#include "snir/core/Print.hpp"
 #include "snir/ir/AnalysisManager.hpp"
 #include "snir/ir/BasicBlock.hpp"
 #include "snir/ir/Branch.hpp"
@@ -23,6 +22,7 @@
 #include <format>
 #include <iterator>
 #include <ostream>
+#include <print>
 #include <vector>
 
 namespace snir {
@@ -72,18 +72,18 @@ auto Printer::printFunction(Function& func) -> void
 
     auto const [type, identifier, def] = view.get(func.asValue());
 
-    print(_out, "define {} @{}", type, identifier.text);
+    std::print(_out, "define {} @{}", type, identifier.text);
     printFunctionArgs(func);
 
-    println(_out, " {{");
+    std::println(_out, " {{");
     auto const& blocks = func.basicBlocks();
     for (auto i{0U}; i < blocks.size(); ++i) {
         printBasicBlock(func, blocks.at(i));
         if (auto const isLast = i == blocks.size() - 1U; not isLast) {
-            println(_out, "");
+            std::println(_out, "");
         }
     }
-    println(_out, "}}\n");
+    std::println(_out, "}}\n");
 }
 
 auto Printer::printFunctionArgs(Function& func) -> void
@@ -92,17 +92,17 @@ auto Printer::printFunctionArgs(Function& func) -> void
     auto types       = func.asValue().registry()->view<Type>();
 
     if (args.empty()) {
-        print(_out, "()");
+        std::print(_out, "()");
         return;
     }
 
     auto const a0 = std::ranges::begin(args);
     auto const l  = std::ranges::end(args);
-    print(_out, "({} %{}", std::get<0>(types.get(*a0)), _localIds.add(*a0));
+    std::print(_out, "({} %{}", std::get<0>(types.get(*a0)), _localIds.add(*a0));
     std::ranges::for_each(std::ranges::next(a0), l, [this, &types](ValueId arg) {
-        print(_out, ", {} %{}", std::get<0>(types.get(arg)), _localIds.add(arg));
+        std::print(_out, ", {} %{}", std::get<0>(types.get(arg)), _localIds.add(arg));
     });
-    print(_out, ")");
+    std::print(_out, ")");
 }
 
 auto Printer::printBasicBlock(Function& func, BasicBlock const& block) -> void
@@ -124,55 +124,55 @@ auto Printer::printBasicBlock(Function& func, BasicBlock const& block) -> void
         return std::format("{}", int(val));
     };
 
-    print(_out, "{}:", _localIds.add(block.label));
+    std::print(_out, "{}:", _localIds.add(block.label));
     if (_cfg != nullptr) {
         auto const preds = getPredsForBlock(*_cfg, block.label);
         if (not preds.empty()) {
             auto first = std::ranges::begin(preds);
-            print(_out, "\t\t\t\t\t\t; preds = %{}", _localIds.add(*first));
+            std::print(_out, "\t\t\t\t\t\t; preds = %{}", _localIds.add(*first));
             std::ranges::for_each(
                 std::ranges::next(first),
                 std::ranges::end(preds),
-                [this](auto pred) { print(_out, ", %{}", _localIds.add(pred)); }
+                [this](auto pred) { std::print(_out, ", %{}", _localIds.add(pred)); }
             );
         }
     }
-    println(_out, "");
+    std::println(_out, "");
 
     for (auto const inst : block.instructions) {
         auto const [kind, type] = common.get(inst);
         switch (kind) {
             case InstKind::Nop: {
-                println(_out, "  ; {}", kind);
+                std::println(_out, "  ; {}", kind);
                 break;
             }
             case InstKind::Const: {
                 auto const [id]    = result.get(inst);
                 auto const res     = formatValue(id.id);
                 auto const [value] = literal.get(inst);
-                println(_out, "  {} = {} {}", res, type, value);
+                std::println(_out, "  {} = {} {}", res, type, value);
                 break;
             }
             case InstKind::Return: {
                 if (type == Type::Void) {
-                    println(_out, "  {} {}", kind, type);
+                    std::println(_out, "  {} {}", kind, type);
                 } else {
                     auto const [args] = operands.get(inst);
                     auto const value  = formatValue(args.list[0]);
-                    println(_out, "  {} {} {}", kind, type, value);
+                    std::println(_out, "  {} {} {}", kind, type, value);
                 }
                 break;
             }
             case InstKind::Branch: {
                 auto [br] = branch.get(inst);
                 if (not br.condition) {
-                    println(_out, "  {} label %{}", kind, _localIds.add(br.iftrue));
+                    std::println(_out, "  {} label %{}", kind, _localIds.add(br.iftrue));
                 } else {
                 }
                 break;
             }
             case InstKind::Phi: {
-                println(_out, "  {} ", kind);
+                std::println(_out, "  {} ", kind);
                 break;
             }
             case InstKind::Add:
@@ -194,7 +194,7 @@ auto Printer::printBasicBlock(Function& func, BasicBlock const& block) -> void
                 auto const res    = formatValue(id.id);
                 auto const lhs    = formatValue(args.list[0]);
                 auto const rhs    = formatValue(args.list[1]);
-                println(_out, "  {} = {} {} {}, {}", res, kind, type, lhs, rhs);
+                std::println(_out, "  {} = {} {} {}, {}", res, kind, type, lhs, rhs);
                 break;
             }
 
@@ -205,7 +205,7 @@ auto Printer::printBasicBlock(Function& func, BasicBlock const& block) -> void
                 auto const [cmp]  = compare.get(inst);
                 auto const lhs    = formatValue(args.list[0]);
                 auto const rhs    = formatValue(args.list[1]);
-                println(_out, "  {} = {} {} {} {}, {}", res, kind, cmp, type, lhs, rhs);
+                std::println(_out, "  {} = {} {} {} {}, {}", res, kind, cmp, type, lhs, rhs);
                 break;
             }
             case InstKind::Trunc: {
@@ -213,7 +213,7 @@ auto Printer::printBasicBlock(Function& func, BasicBlock const& block) -> void
                 auto const [args] = operands.get(inst);
                 auto const res    = formatValue(id.id);
                 auto const value  = formatValue(args.list[0]);
-                println(_out, "  {} = {} {} to {}", res, kind, value, type);
+                std::println(_out, "  {} = {} {} to {}", res, kind, value, type);
                 break;
             }
         }

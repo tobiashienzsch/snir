@@ -1,6 +1,5 @@
 #pragma once
 
-#include "snir/core/Print.hpp"
 #include "snir/ir/AnalysisManager.hpp"
 #include "snir/ir/Function.hpp"
 #include "snir/ir/Instruction.hpp"
@@ -8,6 +7,8 @@
 #include "snir/ir/Result.hpp"
 #include "snir/ir/Value.hpp"
 
+#include <print>
+#include <ranges>
 #include <set>
 
 namespace snir {
@@ -26,9 +27,9 @@ struct DeadStoreElimination
 
         auto nop = Instruction::create(*reg, InstKind::Nop, Type::Void);
 
-        for (auto block = std::rbegin(blocks); block != std::rend(blocks); ++block) {
-            auto rb = std::rbegin(block->instructions);
-            auto re = std::rend(block->instructions);
+        for (auto& block : std::ranges::reverse_view(blocks)) {
+            auto rb = std::rbegin(block.instructions);
+            auto re = std::rend(block.instructions);
             std::transform(rb, re, rb, [this, reg, nop](auto id) {
                 return replaceWithNopIfUnused(Value{*reg, id}, nop);
             });

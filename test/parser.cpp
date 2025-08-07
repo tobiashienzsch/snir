@@ -1,6 +1,6 @@
+#undef NDEBUG
 #include "snir/ir/Parser.hpp"
 #include "snir/core/File.hpp"
-#include "snir/core/Print.hpp"
 #include "snir/core/Strings.hpp"
 #include "snir/ir/Branch.hpp"
 #include "snir/ir/CompareKind.hpp"
@@ -11,8 +11,8 @@
 
 #include <ctre.hpp>
 
-#undef NDEBUG
 #include <cassert>
+#include <print>
 
 using namespace snir;
 
@@ -130,7 +130,7 @@ auto testParserErrors() -> void
     auto registry = Registry{};
     auto parser   = Parser{registry};
     for (auto const& entry : std::filesystem::directory_iterator{"./test/files/error"}) {
-        snir::println("; {}", entry.path().string());
+        std::println("; {}", entry.path().string());
         auto const source = readFile(entry).value();
         auto const error  = parseErrorMessage(source);
         CHECK_THROW_CONTAINS(parser.read(source), error);

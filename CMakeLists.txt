@@ -1,5 +1,4 @@
 cmake_minimum_required(VERSION 3.24)
-project(snir-dev VERSION 0.1.0)
 
 find_program(CCACHE ccache)
 if (CCACHE)
@@ -7,12 +6,14 @@ if (CCACHE)
     set(CMAKE_CXX_COMPILER_LAUNCHER ${CCACHE})
 endif ()
 
-set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set(CMAKE_INTERPROCEDURAL_OPTIMIZATION ON)
+
+project(snir-dev VERSION 0.1.0)
 
 include(FetchContent)
 FetchContent_Declare(

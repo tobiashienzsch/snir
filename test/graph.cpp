@@ -1,15 +1,17 @@
+#undef NDEBUG
+
 #include "snir/graph/Graph.hpp"
 
-#include "snir/core/Print.hpp"
 #include "snir/graph/AdjacencyList.hpp"
 #include "snir/ir/ValueId.hpp"
 
-#undef NDEBUG
 #include <array>
 #include <cassert>
+#include <iostream>
 #include <map>
+#include <print>
 
-auto testAdjacencyList() -> void
+static auto testAdjacencyList() -> void
 {
     auto const graph = snir::AdjacencyList<char>{
         {'A', {'B', 'C'}},
@@ -21,14 +23,14 @@ auto testAdjacencyList() -> void
     };
     auto result = std::vector<char>{};
     snir::dfs(graph, 'A', [&](auto node) {
-        std::printf("node: %c\n", node);
+        std::println("node: {:c}", node);
         result.push_back(node);
     });
 
     assert(std::ranges::equal(result, std::array{'A', 'B', 'D', 'E', 'F', 'C'}));
 }
 
-auto testTopologicalSort() -> void
+static auto testTopologicalSort() -> void
 {
     using Id = int;
 
@@ -52,7 +54,7 @@ auto testTopologicalSort() -> void
     assert(std::ranges::equal(ordering, expected));
 }
 
-auto testGraph() -> void
+static auto testGraph() -> void
 {
     auto graph = snir::Graph<int>{0, 1, 2, 3, 4, 5, 6};
     graph.connect(0, 1);
@@ -61,27 +63,27 @@ auto testGraph() -> void
     graph.connect(3, 4);
     graph.connect(5, 6);
 
-    snir::println("Graph: ");
+    std::println("Graph: ");
     graph.forEach([&graph](auto const& node) {
-        snir::print("{}: [", node);
+        std::print("{}: [", node);
         for (auto edge : graph.outEdges(node)) {
-            snir::print("{} ", edge.sink);
+            std::print("{} ", edge.sink);
         }
-        snir::println("]");
+        std::println("]");
     });
 
     auto stream = std::ostream_iterator<int>(std::cout, " ");
 
     auto const components = snir::FindComponents(graph).get();
-    snir::println("\nComponents: ");
-    snir::println("Count: {}", components.first);
+    std::println("\nComponents: ");
+    std::println("Count: {}", components.first);
     std::ranges::copy(components.second, stream);
-    snir::println("");
+    std::println("");
 
     auto const ordering = topologicalSort(graph);
-    snir::println("\nOrdering (TopologicalSort): ");
+    std::println("\nOrdering (TopologicalSort): ");
     std::ranges::copy(ordering, stream);
-    snir::println("");
+    std::println("");
 }
 
 auto main() -> int

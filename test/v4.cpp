@@ -4,6 +4,7 @@
 #include <cstdio>
 #include <cstdlib>
 #include <optional>
+#include <print>
 #include <string_view>
 #include <vector>
 
@@ -217,11 +218,11 @@ auto testValueStore() -> void
 
 auto main() -> int
 {
-    std::printf("sizeof(Value): %zu\n", sizeof(snir::Value));
-    std::printf("sizeof(Inst): %zu\n", sizeof(snir::Inst));
-    std::printf("sizeof(UnaryOp): %zu\n", sizeof(snir::UnaryOp));
-    std::printf("sizeof(BinaryOp): %zu\n", sizeof(snir::BinaryOp));
-    std::printf("sizeof(Branch): %zu\n", sizeof(snir::Branch));
+    std::println("sizeof(Value): {}", sizeof(snir::Value));
+    std::println("sizeof(Inst): {}", sizeof(snir::Inst));
+    std::println("sizeof(UnaryOp): {}", sizeof(snir::UnaryOp));
+    std::println("sizeof(BinaryOp): {}", sizeof(snir::BinaryOp));
+    std::println("sizeof(Branch): {}", sizeof(snir::Branch));
 
     testValueStore();
 

@@ -1,6 +1,5 @@
 #include "ControlFlowGraph.hpp"
 
-#include "snir/core/Print.hpp"
 #include "snir/graph/Graph.hpp"
 #include "snir/ir/AnalysisManager.hpp"
 #include "snir/ir/BasicBlock.hpp"
@@ -8,6 +7,8 @@
 #include "snir/ir/Function.hpp"
 #include "snir/ir/InstKind.hpp"
 #include "snir/ir/Instruction.hpp"
+
+#include <print>
 
 namespace snir {
 
@@ -23,17 +24,17 @@ auto ControlFlowGraph::operator()(Function const& func, AnalysisManager<Function
         return {};
     }
 
-    println("; CFG for '{}': ", func.identifier());
+    std::println("; CFG for '{}': ", func.identifier());
     for (auto const& block : blocks) {
         addBlockToGraph(block);
     }
 
-    print("; ");
+    std::print("; ");
     auto const order = topologicalSort(_graph);
     for (auto node : order) {
-        print("{} -> ", int(_nodeIds[node]));
+        std::print("{} -> ", int(_nodeIds[node]));
     }
-    println("return");
+    std::println("return");
     return {.nodeIds = _nodeIds, .graph = _graph};
 }
 
@@ -52,12 +53,12 @@ auto ControlFlowGraph::addBlockToGraph(BasicBlock const& block) -> void
     auto terminal = Instruction{*_registry, block.instructions.back()};
     auto kind     = terminal.kind();
     if (kind == InstKind::Return) {
-        println("; return in block {}", int(_nodeIds[node]));
+        std::println("; return in block {}", int(_nodeIds[node]));
     }
     if (kind == InstKind::Branch) {
         auto const [branch] = branchView.get(terminal);
         auto const dest     = _nodeIds.add(branch.iftrue);
-        println("; branch in block {} to {}", int(_nodeIds[node]), int(_nodeIds[dest]));
+        std::println("; branch in block {} to {}", int(_nodeIds[node]), int(_nodeIds[dest]));
         _graph.add(dest);
         _graph.connect(node, dest);
     }

@@ -1,5 +1,4 @@
 #include "snir/core/File.hpp"
-#include "snir/core/Print.hpp"
 #include "snir/core/Strings.hpp"
 #include "snir/ir/CompareKind.hpp"
 #include "snir/ir/Function.hpp"
@@ -18,6 +17,7 @@
 
 #include <chrono>
 #include <fstream>
+#include <print>
 
 namespace {
 struct Arguments
@@ -57,7 +57,7 @@ auto main(int argc, char const* const* argv) -> int
     // Parse arguments
     auto args = parseArguments(std::span<char const* const>(argv, std::size_t(argc)));
     if (not args) {
-        snir::println("Usage:\nsnir-opt -v -O[0,1,2]");
+        std::println("Usage:\nsnir-opt -v -O[0,1,2]");
         return EXIT_FAILURE;
     }
 
@@ -95,7 +95,7 @@ auto main(int argc, char const* const* argv) -> int
     if (func.arguments().empty()) {
         auto vm     = snir::Interpreter{};
         auto result = vm.execute(func, {});
-        snir::println("; return: {} as {}", result.value(), func.type());
+        std::println("; return: {} as {}", result.value(), func.type());
     }
 
     return 0;

@@ -1,6 +1,6 @@
+#undef NDEBUG
 #include "snir/ir/Interpreter.hpp"
 #include "snir/core/File.hpp"
-#include "snir/core/Print.hpp"
 #include "snir/core/Strings.hpp"
 #include "snir/ir/CompareKind.hpp"
 #include "snir/ir/Function.hpp"
@@ -18,15 +18,15 @@
 
 #include <ctre.hpp>
 
-#undef NDEBUG
 #include <cassert>
 #include <filesystem>
+#include <print>
 
 namespace {
 
 struct FunctionTestSpec
 {
-    std::string name{};
+    std::string name;
     snir::Type type{};
     std::size_t args{std::numeric_limits<std::size_t>::max()};
     std::size_t blocks{std::numeric_limits<std::size_t>::max()};
@@ -104,7 +104,7 @@ auto execute(snir::Function const& func, snir::Literal expected) -> void
         auto result = vm.execute(func, {});
         assert(result.has_value());
 
-        snir::println("; return: {} as {}", *result, func.type());
+        std::println("; return: {} as {}", *result, func.type());
         if (func.type() == snir::Type::Void) {
             assert(std::isnan(std::get<double>(result->value)));
         } else {
@@ -131,7 +131,7 @@ auto optimize(snir::Module& module) -> void
 
 auto testFile(std::filesystem::path const& path) -> void
 {
-    snir::println("; {}", path.string());
+    std::println("; {}", path.string());
 
     auto registry = snir::Registry{};
     auto parser   = snir::Parser{registry};
