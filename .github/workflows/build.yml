@@ -15,11 +15,11 @@ jobs:
         include:
           - name: Linux GCC
             os: ubuntu-24.04
-            cmake_flags: "-D CMAKE_C_COMPILER=gcc-14 -D CMAKE_CXX_COMPILER=g++-14"
+            cmake_flags: '-D CMAKE_C_COMPILER=gcc-14 -D CMAKE_CXX_COMPILER=g++-14 -D CMAKE_CXX_FLAGS="-fsanitize=address,undefined -fno-omit-frame-pointer" -D CMAKE_EXE_LINKER_FLAGS="-fsanitize=address,undefined"'
 
           - name: Linux Clang
             os: ubuntu-24.04
-            cmake_flags: ""
+            cmake_flags: '-D CMAKE_CXX_FLAGS="-fsanitize=address,undefined -fno-omit-frame-pointer" -D CMAKE_EXE_LINKER_FLAGS="-fsanitize=address,undefined"'
 
         # Does not support from_chars for floating point types
         #   - name: macOS
