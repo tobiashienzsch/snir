@@ -10,3 +10,7 @@
 
 # IR
 /out.ll
+
+# Python
+/.venv
+/venv
