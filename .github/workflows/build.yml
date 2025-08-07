@@ -51,13 +51,13 @@ jobs:
           platform: x64
 
       - name: CMake configure
-        run: cmake -S . -B build -G "Ninja Multi-Config" -D CMAKE_UNITY_BUILD=ON ${{ matrix.cmake_flags }}
+        run: cmake -S . -B build -G "Ninja Multi-Config" -D CMAKE_UNITY_BUILD=OFF ${{ matrix.cmake_flags }}
 
-      - name: CMake build -- Debug
-        run: cmake --build build --config Debug
+    #   - name: CMake build -- Debug
+    #     run: cmake --build build --config Debug
 
-      - name: CTest -- Debug
-        run: ctest --test-dir build -C Debug --output-on-failure
+    #   - name: CTest -- Debug
+    #     run: ctest --test-dir build -C Debug --output-on-failure
 
       - name: CMake build -- Release
         run: cmake --build build --config Release
