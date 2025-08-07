@@ -29,6 +29,7 @@ Checks:
   - readability-identifier-naming
   - -readability-function-cognitive-complexity
   - -readability-identifier-length
+  - -readability-qualified-auto # Clashes with MSVC debug iterators
 
   - -*-magic-numbers
 
