@@ -4,6 +4,7 @@
 
 #include <algorithm>
 #include <cassert>
+#include <concepts>
 #include <cstddef>
 #include <cstdint>
 #include <functional>
@@ -14,7 +15,7 @@
 
 namespace snir {
 
-template<typename NodeType>
+template<std::unsigned_integral NodeType>
 struct Graph
 {
     using Node = NodeType;

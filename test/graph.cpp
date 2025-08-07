@@ -34,10 +34,10 @@ auto testAdjacencyList() -> void
 
 auto testTopologicalSort() -> void
 {
-    using Id = int;
+    using Id = unsigned;
 
     auto graph = snir::Graph<Id>{};
-    for (int i = 0; i < 7; i++) {
+    for (unsigned i = 0; i < 7; i++) {
         graph.add(Id(i));
     }
 
@@ -58,7 +58,7 @@ auto testTopologicalSort() -> void
 
 auto testGraph() -> void
 {
-    auto graph = snir::Graph<int>{0, 1, 2, 3, 4, 5, 6};
+    auto graph = snir::Graph<unsigned>{0, 1, 2, 3, 4, 5, 6};
     graph.connect(0, 1);
     graph.connect(1, 4);
     graph.connect(2, 3);
@@ -74,7 +74,7 @@ auto testGraph() -> void
         std::println("]");
     });
 
-    auto stream = std::ostream_iterator<int>(std::cout, " ");
+    auto stream = std::ostream_iterator<unsigned>(std::cout, " ");
 
     auto const components = snir::FindComponents(graph).get();
     std::println("\nComponents: ");
