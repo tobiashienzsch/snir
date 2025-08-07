@@ -27,7 +27,7 @@ jobs:
 
           - name: Windows
             os: windows-2025
-            cmake_flags: ""
+            cmake_flags: '-D CMAKE_CXX_FLAGS="/EHsc"'
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -39,6 +39,10 @@ jobs:
         uses: mymindstorm/setup-emsdk@v14
         with:
           version: latest
+
+      - name: Set up Visual Studio shell
+        if: matrix.name == 'Windows'
+        uses: egor-tensin/vs-shell@v2
 
       - name: CMake configure
         run: cmake -S . -B build -G "Ninja Multi-Config" -D CMAKE_UNITY_BUILD=ON ${{ matrix.cmake_flags }}
