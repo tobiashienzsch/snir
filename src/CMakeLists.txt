@@ -1,4 +1,3 @@
-cmake_minimum_required(VERSION 3.24)
 project(snir VERSION ${CMAKE_PROJECT_VERSION})
 
 add_library(snir)

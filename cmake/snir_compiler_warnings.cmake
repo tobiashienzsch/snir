@@ -1,5 +1,3 @@
-cmake_minimum_required(VERSION 3.15)
-
 add_library(snir_compiler_warnings INTERFACE)
 add_library(snir::compiler_warnings ALIAS snir_compiler_warnings)
 

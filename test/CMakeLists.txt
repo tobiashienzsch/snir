@@ -1,4 +1,3 @@
-cmake_minimum_required(VERSION 3.24)
 project(snir-test VERSION ${CMAKE_PROJECT_VERSION})
 
 add_executable(snir-test-graph)
