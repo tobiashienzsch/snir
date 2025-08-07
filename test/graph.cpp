@@ -3,13 +3,15 @@
 #include "snir/graph/Graph.hpp"
 
 #include "snir/graph/AdjacencyList.hpp"
-#include "snir/ir/ValueId.hpp"
 
+#include <algorithm>
 #include <array>
 #include <cassert>
+#include <cstdlib>
 #include <iostream>
-#include <map>
+#include <iterator>
 #include <print>
+#include <vector>
 
 namespace {
 

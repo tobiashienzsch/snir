@@ -1,12 +1,12 @@
 #undef NDEBUG
+
 #include "snir/ir/Interpreter.hpp"
+#include "snir/core/Exception.hpp"
 #include "snir/core/File.hpp"
 #include "snir/core/Strings.hpp"
-#include "snir/ir/CompareKind.hpp"
 #include "snir/ir/Function.hpp"
-#include "snir/ir/Identifier.hpp"
-#include "snir/ir/InstKind.hpp"
 #include "snir/ir/Literal.hpp"
+#include "snir/ir/Module.hpp"
 #include "snir/ir/Parser.hpp"
 #include "snir/ir/pass/DeadStoreElimination.hpp"
 #include "snir/ir/pass/RemoveEmptyBlock.hpp"
@@ -19,8 +19,18 @@
 #include <ctre.hpp>
 
 #include <cassert>
+#include <cmath>
+#include <cstddef>
+#include <cstdint>
+#include <cstdlib>
 #include <filesystem>
+#include <functional>
+#include <iostream>
+#include <limits>
 #include <print>
+#include <stdexcept>
+#include <string>
+#include <string_view>
 
 namespace {
 

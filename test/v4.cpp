@@ -3,10 +3,8 @@
 #include <cstdint>
 #include <cstdio>
 #include <cstdlib>
-#include <optional>
 #include <print>
-#include <string_view>
-#include <vector>
+#include <utility>
 
 #undef NDEBUG
 #include <cassert>

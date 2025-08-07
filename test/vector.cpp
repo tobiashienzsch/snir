@@ -4,6 +4,9 @@
 #undef NDEBUG
 #include <algorithm>
 #include <cassert>
+#include <concepts>
+#include <cstdint>
+#include <exception>
 #include <iterator>
 #include <utility>
 

@@ -1,18 +1,25 @@
 #undef NDEBUG
+
 #include "snir/ir/Parser.hpp"
+#include "snir/core/Exception.hpp"
 #include "snir/core/File.hpp"
 #include "snir/core/Strings.hpp"
 #include "snir/ir/Branch.hpp"
 #include "snir/ir/CompareKind.hpp"
 #include "snir/ir/Function.hpp"
+#include "snir/ir/Identifier.hpp"
 #include "snir/ir/InstKind.hpp"
 #include "snir/ir/Instruction.hpp"
 #include "snir/ir/Literal.hpp"
-
-#include <ctre.hpp>
+#include "snir/ir/Type.hpp"
 
 #include <cassert>
+#include <cstdint>
+#include <cstdlib>
+#include <exception>
 #include <print>
+#include <stdexcept>
+#include <string_view>
 
 using namespace snir;
 

@@ -1,11 +1,7 @@
 #include "snir/core/File.hpp"
 #include "snir/core/Strings.hpp"
-#include "snir/ir/CompareKind.hpp"
 #include "snir/ir/Function.hpp"
-#include "snir/ir/Identifier.hpp"
-#include "snir/ir/InstKind.hpp"
 #include "snir/ir/Interpreter.hpp"
-#include "snir/ir/Literal.hpp"
 #include "snir/ir/Parser.hpp"
 #include "snir/ir/pass/DeadStoreElimination.hpp"
 #include "snir/ir/pass/RemoveEmptyBlock.hpp"
@@ -13,11 +9,17 @@
 #include "snir/ir/PassManager.hpp"
 #include "snir/ir/Printer.hpp"
 #include "snir/ir/Registry.hpp"
-#include "snir/ir/Type.hpp"
 
-#include <chrono>
+#include <cstddef>
+#include <cstdlib>
+#include <filesystem>
 #include <fstream>
+#include <functional>
+#include <ios>
+#include <iostream>
+#include <optional>
 #include <print>
+#include <span>
 
 namespace {
 struct Arguments
