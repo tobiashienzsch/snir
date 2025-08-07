@@ -19,7 +19,7 @@ jobs:
 
           - name: Linux
             os: ubuntu-24.04
-            cmake_flags: ""
+            cmake_flags: "-D CMAKE_C_COMPILER=gcc-14 -D CMAKE_CXX_COMPILER=g++-14"
 
           - name: macOS
             os: macos-15
