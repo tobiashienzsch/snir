@@ -11,7 +11,9 @@
 #include <map>
 #include <print>
 
-static auto testAdjacencyList() -> void
+namespace {
+
+auto testAdjacencyList() -> void
 {
     auto const graph = snir::AdjacencyList<char>{
         {'A', {'B', 'C'}},
@@ -30,7 +32,7 @@ static auto testAdjacencyList() -> void
     assert(std::ranges::equal(result, std::array{'A', 'B', 'D', 'E', 'F', 'C'}));
 }
 
-static auto testTopologicalSort() -> void
+auto testTopologicalSort() -> void
 {
     using Id = int;
 
@@ -54,7 +56,7 @@ static auto testTopologicalSort() -> void
     assert(std::ranges::equal(ordering, expected));
 }
 
-static auto testGraph() -> void
+auto testGraph() -> void
 {
     auto graph = snir::Graph<int>{0, 1, 2, 3, 4, 5, 6};
     graph.connect(0, 1);
@@ -85,6 +87,8 @@ static auto testGraph() -> void
     std::ranges::copy(ordering, stream);
     std::println("");
 }
+
+}  // namespace
 
 auto main() -> int
 {

@@ -71,7 +71,7 @@ struct Value
     };
 };
 
-enum struct InstKind : std::int16_t
+enum struct InstKind : std::int8_t
 {
     Nop,
     Constant,
