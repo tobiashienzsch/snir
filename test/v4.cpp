@@ -158,10 +158,14 @@ struct Branch
 
 struct SharedValueStore
 {
-    SharedValueStore() = default;
+    SharedValueStore()  = default;
+    ~SharedValueStore() = default;
 
     SharedValueStore(SharedValueStore const& other)                    = delete;
     auto operator=(SharedValueStore const& other) -> SharedValueStore& = delete;
+
+    SharedValueStore(SharedValueStore&& other)                    = default;
+    auto operator=(SharedValueStore&& other) -> SharedValueStore& = default;
 
     [[nodiscard]] auto values() -> ValueStore<ValueId, Value>&;
     [[nodiscard]] auto values() const -> ValueStore<ValueId, Value> const&;

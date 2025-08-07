@@ -20,6 +20,7 @@ Checks:
 
   - misc-*
   - -misc-include-cleaner
+  - -misc-no-recursion
 
   - modernize-*
   - performance-*
@@ -39,6 +40,8 @@ ImplementationFileExtensions: ["cpp"]
 CheckOptions:
   - key: bugprone-easily-swappable-parameters.MinimumLength
     value: 4
+  - key: bugprone-suspicious-stringview-data-usage.AllowedCallees
+    value: "std::next"
   - key: cppcoreguidelines-avoid-do-while.IgnoreMacros
     value: true
   - key: readability-identifier-naming.ClassCase
@@ -53,8 +56,6 @@ CheckOptions:
     value: CamelCase
   - key: readability-identifier-naming.FunctionCase
     value: camelBack
-  - key: readability-identifier-naming.FunctionIgnoredRegexp
-    value: "^tag_invoke$"
   - key: readability-identifier-naming.GlobalConstantCase
     value: CamelCase
   - key: readability-identifier-naming.IgnoreMainLikeFunctions
