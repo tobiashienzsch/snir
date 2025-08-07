@@ -23,6 +23,7 @@
 #include <iterator>
 #include <ostream>
 #include <print>
+#include <span>
 #include <vector>
 
 namespace snir {
@@ -128,13 +129,10 @@ auto Printer::printBasicBlock(Function& func, BasicBlock const& block) -> void
     if (_cfg != nullptr) {
         auto const preds = getPredsForBlock(*_cfg, block.label);
         if (not preds.empty()) {
-            auto first = std::ranges::begin(preds);
-            std::print(_out, "\t\t\t\t\t\t; preds = %{}", _localIds.add(*first));
-            std::ranges::for_each(
-                std::ranges::next(first),
-                std::ranges::end(preds),
-                [this](auto pred) { std::print(_out, ", %{}", _localIds.add(pred)); }
-            );
+            std::print(_out, "\t\t\t\t\t\t; preds = %{}", _localIds.add(preds.at(0)));
+            for (auto pred : std::span{preds}.subspan(1)) {
+                std::print(_out, ", %{}", _localIds.add(pred));
+            }
         }
     }
     std::println(_out, "");
