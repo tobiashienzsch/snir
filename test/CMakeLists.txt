@@ -20,3 +20,8 @@ add_executable(snir-test-vector)
 target_sources(snir-test-vector PRIVATE vector.cpp)
 target_link_libraries(snir-test-vector PRIVATE snir::snir snir::compiler_warnings)
 add_test(NAME snir_test_vector COMMAND $<TARGET_FILE:snir-test-vector> WORKING_DIRECTORY ${CMAKE_SOURCE_DIR})
+
+add_executable(snir-test-v4)
+target_sources(snir-test-v4 PRIVATE v4.cpp)
+target_link_libraries(snir-test-v4 PRIVATE snir::snir snir::compiler_warnings)
+add_test(NAME snir_test_v4 COMMAND $<TARGET_FILE:snir-test-v4> WORKING_DIRECTORY ${CMAKE_SOURCE_DIR})

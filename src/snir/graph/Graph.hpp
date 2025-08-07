@@ -156,8 +156,8 @@ struct FindComponents
         , _components(_size)
         , _visited(_size)
     {
-        assert(_components.size() == _size);
-        assert(_visited.size() == _size);
+        assert(std::cmp_equal(_components.size(), _size));
+        assert(std::cmp_equal(_visited.size(), _size));
 
         for (NodeType i = 0; i < _size; ++i) {
             if (!_visited[i]) {
