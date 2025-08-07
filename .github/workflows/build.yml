@@ -1,0 +1,56 @@
+name: Build
+on: push
+
+concurrency:
+  group: ${{ github.ref }}-${{ github.workflow }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: ${{ matrix.name }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: Emscripten
+            os: ubuntu-24.04
+            cmake_flags: ""
+
+          - name: Linux
+            os: ubuntu-24.04
+            cmake_flags: ""
+
+          - name: macOS
+            os: macos-15
+            cmake_flags: ""
+
+          - name: Windows
+            os: windows-2025
+            cmake_flags: ""
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          lfs: true
+
+      - name: Setup emsdk
+        if: matrix.name == 'Emscripten'
+        uses: mymindstorm/setup-emsdk@v14
+        with:
+          version: latest
+
+      - name: CMake configure
+        run: cmake -S . -B build -G "Ninja Multi-Config" -D CMAKE_UNITY_BUILD=ON ${{ matrix.cmake_flags }}
+
+      - name: CMake build -- Debug
+        run: cmake --build build --config Debug
+
+      - name: CTest -- Debug
+        run: ctest --test-dir build -C Debug --output-on-failure
+
+      - name: CMake build -- Release
+        run: cmake --build build --config Release
+
+      - name: CTest -- Release
+        run: ctest --test-dir build -C Release --output-on-failure
