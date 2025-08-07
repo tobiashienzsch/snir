@@ -1,34 +1,37 @@
 # cert-dcl58-cpp = modification of 'std' namespace (fails for std::formatter)
-Checks: >
-  *-,
-  boost-*,
-  bugprone-*,
-  -bugprone-exception-escape,
-  -bugprone-unchecked-optional-access,
+Checks:
+  - -*
+  - boost-*
+  - bugprone-*
+  - -bugprone-exception-escape
+  - -bugprone-unchecked-optional-access
 
-  cert-*,
-  -cert-dcl58-cpp,
+  - cert-*
+  - -cert-dcl58-cpp
 
-  clang-analyzer-*,
-  clang-diagnostics-*,
-  concurrency-*,
+  - clang-analyzer-*
+  - clang-diagnostic-*
+  - concurrency-*
 
-  cppcoreguidelines-*,
-  -cppcoreguidelines-macro-usage,
+  - cppcoreguidelines-*
+  - -cppcoreguidelines-macro-usage
 
-  hicpp-*,
-  misc-*,
-  modernize-*,
-  performance-*,
+  - hicpp-*
+  - misc-*
+  - modernize-*
+  - performance-*
 
-  readability-*,
-  readability-identifier-naming,
-  -readability-identifier-length,
+  - readability-*
+  - readability-identifier-naming
+  - -readability-identifier-length
 
-  -*-magic-numbers,
+  - -*-magic-numbers
 
+FormatStyle: file
 WarningsAsErrors: "*"
-FormatStyle: none
+HeaderFilterRegex: ""
+HeaderFileExtensions: ["hpp"]
+ImplementationFileExtensions: ["cpp"]
 CheckOptions:
   - key: bugprone-easily-swappable-parameters.MinimumLength
     value: 4
