@@ -57,12 +57,10 @@ jobs:
         run: cmake --build build --config Debug
 
       - name: CTest -- Debug
-        # if: runner.os != 'Windows'
-        run: ctest --test-dir build -C Debug --output-on-failure -VV
+        run: ctest --test-dir build -C Debug --output-on-failure
 
       - name: CMake build -- Release
         run: cmake --build build --config Release
 
       - name: CTest -- Release
-        # if: runner.os != 'Windows'
-        run: ctest --test-dir build -C Release --output-on-failure -VV
+        run: ctest --test-dir build -C Release --output-on-failure
