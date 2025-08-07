@@ -1,4 +1,3 @@
-# cert-dcl58-cpp = modification of 'std' namespace (fails for std::formatter)
 Checks:
   - -*
 
@@ -7,8 +6,6 @@ Checks:
   - -bugprone-unchecked-optional-access
 
   - cert-*
-  - -cert-dcl58-cpp
-
   - clang-analyzer-*
   - clang-diagnostic-*
   - concurrency-*
