@@ -2,6 +2,7 @@
 
 #include "snir/ir/Type.hpp"
 
+#include <array>
 #include <cstdint>
 #include <format>
 #include <variant>
