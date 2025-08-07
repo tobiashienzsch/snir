@@ -2,8 +2,13 @@
 
 #include "snir/core/Exception.hpp"
 #include "snir/core/Strings.hpp"
+#include "snir/ir/Type.hpp"
 
 #include <ctre.hpp>
+
+#include <cstdint>
+#include <stdexcept>
+#include <string_view>
 
 namespace snir {
 

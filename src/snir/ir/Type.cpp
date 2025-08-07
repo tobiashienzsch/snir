@@ -2,6 +2,9 @@
 
 #include "snir/core/Exception.hpp"
 
+#include <stdexcept>
+#include <string_view>
+
 namespace snir {
 
 auto parseType(std::string_view source) -> Type

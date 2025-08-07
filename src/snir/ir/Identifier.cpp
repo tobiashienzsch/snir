@@ -4,6 +4,10 @@
 
 #include <ctre.hpp>
 
+#include <stdexcept>
+#include <string_view>
+#include <utility>
+
 namespace snir {
 
 auto parseIdentifier(std::string_view src) -> std::pair<IdentifierKind, std::string_view>

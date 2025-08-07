@@ -1,8 +1,13 @@
 #include "PassManager.hpp"
 
 #include "snir/core/Print.hpp"
+#include "snir/ir/AnalysisManager.hpp"
+#include "snir/ir/Function.hpp"
+#include "snir/ir/Module.hpp"
 
 #include <chrono>
+#include <functional>
+#include <ostream>
 
 namespace snir {
 

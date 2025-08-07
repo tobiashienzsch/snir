@@ -4,6 +4,10 @@
 #include "snir/core/Strings.hpp"
 
 #include <algorithm>
+#include <array>
+#include <ranges>
+#include <stdexcept>
+#include <string_view>
 
 namespace snir {
 

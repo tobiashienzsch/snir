@@ -1,7 +1,9 @@
 #include "Parser.hpp"
 
-#include "snir/core/Print.hpp"
+#include "snir/core/Exception.hpp"
+#include "snir/core/StaticVector.hpp"
 #include "snir/core/Strings.hpp"
+#include "snir/ir/BasicBlock.hpp"
 #include "snir/ir/Branch.hpp"
 #include "snir/ir/CompareKind.hpp"
 #include "snir/ir/Function.hpp"
@@ -10,13 +12,22 @@
 #include "snir/ir/InstKind.hpp"
 #include "snir/ir/Instruction.hpp"
 #include "snir/ir/Literal.hpp"
+#include "snir/ir/Module.hpp"
 #include "snir/ir/Operands.hpp"
+#include "snir/ir/Registry.hpp"
 #include "snir/ir/Result.hpp"
+#include "snir/ir/Type.hpp"
+#include "snir/ir/Value.hpp"
+#include "snir/ir/ValueId.hpp"
+#include "snir/ir/ValueKind.hpp"
 
 #include <ctre.hpp>
 
-#include <algorithm>
-#include <array>
+#include <optional>
+#include <stdexcept>
+#include <string_view>
+#include <utility>
+#include <vector>
 
 namespace snir {
 
@@ -105,7 +116,8 @@ auto Parser::readBlocks(std::string_view source) -> std::vector<BasicBlock>
                 current = std::nullopt;
             }
 
-            current = BasicBlock{getOrCreateLocal(number, ValueKind::Label), {}};
+            current
+                = BasicBlock{.label = getOrCreateLocal(number, ValueKind::Label), .instructions = {}};
             return;
         }
 

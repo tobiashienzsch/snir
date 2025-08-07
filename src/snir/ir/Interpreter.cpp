@@ -1,13 +1,27 @@
 #include "Interpreter.hpp"
 
-#include "snir/core/Print.hpp"
+#include "snir/core/Exception.hpp"
+#include "snir/ir/BasicBlock.hpp"
 #include "snir/ir/Branch.hpp"
 #include "snir/ir/CompareKind.hpp"
+#include "snir/ir/Function.hpp"
 #include "snir/ir/InstKind.hpp"
+#include "snir/ir/Literal.hpp"
 #include "snir/ir/Operands.hpp"
 #include "snir/ir/Result.hpp"
 #include "snir/ir/Type.hpp"
-#include "snir/ir/ValueKind.hpp"
+#include "snir/ir/ValueId.hpp"
+
+#include <algorithm>
+#include <cmath>
+#include <cstdint>
+#include <functional>
+#include <iterator>
+#include <optional>
+#include <ranges>
+#include <span>
+#include <stdexcept>
+#include <variant>
 
 namespace snir {
 
@@ -107,11 +121,11 @@ auto Interpreter::execute(Function const& func, std::span<ValueId const> args)
         auto const lhs   = _registers.at(ops.list[0]).value;
         auto const rhs   = _registers.at(ops.list[1]).value;
         if (cmp == CompareKind::Equal) {
-            _registers.emplace(res.id, static_cast<bool>(lhs == rhs));
+            _registers.emplace(res.id, (lhs == rhs));
             return;
         }
         if (cmp == CompareKind::NotEqual) {
-            _registers.emplace(res.id, static_cast<bool>(lhs != rhs));
+            _registers.emplace(res.id, (lhs != rhs));
             return;
         }
 

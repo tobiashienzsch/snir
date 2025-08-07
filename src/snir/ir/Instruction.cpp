@@ -1,6 +1,14 @@
 #include "Instruction.hpp"
 
 #include "snir/core/Ranges.hpp"
+#include "snir/ir/InstKind.hpp"
+#include "snir/ir/Registry.hpp"
+#include "snir/ir/Type.hpp"
+#include "snir/ir/Value.hpp"
+#include "snir/ir/ValueId.hpp"
+#include "snir/ir/ValueKind.hpp"
+
+#include <array>
 
 namespace snir {
 

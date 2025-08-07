@@ -28,7 +28,7 @@ private:
 
     std::reference_wrapper<std::ostream> _out;
     ControlFlowGraph::Result const* _cfg{nullptr};
-    LocalIdMap<ValueId, int> _localIds{};
+    LocalIdMap<ValueId, int> _localIds;
 };
 
 }  // namespace snir

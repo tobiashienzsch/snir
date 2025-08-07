@@ -1,11 +1,13 @@
 #include "ControlFlowGraph.hpp"
 
-#include "snir/core/Exception.hpp"
 #include "snir/core/Print.hpp"
+#include "snir/graph/Graph.hpp"
+#include "snir/ir/AnalysisManager.hpp"
+#include "snir/ir/BasicBlock.hpp"
 #include "snir/ir/Branch.hpp"
+#include "snir/ir/Function.hpp"
 #include "snir/ir/InstKind.hpp"
 #include "snir/ir/Instruction.hpp"
-#include "snir/ir/Operands.hpp"
 
 namespace snir {
 
@@ -32,7 +34,7 @@ auto ControlFlowGraph::operator()(Function const& func, AnalysisManager<Function
         print("{} -> ", int(_nodeIds[node]));
     }
     println("return");
-    return {_nodeIds, _graph};
+    return {.nodeIds = _nodeIds, .graph = _graph};
 }
 
 auto ControlFlowGraph::addBlockToGraph(BasicBlock const& block) -> void

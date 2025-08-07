@@ -1,23 +1,33 @@
 #include "Printer.hpp"
 
 #include "snir/core/Print.hpp"
+#include "snir/ir/AnalysisManager.hpp"
+#include "snir/ir/BasicBlock.hpp"
 #include "snir/ir/Branch.hpp"
 #include "snir/ir/CompareKind.hpp"
+#include "snir/ir/Function.hpp"
+#include "snir/ir/FunctionDefinition.hpp"
 #include "snir/ir/Identifier.hpp"
 #include "snir/ir/InstKind.hpp"
 #include "snir/ir/Literal.hpp"
+#include "snir/ir/Module.hpp"
 #include "snir/ir/Operands.hpp"
+#include "snir/ir/pass/ControlFlowGraph.hpp"
 #include "snir/ir/Result.hpp"
 #include "snir/ir/Type.hpp"
 #include "snir/ir/Value.hpp"
+#include "snir/ir/ValueId.hpp"
 #include "snir/ir/ValueKind.hpp"
 
 #include <algorithm>
+#include <format>
 #include <iterator>
+#include <ostream>
+#include <vector>
 
 namespace snir {
 
-[[nodiscard]] auto getPredsForBlock(ControlFlowGraph::Result const& result, ValueId block)
+[[nodiscard]] static auto getPredsForBlock(ControlFlowGraph::Result const& result, ValueId block)
     -> std::vector<ValueId>
 {
     auto const node  = result.nodeIds[block];
