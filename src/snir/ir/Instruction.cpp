@@ -1,6 +1,5 @@
 #include "Instruction.hpp"
 
-#include "snir/core/Ranges.hpp"
 #include "snir/ir/InstKind.hpp"
 #include "snir/ir/Registry.hpp"
 #include "snir/ir/Type.hpp"
@@ -8,6 +7,7 @@
 #include "snir/ir/ValueId.hpp"
 #include "snir/ir/ValueKind.hpp"
 
+#include <algorithm>
 #include <array>
 
 namespace snir {
@@ -31,7 +31,7 @@ auto Instruction::type() const -> Type { return _value.get<Type>(); }
 
 auto Instruction::isTerminator() const -> bool
 {
-    return ranges::contains(std::array{InstKind::Return, InstKind::Branch}, kind());
+    return std::ranges::contains(std::array{InstKind::Return, InstKind::Branch}, kind());
 }
 
 auto Instruction::asValue() const -> Value { return _value; }
