@@ -11,7 +11,7 @@ namespace snir {
 
 [[nodiscard]] inline auto readFile(std::filesystem::path const& path) -> std::optional<std::string>
 {
-    auto file = std::ifstream(path, std::ios::binary | std::ios::in);
+    auto file = std::ifstream(path);
     if (not file.is_open()) {
         return std::nullopt;
     }

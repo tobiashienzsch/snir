@@ -92,8 +92,8 @@ try {
     }
 
     // Print optimized source
+    auto out = std::fstream(args->output, std::ios::out);
     if (not args->output.empty()) {
-        auto out = std::fstream(args->output, std::ios::out);
         pm.add(snir::Printer{out});
     }
 
