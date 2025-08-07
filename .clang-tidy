@@ -32,6 +32,7 @@ Checks:
   - -readability-qualified-auto # Clashes with MSVC debug iterators
 
   - -*-magic-numbers
+  - -*-uppercase-literal-suffix
 
 FormatStyle: file
 WarningsAsErrors: "*"

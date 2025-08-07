@@ -78,7 +78,7 @@ template<typename NumberType>
         } else if constexpr (std::integral<NumberType>) {
             return std::from_chars(first, last, value, 10);
         } else {
-            static_assert(alwaysFalse<NumberType>);
+            static_assert(AlwaysFalse<NumberType>);
         }
     }();
     if (result.ec == std::errc{}) {

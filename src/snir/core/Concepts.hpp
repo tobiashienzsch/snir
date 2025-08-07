@@ -9,6 +9,6 @@ template<typename Enum>
 concept ScopedEnum = std::is_scoped_enum_v<Enum>;
 
 template<typename>
-inline constexpr auto alwaysFalse = false;
+inline constexpr auto AlwaysFalse = false;
 
 }  // namespace snir
