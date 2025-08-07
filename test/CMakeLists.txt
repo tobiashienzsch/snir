@@ -24,3 +24,14 @@ add_executable(snir-test-v4)
 target_sources(snir-test-v4 PRIVATE v4.cpp)
 target_link_libraries(snir-test-v4 PRIVATE snir::snir snir::compiler_warnings)
 add_test(NAME snir_test_v4 COMMAND $<TARGET_FILE:snir-test-v4> WORKING_DIRECTORY ${CMAKE_SOURCE_DIR})
+
+file(GLOB SNIR_TEST_FILES "files/*.ll")
+foreach(test_file_path IN LISTS SNIR_TEST_FILES)
+    get_filename_component(test_file ${test_file_path} NAME)
+    add_test(
+        NAME
+            "snir-opt: ${test_file}"
+        COMMAND
+            $<TARGET_FILE:snir-opt> -O2 -v -o ${test_file} ${test_file_path}
+    )
+endforeach()

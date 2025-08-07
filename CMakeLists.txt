@@ -24,5 +24,5 @@ enable_testing()
 include(cmake/snir_compiler_warnings.cmake)
 
 add_subdirectory(src)
-add_subdirectory(test)
 add_subdirectory(tool/snir-opt)
+add_subdirectory(test)
