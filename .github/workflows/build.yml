@@ -13,10 +13,6 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - name: Emscripten
-            os: ubuntu-24.04
-            cmake_flags: ""
-
           - name: Linux
             os: ubuntu-24.04
             cmake_flags: "-D CMAKE_C_COMPILER=gcc-14 -D CMAKE_CXX_COMPILER=g++-14"
@@ -33,12 +29,6 @@ jobs:
         uses: actions/checkout@v4
         with:
           lfs: true
-
-      - name: Setup emsdk
-        if: matrix.name == 'Emscripten'
-        uses: mymindstorm/setup-emsdk@v14
-        with:
-          version: latest
 
       - name: Set up Visual Studio shell
         if: matrix.name == 'Windows'
