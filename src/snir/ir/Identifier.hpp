@@ -18,7 +18,7 @@ enum struct IdentifierKind : std::uint8_t
     Local,
 };
 
-[[nodiscard]] auto parseIdentifier(std::string_view src
-) -> std::pair<IdentifierKind, std::string_view>;
+[[nodiscard]] auto parseIdentifier(std::string_view src)
+    -> std::pair<IdentifierKind, std::string_view>;
 
 }  // namespace snir

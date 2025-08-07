@@ -37,7 +37,8 @@ auto Parser::read(std::string_view source) -> Module
 {
     auto module = Module{*_registry};
 
-    for (auto match : ctre::search_all<R"(define\s+(\w+)\s+@(\w+)\(([^)]*)\)\s*\{([^}]*)\})">(source)) {
+    for (auto match :
+         ctre::search_all<R"(define\s+(\w+)\s+@(\w+)\(([^)]*)\)\s*\{([^}]*)\})">(source)) {
         _locals.clear();
 
         auto func = Function::create(*_registry, parseType(match.get<1>()));
