@@ -11,6 +11,7 @@
 #include "snir/ir/Registry.hpp"
 
 #include <cstddef>
+#include <cstdio>
 #include <cstdlib>
 #include <filesystem>
 #include <fstream>
@@ -59,7 +60,12 @@ auto main(int argc, char const* const* argv) -> int
     // Parse arguments
     auto args = parseArguments(std::span<char const* const>(argv, std::size_t(argc)));
     if (not args) {
-        std::println("Usage:\nsnir-opt -v -O[0,1,2]");
+        std::println(stderr, "Usage:\nsnir-opt -v -O[0,1,2]");
+        return EXIT_FAILURE;
+    }
+
+    if (not std::filesystem::is_regular_file(args->input)) {
+        std::println(stderr, "Input file does not exist: {}", args->input.string());
         return EXIT_FAILURE;
     }
 
