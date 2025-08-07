@@ -13,7 +13,7 @@ else ()
             -Wpedantic
 
             -Wcast-align
-            # -Wconversion
+            -Wconversion
             -Woverloaded-virtual
             -Wreorder
             -Wshadow
