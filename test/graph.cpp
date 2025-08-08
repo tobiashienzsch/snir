@@ -1,8 +1,8 @@
 #undef NDEBUG
 
 #include "snir/graph/Graph.hpp"
-
 #include "snir/graph/AdjacencyList.hpp"
+#include "snir/graph/SimpleGraph.hpp"
 
 #include <algorithm>
 #include <array>
@@ -90,6 +90,27 @@ auto testGraph() -> void
     std::println("");
 }
 
+auto testSimpleGraph() -> void
+{
+    auto graph = snir::SimpleGraph{4zu};
+    graph.connect(0, 1);
+    graph.connect(0, 2);
+    std::println("[0, 1] = {}", graph.isConnected(0, 1));
+    std::println("[0, 3] = {}", graph.isConnected(0, 3));
+    std::println("--------------");
+
+    graph.disconnect(0, 1);
+    graph.disconnect(0, 2);
+    std::println("[0, 1] = {}", graph.isConnected(0, 1));
+    std::println("[0, 3] = {}", graph.isConnected(0, 3));
+    std::println("--------------");
+
+    graph.connectAll();
+    std::println("[0, 1] = {}", graph.isConnected(0, 1));
+    std::println("[0, 3] = {}", graph.isConnected(0, 3));
+    std::println("--------------");
+}
+
 }  // namespace
 
 auto main() -> int
@@ -97,5 +118,6 @@ auto main() -> int
     testAdjacencyList();
     testTopologicalSort();
     testGraph();
+    testSimpleGraph();
     return EXIT_SUCCESS;
 }
