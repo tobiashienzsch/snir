@@ -56,7 +56,7 @@ struct Arguments
 }  // namespace
 
 auto main(int argc, char const* const* argv) -> int
-{
+try {
     // Parse arguments
     auto args = parseArguments(std::span<char const* const>(argv, std::size_t(argc)));
     if (not args) {
@@ -106,5 +106,11 @@ auto main(int argc, char const* const* argv) -> int
         std::println("; return: {} as {}", result.value(), func.type());
     }
 
-    return 0;
+    return EXIT_SUCCESS;
+} catch (std::exception const& e) {
+    std::println(stderr, "Exception in main(): {}", e.what());
+    return EXIT_FAILURE;
+} catch (...) {
+    std::println(stderr, "Unkown exception in main()");
+    return EXIT_FAILURE;
 }

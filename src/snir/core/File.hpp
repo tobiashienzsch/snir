@@ -1,5 +1,7 @@
 #pragma once
 
+#include <cstddef>
+#include <cstdio>
 #include <filesystem>
 #include <fstream>
 #include <optional>
@@ -20,7 +22,16 @@ namespace snir {
         return std::nullopt;
     }
 
-    return content;
+    auto replaceWindowsWithUnix = [](std::string str) {
+        auto pos = std::size_t(0);
+        while ((pos = str.find("\r\n", pos)) != std::string::npos) {
+            str.replace(pos, 2, "\n");
+            ++pos;
+        }
+        return str;
+    };
+
+    return replaceWindowsWithUnix(std::move(content));
 }
 
 }  // namespace snir
