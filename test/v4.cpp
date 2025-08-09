@@ -1,14 +1,14 @@
+#undef NDEBUG
+
 #include "snir/core/ValueStore.hpp"
 
 #include "fmt/os.h"
 
+#include <cassert>
 #include <cstdint>
 #include <cstdio>
 #include <cstdlib>
 #include <utility>
-
-#undef NDEBUG
-#include <cassert>
 
 namespace snir {
 

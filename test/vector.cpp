@@ -1,7 +1,8 @@
+#undef NDEBUG
+
 #include "snir/core/InplaceVector.hpp"
 #include "snir/core/Strings.hpp"
 
-#undef NDEBUG
 #include <algorithm>
 #include <cassert>
 #include <concepts>
