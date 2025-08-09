@@ -19,12 +19,11 @@ jobs:
 
           - name: Linux Clang
             os: ubuntu-24.04
-            cmake_flags: '-D CMAKE_CXX_FLAGS="-fsanitize=address,undefined -fno-omit-frame-pointer" -D CMAKE_EXE_LINKER_FLAGS="-fsanitize=address,undefined"'
+            cmake_flags: '-D CMAKE_CXX_FLAGS="-stdlib=libc++ -fsanitize=address,undefined -fno-omit-frame-pointer" -D CMAKE_EXE_LINKER_FLAGS="-fsanitize=address,undefined"'
 
-        # Does not support from_chars for floating point types
-        #   - name: macOS
-        #     os: macos-15
-        #     cmake_flags: ""
+          - name: macOS
+            os: macos-15
+            cmake_flags: ""
 
           - name: Windows Clang
             os: windows-2025
