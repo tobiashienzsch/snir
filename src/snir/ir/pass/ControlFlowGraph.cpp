@@ -1,6 +1,6 @@
 #include "ControlFlowGraph.hpp"
 
-#include "snir/graph/Graph.hpp"
+#include "snir/core/Graph.hpp"
 #include "snir/ir/AnalysisManager.hpp"
 #include "snir/ir/BasicBlock.hpp"
 #include "snir/ir/Branch.hpp"

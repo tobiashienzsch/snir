@@ -1,9 +1,9 @@
 #undef NDEBUG
 
-#include "snir/graph/Graph.hpp"
-#include "snir/graph/AdjacencyList.hpp"
-#include "snir/graph/DirectedGraph.hpp"
-#include "snir/graph/UndirectedGraph.hpp"
+#include "snir/core/Graph.hpp"
+#include "snir/core/AdjacencyList.hpp"
+#include "snir/core/DirectedGraph.hpp"
+#include "snir/core/UndirectedGraph.hpp"
 
 #include "fmt/os.h"
 

@@ -1,7 +1,7 @@
 #pragma once
 
+#include "snir/core/Graph.hpp"
 #include "snir/core/LocalIdMap.hpp"
-#include "snir/graph/Graph.hpp"
 #include "snir/ir/AnalysisManager.hpp"
 #include "snir/ir/Function.hpp"
 #include "snir/ir/Registry.hpp"
