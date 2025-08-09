@@ -1,5 +1,6 @@
 #undef NDEBUG
 
+#include "snir/core/FlatSet.hpp"
 #include "snir/core/InplaceVector.hpp"
 #include "snir/core/Strings.hpp"
 
@@ -101,10 +102,35 @@ auto testVector() -> void  // NOLINT(readability-function-cognitive-complexity)
     static_assert(sizeof(snir::InplaceVector<std::uint32_t, 3>{}) == 16);
 }
 
+auto testFlatSet() -> void
+{
+    auto set = snir::FlatSet<int>{};
+    assert(set.empty());
+
+    auto in0 = set.emplace(42);
+    assert(in0.second);
+    assert(set.size() == 1);
+    assert(set.contains(42));
+    assert(not set.contains(143));
+
+    auto in1 = set.emplace(143);
+    assert(in1.second);
+    assert(set.size() == 2);
+    assert(set.contains(42));
+    assert(set.contains(143));
+
+    auto in2 = set.emplace(143);
+    assert(not in2.second);
+
+    assert(std::ranges::equal(set, std::array{42, 143}));
+    assert(std::ranges::equal(std::as_const(set), std::array{42, 143}));
+}
+
 }  // namespace
 
 auto main() -> int
 {
     testVector();
+    testFlatSet();
     return 0;
 }
