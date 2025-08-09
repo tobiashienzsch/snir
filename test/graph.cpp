@@ -2,6 +2,7 @@
 
 #include "snir/graph/Graph.hpp"
 #include "snir/graph/AdjacencyList.hpp"
+#include "snir/graph/DirectedGraph.hpp"
 #include "snir/graph/SimpleGraph.hpp"
 
 #include <algorithm>
@@ -93,22 +94,57 @@ auto testGraph() -> void
 auto testSimpleGraph() -> void
 {
     auto graph = snir::SimpleGraph{4zu};
+
     graph.connect(0, 1);
     graph.connect(0, 2);
-    std::println("[0, 1] = {}", graph.isConnected(0, 1));
-    std::println("[0, 3] = {}", graph.isConnected(0, 3));
-    std::println("--------------");
+    assert(graph.isConnected(0, 1));
+    assert(graph.isConnected(1, 0));
+    assert(not graph.isConnected(0, 3));
+    assert(not graph.isConnected(3, 0));
 
     graph.disconnect(0, 1);
     graph.disconnect(0, 2);
-    std::println("[0, 1] = {}", graph.isConnected(0, 1));
-    std::println("[0, 3] = {}", graph.isConnected(0, 3));
-    std::println("--------------");
+    assert(not graph.isConnected(0, 1));
+    assert(not graph.isConnected(1, 0));
+    assert(not graph.isConnected(0, 3));
+    assert(not graph.isConnected(3, 0));
 
     graph.connectAll();
-    std::println("[0, 1] = {}", graph.isConnected(0, 1));
-    std::println("[0, 3] = {}", graph.isConnected(0, 3));
-    std::println("--------------");
+    assert(graph.isConnected(0, 1));
+    assert(graph.isConnected(1, 0));
+    assert(graph.isConnected(0, 3));
+    assert(graph.isConnected(3, 0));
+}
+
+auto testDirectedGraph() -> void
+{
+    auto graph = snir::DirectedGraph{3zu};
+    graph.connect(0, 1);
+    assert(graph.isConnected(0, 1));
+    assert(not graph.isConnected(1, 0));
+    assert(not graph.isConnected(2, 0));
+    assert(not graph.isConnected(0, 2));
+
+    graph.disconnect(0, 1);
+    graph.disconnect(0, 2);
+    assert(not graph.isConnected(0, 1));
+    assert(not graph.isConnected(0, 2));
+
+    graph.connectAll();
+    assert(graph.isConnected(0, 0));
+    assert(graph.isConnected(0, 1));
+    assert(graph.isConnected(0, 2));
+    assert(graph.isConnected(0, 0));
+    assert(graph.isConnected(1, 0));
+    assert(graph.isConnected(2, 0));
+
+    graph.disconnectAll();
+    assert(not graph.isConnected(0, 0));
+    assert(not graph.isConnected(0, 1));
+    assert(not graph.isConnected(0, 2));
+    assert(not graph.isConnected(0, 0));
+    assert(not graph.isConnected(1, 0));
+    assert(not graph.isConnected(2, 0));
 }
 
 }  // namespace
@@ -119,5 +155,6 @@ auto main() -> int
     testTopologicalSort();
     testGraph();
     testSimpleGraph();
+    testDirectedGraph();
     return EXIT_SUCCESS;
 }
