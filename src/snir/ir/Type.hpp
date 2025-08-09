@@ -22,7 +22,8 @@ enum struct Type : std::uint8_t
 template<>
 struct fmt::formatter<snir::Type> : formatter<string_view>
 {
-    auto format(snir::Type type, format_context& ctx) const -> format_context::iterator
+    template<typename FormatContext>
+    auto format(snir::Type type, FormatContext& ctx) const
     {
         static constexpr auto names = std::array{
 #define SNIR_TYPE(Id, Name) string_view{#Name},

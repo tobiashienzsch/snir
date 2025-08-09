@@ -18,7 +18,8 @@ enum struct ValueKind : std::uint8_t
 template<>
 struct fmt::formatter<snir::ValueKind> : formatter<string_view>
 {
-    auto format(snir::ValueKind type, format_context& ctx) const -> format_context::iterator
+    template<typename FormatContext>
+    auto format(snir::ValueKind type, FormatContext& ctx) const
     {
         static constexpr auto names = std::array{
 #define SNIR_VALUE_KIND(Id, Name) string_view{#Name},
