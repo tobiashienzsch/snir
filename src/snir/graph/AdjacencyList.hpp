@@ -1,11 +1,11 @@
 #pragma once
 
 #include "snir/core/Containers.hpp"
+#include "snir/core/FlatSet.hpp"
 
 #include <algorithm>
 #include <map>
 #include <ranges>
-#include <set>
 #include <stack>
 #include <vector>
 
@@ -17,8 +17,8 @@ using AdjacencyList = std::map<T, std::vector<T>>;
 template<typename T, typename Visitor>
 auto dfs(AdjacencyList<T> const& graph, T first, Visitor visitor)
 {
-    auto visited = std::set<T>{};
-    auto stack   = std::stack<T>{};
+    auto visited = FlatSet<T>{};
+    auto stack   = std::stack<T, std::vector<T>>{};
     stack.push(first);
 
     while (not stack.empty()) {

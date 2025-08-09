@@ -1,5 +1,6 @@
 #pragma once
 
+#include "snir/core/FlatSet.hpp"
 #include "snir/ir/AnalysisManager.hpp"
 #include "snir/ir/Function.hpp"
 #include "snir/ir/Instruction.hpp"
@@ -8,7 +9,6 @@
 #include "snir/ir/Value.hpp"
 
 #include <ranges>
-#include <set>
 
 namespace snir {
 
@@ -53,7 +53,7 @@ private:
         return inst;
     }
 
-    std::set<ValueId> _used;
+    FlatSet<ValueId> _used;
 };
 
 }  // namespace snir
