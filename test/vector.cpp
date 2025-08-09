@@ -124,6 +124,16 @@ auto testFlatSet() -> void
 
     assert(std::ranges::equal(set, std::array{42, 143}));
     assert(std::ranges::equal(std::as_const(set), std::array{42, 143}));
+
+    snir::eraseIf(set, [](auto v) { return v > 42; });
+    assert(set.size() == 1);
+    assert(set.contains(42));
+    assert(not set.contains(143));
+
+    set.clear();
+    assert(set.empty());
+    assert(not set.contains(42));
+    assert(not set.contains(143));
 }
 
 }  // namespace

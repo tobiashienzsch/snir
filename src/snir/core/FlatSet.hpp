@@ -295,68 +295,68 @@ struct FlatSet
 
     [[nodiscard]] constexpr auto lower_bound(key_type const& key) -> iterator
     {
-        return std::lower_bound(begin(), end(), key, std::ref(_compare));
+        return std::ranges::lower_bound(*this, key, std::ref(_compare));
     }
 
     [[nodiscard]] constexpr auto lower_bound(key_type const& key) const -> const_iterator
     {
-        return std::lower_bound(begin(), end(), key, std::ref(_compare));
+        return std::ranges::lower_bound(*this, key, std::ref(_compare));
     }
 
     template<typename K>
         requires detail::isTransparent<Compare>
     [[nodiscard]] constexpr auto lower_bound(K const& key) -> iterator
     {
-        return std::lower_bound(begin(), end(), key, std::ref(_compare));
+        return std::ranges::lower_bound(*this, key, std::ref(_compare));
     }
 
     template<typename K>
         requires detail::isTransparent<Compare>
     [[nodiscard]] constexpr auto lower_bound(K const& key) const -> const_iterator
     {
-        return std::lower_bound(begin(), end(), key, std::ref(_compare));
+        return std::ranges::lower_bound(*this, key, std::ref(_compare));
     }
 
     [[nodiscard]] constexpr auto upper_bound(key_type const& key) -> iterator
     {
-        return std::upper_bound(begin(), end(), key, std::ref(_compare));
+        return std::ranges::upper_bound(*this, key, std::ref(_compare));
     }
 
     [[nodiscard]] constexpr auto upper_bound(key_type const& key) const -> const_iterator
     {
-        return std::upper_bound(begin(), end(), key, std::ref(_compare));
+        return std::ranges::upper_bound(*this, key, std::ref(_compare));
     }
 
     template<typename K>
         requires detail::isTransparent<Compare>
     [[nodiscard]] constexpr auto upper_bound(K const& key) -> iterator
     {
-        return std::upper_bound(begin(), end(), key, std::ref(_compare));
+        return std::ranges::upper_bound(*this, key, std::ref(_compare));
     }
 
     template<typename K>
         requires detail::isTransparent<Compare>
     [[nodiscard]] constexpr auto upper_bound(K const& key) const -> const_iterator
     {
-        return std::upper_bound(begin(), end(), key, std::ref(_compare));
+        return std::ranges::upper_bound(*this, key, std::ref(_compare));
     }
 
     [[nodiscard]] constexpr auto equal_range(key_type const& key) -> std::pair<iterator, iterator>
     {
-        return std::equal_range(begin(), end(), key, std::ref(_compare));
+        return std::ranges::equal_range(*this, key, std::ref(_compare));
     }
 
     [[nodiscard]] constexpr auto equal_range(key_type const& key) const
         -> std::pair<const_iterator, const_iterator>
     {
-        return std::equal_range(begin(), end(), key, std::ref(_compare));
+        return std::ranges::equal_range(*this, key, std::ref(_compare));
     }
 
     template<typename K>
         requires detail::isTransparent<Compare>
     [[nodiscard]] constexpr auto equal_range(K const& key) -> std::pair<iterator, iterator>
     {
-        return std::equal_range(begin(), end(), key, std::ref(_compare));
+        return std::ranges::equal_range(*this, key, std::ref(_compare));
     }
 
     template<typename K>
@@ -364,17 +364,17 @@ struct FlatSet
     [[nodiscard]] constexpr auto equal_range(K const& key) const
         -> std::pair<const_iterator, const_iterator>
     {
-        return std::equal_range(begin(), end(), key, std::ref(_compare));
+        return std::ranges::equal_range(*this, key, std::ref(_compare));
     }
 
     friend constexpr auto operator==(FlatSet const& lhs, FlatSet const& rhs) -> bool
     {
-        return std::equal(lhs.begin(), lhs.end(), rhs.begin(), rhs.end());
+        return std::ranges::equal(lhs, rhs);
     }
 
     friend constexpr auto operator<(FlatSet const& lhs, FlatSet const& rhs) -> bool
     {
-        return std::lexicographical_compare(lhs.begin(), lhs.end(), rhs.begin(), rhs.end());
+        return std::ranges::lexicographical_compare(lhs, rhs);
     }
 
     friend constexpr auto operator>(FlatSet const& x, FlatSet const& y) -> bool { return y < x; }
@@ -394,7 +394,7 @@ private:
 };
 
 template<typename Key, typename Container, typename Compare, typename Pred>
-constexpr auto erase_if(FlatSet<Key, Container, Compare>& c, Pred pred) ->
+constexpr auto eraseIf(FlatSet<Key, Container, Compare>& c, Pred pred) ->
     typename FlatSet<Key, Container, Compare>::size_type
 {
     auto const it = std::remove_if(c.begin(), c.end(), pred);
