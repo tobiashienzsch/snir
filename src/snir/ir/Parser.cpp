@@ -117,8 +117,10 @@ auto Parser::readBlocks(std::string_view source) -> std::vector<BasicBlock>
                 current = std::nullopt;
             }
 
-            current
-                = BasicBlock{.label = getOrCreateLocal(number, ValueKind::Label), .instructions = {}};
+            current = BasicBlock{
+                .label        = getOrCreateLocal(number, ValueKind::Label),
+                .instructions = {},
+            };
             return;
         }
 
