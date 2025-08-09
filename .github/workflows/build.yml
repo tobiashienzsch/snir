@@ -13,24 +13,34 @@ jobs:
       fail-fast: false
       matrix:
         include:
+          - name: Emscripten
+            os: ubuntu-24.04
+            cmake_exe: 'emcmake cmake'
+            cmake_flags: ''
+
           - name: Linux GCC
             os: ubuntu-24.04
+            cmake_exe: 'cmake'
             cmake_flags: '-D CMAKE_C_COMPILER=gcc-14 -D CMAKE_CXX_COMPILER=g++-14 -D CMAKE_CXX_FLAGS="-fsanitize=address,undefined -fno-omit-frame-pointer" -D CMAKE_EXE_LINKER_FLAGS="-fsanitize=address,undefined"'
 
           - name: Linux Clang
             os: ubuntu-24.04
+            cmake_exe: 'cmake'
             cmake_flags: '-D CMAKE_CXX_FLAGS="-fsanitize=address,undefined -fno-omit-frame-pointer" -D CMAKE_EXE_LINKER_FLAGS="-fsanitize=address,undefined"'
 
           - name: macOS
             os: macos-15
+            cmake_exe: 'cmake'
             cmake_flags: '-D CMAKE_CXX_FLAGS="-fsanitize=address,undefined -fno-omit-frame-pointer" -D CMAKE_EXE_LINKER_FLAGS="-fsanitize=address,undefined"'
 
           - name: Windows Clang
             os: windows-2025
+            cmake_exe: 'cmake'
             cmake_flags: ''
 
           - name: Windows MSVC
             os: windows-2025
+            cmake_exe: 'cmake'
             cmake_flags: '-D CMAKE_CXX_FLAGS="/EHsc"'
     steps:
       - name: Checkout code
@@ -49,8 +59,14 @@ jobs:
           version: latest
           platform: x64
 
+      - name: Setup emsdk
+        if: matrix.name == 'Emscripten'
+        uses: mymindstorm/setup-emsdk@v14
+        with:
+          version: latest
+
       - name: CMake configure
-        run: cmake -S . -B build -G "Ninja Multi-Config" -D CMAKE_UNITY_BUILD=ON ${{ matrix.cmake_flags }}
+        run: ${{ matrix.cmake_exe }} -S . -B build -G "Ninja Multi-Config" -D CMAKE_UNITY_BUILD=ON ${{ matrix.cmake_flags }}
 
       - name: CMake build -- Debug
         run: cmake --build build --config Debug
