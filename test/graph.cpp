@@ -3,7 +3,7 @@
 #include "snir/graph/Graph.hpp"
 #include "snir/graph/AdjacencyList.hpp"
 #include "snir/graph/DirectedGraph.hpp"
-#include "snir/graph/SimpleGraph.hpp"
+#include "snir/graph/UndirectedGraph.hpp"
 
 #include <algorithm>
 #include <array>
@@ -85,9 +85,9 @@ auto testGraph() -> void
     std::println("");
 }
 
-auto testSimpleGraph() -> void
+auto testUndirectedGraph() -> void
 {
-    auto graph = snir::SimpleGraph{4zu};
+    auto graph = snir::UndirectedGraph{4zu};
 
     graph.connect(0, 1);
     graph.connect(0, 2);
@@ -148,7 +148,7 @@ auto main() -> int
     testAdjacencyList();
     testTopologicalSort();
     testGraph();
-    testSimpleGraph();
+    testUndirectedGraph();
     testDirectedGraph();
     return EXIT_SUCCESS;
 }

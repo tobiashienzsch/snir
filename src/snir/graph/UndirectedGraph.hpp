@@ -6,11 +6,11 @@
 
 namespace snir {
 
-struct SimpleGraph
+struct UndirectedGraph
 {
-    SimpleGraph() = default;
+    UndirectedGraph() = default;
 
-    explicit SimpleGraph(std::size_t nodes)
+    explicit UndirectedGraph(std::size_t nodes)
         : _nodes{nodes}
         , _adjacencyMatrix(matrixSize(nodes), false)
     {}
