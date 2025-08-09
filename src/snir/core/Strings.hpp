@@ -6,6 +6,7 @@
 #include <algorithm>
 #include <charconv>
 #include <concepts>
+#include <cstdlib>
 #include <iterator>
 #include <optional>
 #include <string>
@@ -66,6 +67,33 @@ getBetween(std::string_view s, std::string_view start, std::string_view stop) ->
     return s.substr(endOfStart, stopPos - endOfStart);
 }
 
+namespace detail {
+
+// macOS does not have std::from_chars for floating-point types
+template<std::floating_point Float>
+auto fromChars(char const* first, char const* /*last*/, Float& value) -> std::from_chars_result
+{
+    char* end      = nullptr;
+    auto const val = [&] {
+        if constexpr (std::same_as<Float, float>) {
+            return std::strtof(first, &end);
+        } else if constexpr (std::same_as<Float, double>) {
+            return std::strtod(first, &end);
+        } else {
+            static_assert(AlwaysFalse<Float>);
+        }
+    }();
+
+    if (end == first) {
+        return {.ptr = end, .ec = std::errc::invalid_argument};
+    }
+
+    value = val;
+    return {.ptr = end, .ec = {}};
+};
+
+}  // namespace detail
+
 template<typename NumberType>
 [[nodiscard]] auto tryParse(std::string_view str) -> std::optional<NumberType>
 {
@@ -74,7 +102,11 @@ template<typename NumberType>
     auto const* const last  = std::next(str.data(), std::ranges::ssize(str));
     auto const result       = [&] {
         if constexpr (std::floating_point<NumberType>) {
-            return std::from_chars(first, last, value, std::chars_format::general);
+#if defined(__APPLE__)
+            return detail::fromChars(first, last, value);
+#else
+            return std::from_chars(first, last, value);
+#endif
         } else if constexpr (std::integral<NumberType>) {
             return std::from_chars(first, last, value, 10);
         } else {
