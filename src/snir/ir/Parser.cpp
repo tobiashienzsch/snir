@@ -1,7 +1,7 @@
 #include "Parser.hpp"
 
 #include "snir/core/Exception.hpp"
-#include "snir/core/StaticVector.hpp"
+#include "snir/core/InplaceVector.hpp"
 #include "snir/core/Strings.hpp"
 #include "snir/ir/BasicBlock.hpp"
 #include "snir/ir/Branch.hpp"
@@ -147,7 +147,7 @@ auto Parser::readBinaryInst(std::string_view source) -> std::optional<ValueId>
 
         auto inst = Instruction::create(*_registry, kind, type);
         inst.asValue().emplace<Result>(result);
-        inst.asValue().emplace<Operands>(StaticVector<ValueId, 2>{lhs, rhs});
+        inst.asValue().emplace<Operands>(InplaceVector<ValueId, 2>{lhs, rhs});
         return inst;
     }
 
@@ -168,7 +168,7 @@ auto Parser::readIntCmpInst(std::string_view source) -> std::optional<ValueId>
         auto inst = Instruction::create(*_registry, InstKind::IntCmp, type);
         inst.asValue().emplace<Result>(result);
         inst.asValue().emplace<CompareKind>(cmp);
-        inst.asValue().emplace<Operands>(StaticVector<ValueId, 2>{lhs, rhs});
+        inst.asValue().emplace<Operands>(InplaceVector<ValueId, 2>{lhs, rhs});
         return inst;
     }
 
@@ -185,7 +185,7 @@ auto Parser::readTruncInst(std::string_view source) -> std::optional<ValueId>
 
         auto inst = Instruction::create(*_registry, InstKind::Trunc, type);
         inst.asValue().emplace<Result>(result);
-        inst.asValue().emplace<Operands>(StaticVector<ValueId, 2>{value});
+        inst.asValue().emplace<Operands>(InplaceVector<ValueId, 2>{value});
         return inst;
     }
 
@@ -200,7 +200,7 @@ auto Parser::readReturnInst(std::string_view source) -> std::optional<ValueId>
         auto const operand         = getOrCreateLocal(opSrc, ValueKind::Register);
 
         auto ret = Instruction::create(*_registry, InstKind::Return, type);
-        ret.asValue().emplace<Operands>(StaticVector<ValueId, 2>{operand});
+        ret.asValue().emplace<Operands>(InplaceVector<ValueId, 2>{operand});
         return ret;
     }
 

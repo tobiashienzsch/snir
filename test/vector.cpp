@@ -1,4 +1,4 @@
-#include "snir/core/StaticVector.hpp"
+#include "snir/core/InplaceVector.hpp"
 #include "snir/core/Strings.hpp"
 
 #undef NDEBUG
@@ -15,7 +15,7 @@ namespace {
 auto testVector() -> void  // NOLINT(readability-function-cognitive-complexity)
 {
     auto test = []<typename T>(T val) {  // NOLINT(readability-function-cognitive-complexity)
-        using Vec = snir::StaticVector<T, 2>;
+        using Vec = snir::InplaceVector<T, 2>;
         static_assert(std::same_as<typename Vec::value_type, T>);
         static_assert(std::same_as<typename Vec::value_type, T>);
 
@@ -72,7 +72,7 @@ auto testVector() -> void  // NOLINT(readability-function-cognitive-complexity)
             [[maybe_unused]] auto newVal = vec.push_back(val);
             assert(false);
         } catch (std::exception const& e) {
-            assert(snir::strings::contains(e.what(), "push_back on full StaticVector<T, 2>"));
+            assert(snir::strings::contains(e.what(), "push_back on full InplaceVector<T, 2>"));
         }
     };
 
@@ -87,17 +87,17 @@ auto testVector() -> void  // NOLINT(readability-function-cognitive-complexity)
     test(float{42});
     test(double{42});
 
-    static_assert(sizeof(snir::StaticVector<std::uint8_t, 1>{}) == 2);
-    static_assert(sizeof(snir::StaticVector<std::uint8_t, 2>{}) == 3);
-    static_assert(sizeof(snir::StaticVector<std::uint8_t, 3>{}) == 4);
+    static_assert(sizeof(snir::InplaceVector<std::uint8_t, 1>{}) == 2);
+    static_assert(sizeof(snir::InplaceVector<std::uint8_t, 2>{}) == 3);
+    static_assert(sizeof(snir::InplaceVector<std::uint8_t, 3>{}) == 4);
 
-    static_assert(sizeof(snir::StaticVector<std::uint16_t, 1>{}) == 4);
-    static_assert(sizeof(snir::StaticVector<std::uint16_t, 2>{}) == 6);
-    static_assert(sizeof(snir::StaticVector<std::uint16_t, 3>{}) == 8);
+    static_assert(sizeof(snir::InplaceVector<std::uint16_t, 1>{}) == 4);
+    static_assert(sizeof(snir::InplaceVector<std::uint16_t, 2>{}) == 6);
+    static_assert(sizeof(snir::InplaceVector<std::uint16_t, 3>{}) == 8);
 
-    static_assert(sizeof(snir::StaticVector<std::uint32_t, 1>{}) == 8);
-    static_assert(sizeof(snir::StaticVector<std::uint32_t, 2>{}) == 12);
-    static_assert(sizeof(snir::StaticVector<std::uint32_t, 3>{}) == 16);
+    static_assert(sizeof(snir::InplaceVector<std::uint32_t, 1>{}) == 8);
+    static_assert(sizeof(snir::InplaceVector<std::uint32_t, 2>{}) == 12);
+    static_assert(sizeof(snir::InplaceVector<std::uint32_t, 3>{}) == 16);
 }
 
 }  // namespace

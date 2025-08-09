@@ -11,7 +11,7 @@
 namespace snir {
 
 template<typename T, unsigned Capacity>
-struct StaticVector
+struct InplaceVector
 {
     using value_type             = T;
     using size_type              = std::size_t;
@@ -25,9 +25,9 @@ struct StaticVector
     using reverse_iterator       = std::reverse_iterator<iterator>;
     using const_reverse_iterator = std::reverse_iterator<const_iterator>;
 
-    StaticVector() = default;
+    InplaceVector() = default;
 
-    StaticVector(std::initializer_list<T> il)
+    InplaceVector(std::initializer_list<T> il)
     {
         if (il.size() <= capacity()) {
             std::ranges::copy(il, _buffer.begin());
@@ -72,7 +72,7 @@ struct StaticVector
     auto push_back(U&& val) -> reference  // NOLINT(readability-identifier-naming)
     {
         if (full()) {
-            raisef<std::out_of_range>("push_back on full StaticVector<T, {}>", capacity());
+            raisef<std::out_of_range>("push_back on full InplaceVector<T, {}>", capacity());
         }
 
         _buffer.at(_size) = std::forward<U>(val);
