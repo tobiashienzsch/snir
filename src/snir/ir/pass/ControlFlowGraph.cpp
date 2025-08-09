@@ -35,7 +35,10 @@ auto ControlFlowGraph::operator()(Function const& func, AnalysisManager<Function
         std::print("{} -> ", int(_nodeIds[node]));
     }
     std::println("return");
-    return {.nodeIds = _nodeIds, .graph = _graph};
+    return {
+        .nodeIds = _nodeIds,
+        .graph   = _graph,
+    };
 }
 
 auto ControlFlowGraph::addBlockToGraph(BasicBlock const& block) -> void

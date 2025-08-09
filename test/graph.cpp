@@ -79,12 +79,6 @@ auto testGraph() -> void
 
     auto stream = std::ostream_iterator<unsigned>(std::cout, " ");
 
-    auto const components = snir::FindComponents(graph).get();
-    std::println("\nComponents: ");
-    std::println("Count: {}", components.first);
-    std::ranges::copy(components.second, stream);
-    std::println("");
-
     auto const ordering = topologicalSort(graph);
     std::println("\nOrdering (TopologicalSort): ");
     std::ranges::copy(ordering, stream);
