@@ -7,6 +7,8 @@ Checks:
 
   - cert-*
   - clang-analyzer-*
+  - -clang-analyzer-optin.cplusplus.UninitializedObject # fmt has issues
+
   - clang-diagnostic-*
   - concurrency-*
 
