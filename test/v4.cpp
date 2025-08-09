@@ -1,9 +1,10 @@
 #include "snir/core/ValueStore.hpp"
 
+#include "fmt/os.h"
+
 #include <cstdint>
 #include <cstdio>
 #include <cstdlib>
-#include <print>
 #include <utility>
 
 #undef NDEBUG
@@ -220,11 +221,11 @@ auto testValueStore() -> void
 
 auto main() -> int
 {
-    std::println("sizeof(Value): {}", sizeof(snir::Value));
-    std::println("sizeof(Inst): {}", sizeof(snir::Inst));
-    std::println("sizeof(UnaryOp): {}", sizeof(snir::UnaryOp));
-    std::println("sizeof(BinaryOp): {}", sizeof(snir::BinaryOp));
-    std::println("sizeof(Branch): {}", sizeof(snir::Branch));
+    fmt::println("sizeof(Value): {}", sizeof(snir::Value));
+    fmt::println("sizeof(Inst): {}", sizeof(snir::Inst));
+    fmt::println("sizeof(UnaryOp): {}", sizeof(snir::UnaryOp));
+    fmt::println("sizeof(BinaryOp): {}", sizeof(snir::BinaryOp));
+    fmt::println("sizeof(Branch): {}", sizeof(snir::Branch));
 
     testValueStore();
 

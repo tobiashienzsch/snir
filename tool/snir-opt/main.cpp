@@ -10,6 +10,8 @@
 #include "snir/ir/Printer.hpp"
 #include "snir/ir/Registry.hpp"
 
+#include "fmt/os.h"
+
 #include <cstddef>
 #include <cstdio>
 #include <cstdlib>
@@ -19,7 +21,6 @@
 #include <ios>
 #include <iostream>
 #include <optional>
-#include <print>
 #include <span>
 
 namespace {
@@ -60,12 +61,12 @@ try {
     // Parse arguments
     auto args = parseArguments(std::span<char const* const>(argv, std::size_t(argc)));
     if (not args) {
-        std::println(stderr, "Usage:\nsnir-opt -v -O[0,1,2]");
+        fmt::println(stderr, "Usage:\nsnir-opt -v -O[0,1,2]");
         return EXIT_FAILURE;
     }
 
     if (not std::filesystem::is_regular_file(args->input)) {
-        std::println(stderr, "Input file does not exist: {}", args->input.string());
+        fmt::println(stderr, "Input file does not exist: {}", args->input.string());
         return EXIT_FAILURE;
     }
 
@@ -103,14 +104,14 @@ try {
     if (func.arguments().empty()) {
         auto vm     = snir::Interpreter{};
         auto result = vm.execute(func, {});
-        std::println("; return: {} as {}", result.value(), func.type());
+        fmt::println("; return: {} as {}", result.value(), func.type());
     }
 
     return EXIT_SUCCESS;
 } catch (std::exception const& e) {
-    std::println(stderr, "Exception in main(): {}", e.what());
+    fmt::println(stderr, "Exception in main(): {}", e.what());
     return EXIT_FAILURE;
 } catch (...) {
-    std::println(stderr, "Unkown exception in main()");
+    fmt::println(stderr, "Unkown exception in main()");
     return EXIT_FAILURE;
 }

@@ -5,13 +5,14 @@
 #include "snir/graph/DirectedGraph.hpp"
 #include "snir/graph/UndirectedGraph.hpp"
 
+#include "fmt/os.h"
+
 #include <algorithm>
 #include <array>
 #include <cassert>
 #include <cstdlib>
 #include <iostream>
 #include <iterator>
-#include <print>
 #include <vector>
 
 namespace {
@@ -28,7 +29,7 @@ auto testAdjacencyList() -> void
     };
     auto result = std::vector<char>{};
     snir::dfs(graph, 'A', [&](auto node) {
-        std::println("node: {:c}", node);
+        fmt::println("node: {:c}", node);
         result.push_back(node);
     });
 
@@ -68,21 +69,21 @@ auto testGraph() -> void
     graph.connect(3, 4);
     graph.connect(5, 6);
 
-    std::println("Graph: ");
+    fmt::println("Graph: ");
     graph.forEach([&graph](auto const& node) {
-        std::print("{}: [", node);
+        fmt::print("{}: [", node);
         for (auto edge : graph.outEdges(node)) {
-            std::print("{} ", edge.sink);
+            fmt::print("{} ", edge.sink);
         }
-        std::println("]");
+        fmt::println("]");
     });
 
     auto stream = std::ostream_iterator<unsigned>(std::cout, " ");
 
     auto const ordering = topologicalSort(graph);
-    std::println("\nOrdering (TopologicalSort): ");
+    fmt::println("\nOrdering (TopologicalSort): ");
     std::ranges::copy(ordering, stream);
-    std::println("");
+    fmt::println("");
 }
 
 auto testUndirectedGraph() -> void

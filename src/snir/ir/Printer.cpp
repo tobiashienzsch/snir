@@ -18,11 +18,12 @@
 #include "snir/ir/ValueId.hpp"
 #include "snir/ir/ValueKind.hpp"
 
+#include "fmt/os.h"
+#include "fmt/ostream.h"
+
 #include <algorithm>
-#include <format>
 #include <iterator>
 #include <ostream>
-#include <print>
 #include <span>
 #include <vector>
 
@@ -73,18 +74,18 @@ auto Printer::printFunction(Function& func) -> void
 
     auto const [type, identifier, def] = view.get(func.asValue());
 
-    std::print(_out, "define {} @{}", type, identifier.text);
+    fmt::print(_out, "define {} @{}", type, identifier.text);
     printFunctionArgs(func);
 
-    std::println(_out, " {{");
+    fmt::println(_out, " {{");
     auto const& blocks = func.basicBlocks();
     for (auto i = 0zu; i < blocks.size(); ++i) {
         printBasicBlock(func, blocks.at(i));
         if (auto const isLast = i == blocks.size() - 1zu; not isLast) {
-            std::println(_out, "");
+            fmt::println(_out, "");
         }
     }
-    std::println(_out, "}}\n");
+    fmt::println(_out, "}}\n");
 }
 
 auto Printer::printFunctionArgs(Function& func) -> void
@@ -93,17 +94,17 @@ auto Printer::printFunctionArgs(Function& func) -> void
     auto types       = func.asValue().registry()->view<Type>();
 
     if (args.empty()) {
-        std::print(_out, "()");
+        fmt::print(_out, "()");
         return;
     }
 
     auto const a0 = std::ranges::begin(args);
     auto const l  = std::ranges::end(args);
-    std::print(_out, "({} %{}", std::get<0>(types.get(*a0)), _localIds.add(*a0));
+    fmt::print(_out, "({} %{}", std::get<0>(types.get(*a0)), _localIds.add(*a0));
     std::ranges::for_each(std::ranges::next(a0), l, [this, &types](ValueId arg) {
-        std::print(_out, ", {} %{}", std::get<0>(types.get(arg)), _localIds.add(arg));
+        fmt::print(_out, ", {} %{}", std::get<0>(types.get(arg)), _localIds.add(arg));
     });
-    std::print(_out, ")");
+    fmt::print(_out, ")");
 }
 
 auto Printer::printBasicBlock(Function& func, BasicBlock const& block) -> void
@@ -120,57 +121,57 @@ auto Printer::printBasicBlock(Function& func, BasicBlock const& block) -> void
     auto formatValue = [&](ValueId val) {
         auto [kind] = valueKind.get(val);
         if (kind == ValueKind::Register) {
-            return std::format("%{}", _localIds.add(val));
+            return fmt::format("%{}", _localIds.add(val));
         }
-        return std::format("{}", int(val));
+        return fmt::format("{}", int(val));
     };
 
-    std::print(_out, "{}:", _localIds.add(block.label));
+    fmt::print(_out, "{}:", _localIds.add(block.label));
     if (_cfg != nullptr) {
         auto const preds = getPredsForBlock(*_cfg, block.label);
         if (not preds.empty()) {
-            std::print(_out, "\t\t\t\t\t\t; preds = %{}", _localIds.add(preds.at(0)));
+            fmt::print(_out, "\t\t\t\t\t\t; preds = %{}", _localIds.add(preds.at(0)));
             for (auto pred : std::span{preds}.subspan(1)) {
-                std::print(_out, ", %{}", _localIds.add(pred));
+                fmt::print(_out, ", %{}", _localIds.add(pred));
             }
         }
     }
-    std::println(_out, "");
+    fmt::println(_out, "");
 
     for (auto const inst : block.instructions) {
         auto const [kind, type] = common.get(inst);
         switch (kind) {
             case InstKind::Nop: {
-                std::println(_out, "  ; {}", kind);
+                fmt::println(_out, "  ; {}", kind);
                 break;
             }
             case InstKind::Const: {
                 auto const [id]    = result.get(inst);
                 auto const res     = formatValue(id.id);
                 auto const [value] = literal.get(inst);
-                std::println(_out, "  {} = {} {}", res, type, value);
+                fmt::println(_out, "  {} = {} {}", res, type, value);
                 break;
             }
             case InstKind::Return: {
                 if (type == Type::Void) {
-                    std::println(_out, "  {} {}", kind, type);
+                    fmt::println(_out, "  {} {}", kind, type);
                 } else {
                     auto const [args] = operands.get(inst);
                     auto const value  = formatValue(args.list[0]);
-                    std::println(_out, "  {} {} {}", kind, type, value);
+                    fmt::println(_out, "  {} {} {}", kind, type, value);
                 }
                 break;
             }
             case InstKind::Branch: {
                 auto [br] = branch.get(inst);
                 if (not br.condition) {
-                    std::println(_out, "  {} label %{}", kind, _localIds.add(br.iftrue));
+                    fmt::println(_out, "  {} label %{}", kind, _localIds.add(br.iftrue));
                 } else {
                 }
                 break;
             }
             case InstKind::Phi: {
-                std::println(_out, "  {} ", kind);
+                fmt::println(_out, "  {} ", kind);
                 break;
             }
             case InstKind::Add:
@@ -192,7 +193,7 @@ auto Printer::printBasicBlock(Function& func, BasicBlock const& block) -> void
                 auto const res    = formatValue(id.id);
                 auto const lhs    = formatValue(args.list[0]);
                 auto const rhs    = formatValue(args.list[1]);
-                std::println(_out, "  {} = {} {} {}, {}", res, kind, type, lhs, rhs);
+                fmt::println(_out, "  {} = {} {} {}, {}", res, kind, type, lhs, rhs);
                 break;
             }
 
@@ -203,7 +204,7 @@ auto Printer::printBasicBlock(Function& func, BasicBlock const& block) -> void
                 auto const [cmp]  = compare.get(inst);
                 auto const lhs    = formatValue(args.list[0]);
                 auto const rhs    = formatValue(args.list[1]);
-                std::println(_out, "  {} = {} {} {} {}, {}", res, kind, cmp, type, lhs, rhs);
+                fmt::println(_out, "  {} = {} {} {} {}, {}", res, kind, cmp, type, lhs, rhs);
                 break;
             }
             case InstKind::Trunc: {
@@ -211,7 +212,7 @@ auto Printer::printBasicBlock(Function& func, BasicBlock const& block) -> void
                 auto const [args] = operands.get(inst);
                 auto const res    = formatValue(id.id);
                 auto const value  = formatValue(args.list[0]);
-                std::println(_out, "  {} = {} {} to {}", res, kind, value, type);
+                fmt::println(_out, "  {} = {} {} to {}", res, kind, value, type);
                 break;
             }
         }

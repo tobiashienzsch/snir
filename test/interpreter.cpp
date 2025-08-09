@@ -16,6 +16,7 @@
 #include "snir/ir/Registry.hpp"
 #include "snir/ir/Type.hpp"
 
+#include "fmt/os.h"
 #include <ctre.hpp>
 
 #include <cassert>
@@ -27,7 +28,6 @@
 #include <functional>
 #include <iostream>
 #include <limits>
-#include <print>
 #include <stdexcept>
 #include <string>
 #include <string_view>
@@ -114,7 +114,7 @@ auto execute(snir::Function const& func, snir::Literal expected) -> void
         auto result = vm.execute(func, {});
         assert(result.has_value());
 
-        std::println("; return: {} as {}", *result, func.type());
+        fmt::println("; return: {} as {}", *result, func.type());
         if (func.type() == snir::Type::Void) {
             assert(std::isnan(std::get<double>(result->value)));
         } else {
@@ -141,7 +141,7 @@ auto optimize(snir::Module& module) -> void
 
 auto testFile(std::filesystem::path const& path) -> void
 {
-    std::println("; {}", path.string());
+    fmt::println("; {}", path.string());
 
     auto registry = snir::Registry{};
     auto parser   = snir::Parser{registry};

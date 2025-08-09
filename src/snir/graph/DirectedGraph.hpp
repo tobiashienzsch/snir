@@ -3,7 +3,6 @@
 #include <cstddef>
 #include <cstdlib>
 #include <iterator>
-#include <print>
 #include <vector>
 
 namespace snir {

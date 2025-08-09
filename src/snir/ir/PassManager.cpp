@@ -4,10 +4,11 @@
 #include "snir/ir/Function.hpp"
 #include "snir/ir/Module.hpp"
 
+#include "fmt/ostream.h"
+
 #include <chrono>
 #include <functional>
 #include <ostream>
-#include <print>
 
 namespace snir {
 
@@ -29,7 +30,7 @@ auto PassManager::operator()(Function& func, AnalysisManager<Function>& analysis
         auto const stop  = std::chrono::steady_clock::now();
         auto const delta = std::chrono::duration_cast<std::chrono::microseconds>(stop - start);
         if (_log) {
-            std::println(
+            fmt::println(
                 _out,
                 "; function pass on {}: {} ({})",
                 func.identifier(),

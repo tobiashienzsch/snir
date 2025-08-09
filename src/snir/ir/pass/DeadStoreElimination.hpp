@@ -7,7 +7,6 @@
 #include "snir/ir/Result.hpp"
 #include "snir/ir/Value.hpp"
 
-#include <print>
 #include <ranges>
 #include <set>
 

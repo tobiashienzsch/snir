@@ -13,11 +13,12 @@
 #include "snir/ir/Literal.hpp"
 #include "snir/ir/Type.hpp"
 
+#include "fmt/os.h"
+
 #include <cassert>
 #include <cstdint>
 #include <cstdlib>
 #include <exception>
-#include <print>
 #include <stdexcept>
 #include <string_view>
 
@@ -137,7 +138,7 @@ auto testParserErrors() -> void
     auto registry = Registry{};
     auto parser   = Parser{registry};
     for (auto const& entry : std::filesystem::directory_iterator{"./test/files/error"}) {
-        std::println("; {}", entry.path().string());
+        fmt::println("; {}", entry.path().string());
         auto const source = readFile(entry).value();
         auto const error  = parseErrorMessage(source);
         CHECK_THROW_CONTAINS(parser.read(source), error);

@@ -1,8 +1,9 @@
 #pragma once
 
+#include "fmt/format.h"
+
 #include <array>
 #include <cstdint>
-#include <format>
 
 namespace snir {
 
@@ -17,17 +18,16 @@ enum struct InstKind : std::uint8_t
 }  // namespace snir
 
 template<>
-struct std::formatter<snir::InstKind, char> : std::formatter<std::string_view, char>
+struct fmt::formatter<snir::InstKind> : formatter<string_view>
 {
-    template<typename FormatContext>
-    auto format(snir::InstKind kind, FormatContext& fc) const
+    auto format(snir::InstKind kind, format_context& ctx) const -> format_context::iterator
     {
         static constexpr auto names = std::array{
-#define SNIR_INST_KIND(Id, Name) std::string_view{#Name},
+#define SNIR_INST_KIND(Id, Name) string_view{#Name},
 #include "snir/ir/InstKind.def"
         };
 
         auto str = names.at(static_cast<std::size_t>(kind));
-        return std::formatter<std::string_view, char>::format(str, fc);
+        return formatter<string_view>::format(str, ctx);
     }
 };

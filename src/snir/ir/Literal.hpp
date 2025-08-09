@@ -2,9 +2,10 @@
 
 #include "snir/ir/Type.hpp"
 
+#include "fmt/format.h"
+
 #include <array>
 #include <cstdint>
-#include <format>
 #include <variant>
 
 namespace snir {
@@ -19,12 +20,11 @@ struct Literal
 }  // namespace snir
 
 template<>
-struct std::formatter<snir::Literal, char> : std::formatter<std::string_view, char>
+struct fmt::formatter<snir::Literal> : formatter<string_view>
 {
-    template<typename FormatContext>
-    auto format(snir::Literal literal, FormatContext& fc) const
+    auto format(snir::Literal literal, format_context& ctx) const -> format_context::iterator
     {
-        auto str = std::visit([](auto val) { return std::format("{}", val); }, literal.value);
-        return std::formatter<std::string_view, char>::format(str, fc);
+        auto str = std::visit([](auto val) { return fmt::format("{}", val); }, literal.value);
+        return formatter<string_view>::format(str, ctx);
     }
 };

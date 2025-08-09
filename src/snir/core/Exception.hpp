@@ -1,7 +1,8 @@
 #pragma once
 
+#include "fmt/format.h"
+
 #include <exception>
-#include <format>
 #include <stdexcept>
 
 namespace snir {
@@ -13,9 +14,9 @@ template<typename E, typename... Args>
 }
 
 template<typename E, typename... Args>
-[[noreturn]] auto raisef(std::format_string<Args...> fmt, Args&&... args)
+[[noreturn]] auto raisef(fmt::format_string<Args...> fmt, Args&&... args)
 {
-    raise<E>(std::format(fmt, std::forward<Args>(args)...));
+    raise<E>(fmt::format(fmt, std::forward<Args>(args)...));
 }
 
 }  // namespace snir

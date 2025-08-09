@@ -2,6 +2,7 @@
 
 #include "snir/core/Exception.hpp"
 
+#include <algorithm>
 #include <array>
 #include <concepts>
 #include <cstdint>

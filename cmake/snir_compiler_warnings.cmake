@@ -24,5 +24,7 @@ else ()
             -Wunused-parameter
             -Wzero-as-null-pointer-constant
             -Wredundant-decls
+
+            -Wno-switch-enum
     )
 endif ()
