@@ -66,7 +66,14 @@ jobs:
           version: latest
 
       - name: CMake configure
-        run: ${{ matrix.cmake_exe }} -S . -B build -G "Ninja Multi-Config" -D CMAKE_UNITY_BUILD=ON ${{ matrix.cmake_flags }}
+        run: >
+            ${{ matrix.cmake_exe }}
+            -S .
+            -B build
+            -G "Ninja Multi-Config"
+            -D CMAKE_UNITY_BUILD=ON
+            -D CMAKE_COMPILE_WARNING_AS_ERROR=ON
+            ${{ matrix.cmake_flags }}
 
       - name: CMake build -- Debug
         run: cmake --build build --config Debug
