@@ -27,4 +27,9 @@ else ()
 
             -Wno-switch-enum
     )
+
+    if(WIN32 AND (CMAKE_CXX_COMPILER_ID STREQUAL "Clang"))
+        # Warns for [[no_unique_address]] being ignored for ABI reasons
+        target_compile_options(snir_compiler_warnings INTERFACE "-Wno-unknown-attributes")
+    endif()
 endif ()
