@@ -36,7 +36,7 @@ jobs:
           - name: Windows Clang
             os: windows-2025
             cmake_exe: 'cmake'
-            cmake_flags: ''
+            cmake_flags: '-D CMAKE_CXX_FLAGS="-D _CRT_SECURE_NO_WARNINGS=1"'
 
           - name: Windows MSVC
             os: windows-2025
