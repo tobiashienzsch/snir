@@ -19,3 +19,7 @@ target_sources(snir
 
         snir/ir/pass/ControlFlowGraph.cpp
 )
+
+if(WIN32)
+    target_compile_definitions(snir PUBLIC _CRT_SECURE_NO_WARNINGS=1)
+endif()
