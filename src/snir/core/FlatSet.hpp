@@ -13,10 +13,10 @@ namespace snir {
 namespace detail {
 
 template<typename T, typename = void>
-inline constexpr bool isTransparent = false;
+inline constexpr bool IsTransparent = false;
 
 template<typename T>
-inline constexpr bool isTransparent<T, std::void_t<typename T::is_transparent>> = true;
+inline constexpr bool IsTransparent<T, std::void_t<typename T::is_transparent>> = true;
 
 }  // namespace detail
 
@@ -131,7 +131,7 @@ struct FlatSet
     [[nodiscard]] constexpr auto size() const noexcept -> size_type { return _container.size(); }
 
     /// \brief Returns the max_size of the underlying container.
-    [[nodiscard]] constexpr auto max_size() const noexcept -> size_type
+    [[nodiscard]] constexpr auto maxSize() const noexcept -> size_type
     {
         return _container.max_size();
     }
@@ -140,8 +140,8 @@ struct FlatSet
     template<typename... Args>
     constexpr auto emplace(Args&&... args) -> std::pair<iterator, bool>
     {
-        auto key    = Key{std::forward<Args>(args)...};
-        iterator it = lower_bound(key);
+        auto key = Key{std::forward<Args>(args)...};
+        auto it  = lowerBound(key);
 
         if (it == end() or _compare(key, *it)) {
             it = _container.emplace(it, std::move(key));
@@ -152,7 +152,7 @@ struct FlatSet
     }
 
     template<typename... Args>
-    constexpr auto emplace_hint(const_iterator /*position*/, Args&&... args) -> iterator
+    constexpr auto emplaceHint(const_iterator /*position*/, Args&&... args) -> iterator
     {
         return emplace(std::forward<Args>(args)...).first;
     }
@@ -224,9 +224,9 @@ struct FlatSet
     constexpr auto clear() noexcept -> void { _container.clear(); }
 
     // observers
-    [[nodiscard]] constexpr auto key_comp() const -> key_compare { return _compare; }
+    [[nodiscard]] constexpr auto keyComp() const -> key_compare { return _compare; }
 
-    [[nodiscard]] constexpr auto value_comp() const -> value_compare { return _compare; }
+    [[nodiscard]] constexpr auto valueComp() const -> value_compare { return _compare; }
 
     // set operations
     [[nodiscard]] constexpr auto find(key_type const& key) -> iterator
@@ -240,7 +240,7 @@ struct FlatSet
 
     [[nodiscard]] constexpr auto find(key_type const& key) const -> const_iterator
     {
-        auto const it = lower_bound(key);
+        auto const it = lowerBound(key);
         if (it == end() or _compare(key, *it)) {
             return end();
         }
@@ -248,7 +248,7 @@ struct FlatSet
     }
 
     template<typename K>
-        requires detail::isTransparent<Compare>
+        requires detail::IsTransparent<Compare>
     [[nodiscard]] constexpr auto find(K const& key) -> iterator
     {
         auto const it = lower_bound(key);
@@ -259,7 +259,7 @@ struct FlatSet
     }
 
     template<typename K>
-        requires detail::isTransparent<Compare>
+        requires detail::IsTransparent<Compare>
     [[nodiscard]] constexpr auto find(K const& key) const -> const_iterator
     {
         auto const it = lower_bound(key);
@@ -275,7 +275,7 @@ struct FlatSet
     }
 
     template<typename K>
-        requires detail::isTransparent<Compare>
+        requires detail::IsTransparent<Compare>
     [[nodiscard]] constexpr auto count(K const& key) const -> size_type
     {
         return find(key) == end() ? 0 : 1;
@@ -287,81 +287,81 @@ struct FlatSet
     }
 
     template<typename K>
-        requires detail::isTransparent<Compare>
+        requires detail::IsTransparent<Compare>
     [[nodiscard]] constexpr auto contains(K const& key) const -> bool
     {
         return count(key) == 1;
     }
 
-    [[nodiscard]] constexpr auto lower_bound(key_type const& key) -> iterator
+    [[nodiscard]] constexpr auto lowerBound(key_type const& key) -> iterator
     {
         return std::ranges::lower_bound(*this, key, std::ref(_compare));
     }
 
-    [[nodiscard]] constexpr auto lower_bound(key_type const& key) const -> const_iterator
-    {
-        return std::ranges::lower_bound(*this, key, std::ref(_compare));
-    }
-
-    template<typename K>
-        requires detail::isTransparent<Compare>
-    [[nodiscard]] constexpr auto lower_bound(K const& key) -> iterator
+    [[nodiscard]] constexpr auto lowerBound(key_type const& key) const -> const_iterator
     {
         return std::ranges::lower_bound(*this, key, std::ref(_compare));
     }
 
     template<typename K>
-        requires detail::isTransparent<Compare>
-    [[nodiscard]] constexpr auto lower_bound(K const& key) const -> const_iterator
+        requires detail::IsTransparent<Compare>
+    [[nodiscard]] constexpr auto lowerBound(K const& key) -> iterator
     {
         return std::ranges::lower_bound(*this, key, std::ref(_compare));
     }
 
-    [[nodiscard]] constexpr auto upper_bound(key_type const& key) -> iterator
+    template<typename K>
+        requires detail::IsTransparent<Compare>
+    [[nodiscard]] constexpr auto lowerBound(K const& key) const -> const_iterator
+    {
+        return std::ranges::lower_bound(*this, key, std::ref(_compare));
+    }
+
+    [[nodiscard]] constexpr auto upperBound(key_type const& key) -> iterator
     {
         return std::ranges::upper_bound(*this, key, std::ref(_compare));
     }
 
-    [[nodiscard]] constexpr auto upper_bound(key_type const& key) const -> const_iterator
+    [[nodiscard]] constexpr auto upperBound(key_type const& key) const -> const_iterator
     {
         return std::ranges::upper_bound(*this, key, std::ref(_compare));
     }
 
     template<typename K>
-        requires detail::isTransparent<Compare>
-    [[nodiscard]] constexpr auto upper_bound(K const& key) -> iterator
+        requires detail::IsTransparent<Compare>
+    [[nodiscard]] constexpr auto upperBound(K const& key) -> iterator
     {
         return std::ranges::upper_bound(*this, key, std::ref(_compare));
     }
 
     template<typename K>
-        requires detail::isTransparent<Compare>
-    [[nodiscard]] constexpr auto upper_bound(K const& key) const -> const_iterator
+        requires detail::IsTransparent<Compare>
+    [[nodiscard]] constexpr auto upperBound(K const& key) const -> const_iterator
     {
         return std::ranges::upper_bound(*this, key, std::ref(_compare));
     }
 
-    [[nodiscard]] constexpr auto equal_range(key_type const& key) -> std::pair<iterator, iterator>
+    [[nodiscard]] constexpr auto equalRange(key_type const& key) -> std::pair<iterator, iterator>
     {
         return std::ranges::equal_range(*this, key, std::ref(_compare));
     }
 
-    [[nodiscard]] constexpr auto equal_range(key_type const& key) const
+    [[nodiscard]] constexpr auto equalRange(key_type const& key) const
         -> std::pair<const_iterator, const_iterator>
     {
         return std::ranges::equal_range(*this, key, std::ref(_compare));
     }
 
     template<typename K>
-        requires detail::isTransparent<Compare>
-    [[nodiscard]] constexpr auto equal_range(K const& key) -> std::pair<iterator, iterator>
+        requires detail::IsTransparent<Compare>
+    [[nodiscard]] constexpr auto equalRange(K const& key) -> std::pair<iterator, iterator>
     {
         return std::ranges::equal_range(*this, key, std::ref(_compare));
     }
 
     template<typename K>
-        requires detail::isTransparent<Compare>
-    [[nodiscard]] constexpr auto equal_range(K const& key) const
+        requires detail::IsTransparent<Compare>
+    [[nodiscard]] constexpr auto equalRange(K const& key) const
         -> std::pair<const_iterator, const_iterator>
     {
         return std::ranges::equal_range(*this, key, std::ref(_compare));

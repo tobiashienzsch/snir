@@ -25,6 +25,16 @@ target_sources(snir-test-v4 PRIVATE v4.cpp)
 target_link_libraries(snir-test-v4 PRIVATE snir::snir snir::compiler_warnings)
 add_test(NAME snir_test_v4 COMMAND $<TARGET_FILE:snir-test-v4> WORKING_DIRECTORY ${CMAKE_SOURCE_DIR})
 
+add_executable(snir-test-lang-lexer)
+target_sources(snir-test-lang-lexer PRIVATE lang/Lexer.cpp)
+target_link_libraries(snir-test-lang-lexer PRIVATE snir::snir snir::compiler_warnings)
+add_test(NAME snir_test_lang-lexer COMMAND $<TARGET_FILE:snir-test-lang-lexer> WORKING_DIRECTORY ${CMAKE_SOURCE_DIR})
+
+add_executable(snir-test-lang-parser)
+target_sources(snir-test-lang-parser PRIVATE lang/Parser.cpp)
+target_link_libraries(snir-test-lang-parser PRIVATE snir::snir snir::compiler_warnings)
+add_test(NAME snir_test_lang-parser COMMAND $<TARGET_FILE:snir-test-lang-parser> WORKING_DIRECTORY ${CMAKE_SOURCE_DIR})
+
 file(GLOB SNIR_TEST_FILES "files/*.ll")
 foreach(test_file_path IN LISTS SNIR_TEST_FILES)
     get_filename_component(test_file ${test_file_path} NAME)

@@ -18,4 +18,7 @@ target_sources(snir
         snir/ir/Type.cpp
 
         snir/ir/pass/ControlFlowGraph.cpp
+
+        snir/lang/Ast.cpp
+        snir/lang/Token.cpp
 )

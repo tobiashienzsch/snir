@@ -13,6 +13,9 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set(CMAKE_CXX_SCAN_FOR_MODULES OFF)
 
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
+
 project(snir-dev VERSION 0.1.0)
 
 include(FetchContent)
@@ -25,5 +28,8 @@ enable_testing()
 include(cmake/snir_compiler_warnings.cmake)
 
 add_subdirectory(src)
+
+add_subdirectory(tool/snir-lang)
 add_subdirectory(tool/snir-opt)
+
 add_subdirectory(test)

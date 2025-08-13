@@ -56,6 +56,8 @@ CheckOptions:
     value: _
   - key: readability-identifier-naming.EnumCase
     value: CamelCase
+  - key: readability-identifier-naming.EnumConstantCase
+    value: CamelCase
   - key: readability-identifier-naming.FunctionCase
     value: camelBack
   - key: readability-identifier-naming.GlobalConstantCase
