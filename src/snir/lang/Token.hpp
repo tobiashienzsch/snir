@@ -5,6 +5,8 @@
 #include <ostream>
 #include <string>
 
+namespace snir::lang {
+
 #define TCC_TOKENS                                                                                   \
     TCC_TOKEN_TYPE(BadToken)                                                                         \
     TCC_TOKEN_TYPE(Whitespace)                                                                       \
@@ -66,3 +68,5 @@ struct SyntaxToken
         }
     }
 }
+
+}  // namespace snir::lang

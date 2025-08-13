@@ -7,6 +7,8 @@
 #include <algorithm>
 #include <memory>
 
+namespace snir::lang {
+
 struct Parser
 {
     explicit Parser(std::string_view text)
@@ -117,3 +119,5 @@ private:
     std::size_t _position{};
     std::vector<SyntaxToken> _tokens;
 };
+
+}  // namespace snir::lang

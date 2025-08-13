@@ -15,11 +15,11 @@ auto main(int argc, char** argv) -> int
     }
 
     auto src = snir::readFile(args[1]);
-    auto p   = Parser{src.value()};
+    auto p   = snir::lang::Parser{src.value()};
     auto ast = p.generateAst();
 
     p.printDiagnostics(std::cout);
-    AstUtils::prettyPrint(std::cout, *ast);
+    snir::lang::AstUtils::prettyPrint(std::cout, *ast);
 
     return EXIT_SUCCESS;
 }

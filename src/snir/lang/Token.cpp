@@ -1,5 +1,6 @@
 #include "Token.hpp"
 
+namespace snir::lang {
 auto operator<<(std::ostream& out, SyntaxTokenType const type) -> std::ostream&
 {
     switch (type) {
@@ -14,3 +15,4 @@ auto operator<<(std::ostream& out, SyntaxTokenType const type) -> std::ostream&
 
     return out;
 }
+}  // namespace snir::lang

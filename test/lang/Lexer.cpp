@@ -7,6 +7,8 @@
 
 auto main() -> int
 {
+    using namespace snir::lang;
+
     fmt::print("Lexer: operator\n");
     {
         auto ctx = ParseContext{};

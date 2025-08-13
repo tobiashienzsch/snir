@@ -10,6 +10,8 @@
 
 auto main() -> int
 {
+    using namespace snir::lang;
+
     fmt::print("parser: constant\n");
     for (auto const source : std::array{"42", "143", "1", "0"}) {
         auto p   = Parser(source);

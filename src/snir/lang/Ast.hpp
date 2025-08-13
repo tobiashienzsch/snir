@@ -12,6 +12,8 @@
 #include <utility>
 #include <vector>
 
+namespace snir::lang {
+
 enum struct AstNodeType : std::uint8_t
 {
     Op,
@@ -229,3 +231,5 @@ struct AstUtils
         }
     }
 };
+
+}  // namespace snir::lang

@@ -10,6 +10,8 @@
 #include <ostream>
 #include <vector>
 
+namespace snir::lang {
+
 struct ParseContext
 {
     ParseContext() = default;
@@ -29,3 +31,5 @@ struct ParseContext
 private:
     std::vector<std::string> _errors;
 };
+
+}  // namespace snir::lang

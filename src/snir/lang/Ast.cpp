@@ -1,5 +1,6 @@
 #include "Ast.hpp"
 
+namespace snir::lang {
 auto operator<<(std::ostream& out, AstNodeType const type) -> std::ostream&
 {
     switch (type) {
@@ -26,3 +27,4 @@ auto operator<<(std::ostream& out, AstNodeType const type) -> std::ostream&
     }
     return out;
 }
+}  // namespace snir::lang

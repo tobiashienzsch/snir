@@ -10,6 +10,8 @@
 #include <cstddef>
 #include <string_view>
 
+namespace snir::lang {
+
 struct Lexer
 {
     Lexer(ParseContext& ctx, std::string_view text) : _context{&ctx}, _text{text} {}
@@ -98,3 +100,5 @@ private:
     std::string_view _text;
     std::size_t _position{0};
 };
+
+}  // namespace snir::lang
