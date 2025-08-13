@@ -43,7 +43,7 @@ struct Lexer
         // literal_integer
         if (std::isdigit(current()) != 0) {
             auto const start = _position;
-            while (std::isdigit(current()) == 1) {
+            while (std::isdigit(current()) != 0) {
                 advance();
             }
 
