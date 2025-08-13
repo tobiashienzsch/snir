@@ -4,15 +4,17 @@
 
 #include <cstdlib>
 #include <iostream>
+#include <span>
 
 auto main(int argc, char** argv) -> int
 {
-    if (argc != 2) {
-        std::cerr << "usage: " << argv[0] << " path/to/source.tcc\n";
+    auto const args = std::span<char const* const>(argv, std::size_t(argc));
+    if (args.size() != 2) {
+        std::cerr << "usage: " << args[0] << " path/to/source.tcc\n";
         std::exit(EXIT_FAILURE);  // NOLINT(concurrency-mt-unsafe)
     }
 
-    auto src = snir::readFile(argv[1]);
+    auto src = snir::readFile(args[1]);
     auto p   = Parser{src.value()};
     auto ast = p.generateAst();
 

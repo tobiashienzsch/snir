@@ -5,13 +5,14 @@
 #include <fmt/format.h>
 #include <fmt/ostream.h>
 
+#include <cstdint>
 #include <memory>
 #include <ostream>
 #include <string>
 #include <utility>
 #include <vector>
 
-enum struct AstNodeType
+enum struct AstNodeType : std::uint8_t
 {
     Op,
     Constant,
@@ -25,7 +26,13 @@ auto operator<<(std::ostream& out, AstNodeType type) -> std::ostream&;
 // NOLINTNEXTLINE(hicpp-special-member-functions)
 struct AstNode
 {
+    AstNode()          = default;
     virtual ~AstNode() = default;
+
+    AstNode(AstNode const&)                        = delete;
+    AstNode(AstNode&&) noexcept                    = delete;
+    auto operator=(AstNode const&) -> AstNode&     = delete;
+    auto operator=(AstNode&&) noexcept -> AstNode& = delete;
 
     [[nodiscard]] virtual auto getType() const -> AstNodeType                                   = 0;
     [[nodiscard]] virtual auto getSource() const -> std::string                                 = 0;
@@ -37,11 +44,7 @@ struct AstOperator final : public AstNode
 {
     explicit AstOperator(SyntaxToken token) : _token{std::move(token)} {}
 
-    AstOperator(AstOperator const&)                        = delete;
-    auto operator=(AstOperator const&) -> AstOperator&     = delete;
-    AstOperator(AstOperator&&) noexcept                    = default;
-    auto operator=(AstOperator&&) noexcept -> AstOperator& = default;
-    ~AstOperator() override                                = default;
+    ~AstOperator() override = default;
 
     [[nodiscard]] auto getType() const -> AstNodeType override { return AstNodeType::Op; }
 
@@ -64,11 +67,7 @@ struct AstConstant final : public AstNode
 {
     explicit AstConstant(SyntaxToken token) : _token{std::move(token)} {}
 
-    AstConstant(AstConstant const&)                        = delete;
-    auto operator=(AstConstant const&) -> AstConstant&     = delete;
-    AstConstant(AstConstant&&) noexcept                    = default;
-    auto operator=(AstConstant&&) noexcept -> AstConstant& = default;
-    ~AstConstant() override                                = default;
+    ~AstConstant() override = default;
 
     [[nodiscard]] auto getType() const -> AstNodeType override { return AstNodeType::Constant; }
 
@@ -94,11 +93,6 @@ struct AstBinaryExpr final : public AstNode
         , _operator{std::make_unique<AstOperator>(op)}
         , _rhs{std::move(rhs)}
     {}
-
-    AstBinaryExpr(AstBinaryExpr const&)                        = delete;
-    auto operator=(AstBinaryExpr const&) -> AstBinaryExpr&     = delete;
-    AstBinaryExpr(AstBinaryExpr&&) noexcept                    = default;
-    auto operator=(AstBinaryExpr&&) noexcept -> AstBinaryExpr& = default;
 
     ~AstBinaryExpr() override = default;
 
@@ -138,11 +132,6 @@ struct AstUnaryExp final : public AstNode
         , _operand{std::move(operand)}
     {}
 
-    AstUnaryExp(AstUnaryExp const&)                        = delete;
-    auto operator=(AstUnaryExp const&) -> AstUnaryExp&     = delete;
-    AstUnaryExp(AstUnaryExp&&) noexcept                    = default;
-    auto operator=(AstUnaryExp&&) noexcept -> AstUnaryExp& = default;
-
     ~AstUnaryExp() override = default;
 
     [[nodiscard]] auto getType() const -> AstNodeType override
@@ -180,11 +169,6 @@ struct AstBracedExpr final : public AstNode
         , _expression{std::move(exp)}
         , _close{std::move(close)}
     {}
-
-    AstBracedExpr(AstBracedExpr const&)                        = delete;
-    auto operator=(AstBracedExpr const&) -> AstBracedExpr&     = delete;
-    AstBracedExpr(AstBracedExpr&&) noexcept                    = default;
-    auto operator=(AstBracedExpr&&) noexcept -> AstBracedExpr& = default;
 
     ~AstBracedExpr() override = default;
 

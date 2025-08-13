@@ -12,7 +12,7 @@
 
 struct Lexer
 {
-    Lexer(ParseContext& ctx, std::string_view text) : _context{ctx}, _text{text} {}
+    Lexer(ParseContext& ctx, std::string_view text) : _context{&ctx}, _text{text} {}
 
     auto nextToken() -> SyntaxToken
     {
@@ -77,7 +77,7 @@ struct Lexer
             return {.type = SyntaxTokenType::CloseBrace, .position = _position++, .text = ")"};
         }
 
-        _context.addError(fmt::format("bad character input: {0}", current()));
+        _context->addError(fmt::format("bad character input: {0}", current()));
 
         return SyntaxToken{
             .type     = SyntaxTokenType::BadToken,
@@ -94,7 +94,7 @@ private:
 
     auto advance() noexcept -> std::size_t { return ++_position; }
 
-    ParseContext& _context;
+    ParseContext* _context;
     std::string_view _text;
     std::size_t _position{0};
 };

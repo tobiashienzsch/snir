@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cstddef>
+#include <cstdint>
 #include <ostream>
 #include <string>
 
@@ -18,7 +19,7 @@
     TCC_TOKEN_TYPE(EndOfFile)
 
 #define TCC_TOKEN_TYPE(x) x,
-enum struct SyntaxTokenType
+enum struct SyntaxTokenType : std::uint8_t
 {
     TCC_TOKENS
 };
